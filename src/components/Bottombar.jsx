@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 const Bottombar = () => {
   const location = useLocation();
+  
   const { pathname } = location;
   
   return (

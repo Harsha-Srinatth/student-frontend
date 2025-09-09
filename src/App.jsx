@@ -7,6 +7,7 @@ import Roleforlogin from './pages/Roleforlogin';
 import OtpPage from "./forms/OtpPage";
 import Dashboars from './components/Dashboars';
 import ActivitiesList from "./components/ActivitiesList";
+import MainDashboard from "./pages/MainDashboard"
 
 
 const App = () => {
@@ -20,6 +21,8 @@ const App = () => {
         <Route path= "/opt/verification" element={<OtpPage />} />
          <Route path= "/dashboard" element={<Dashboars />} />
          <Route path= "/activity" element={<ActivitiesList />} />
+         <Route path= "/main" element={<MainDashboard />} />
+
         <Route path="*" element={<Navigate to="/landing/page" />} />
       </Routes>
     </Router>

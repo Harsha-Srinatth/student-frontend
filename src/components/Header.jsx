@@ -5,6 +5,7 @@ import api from '../services/api';
 
 const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
+  
   const [username, setUsername] = useState('');
   const [image,setImage] = useState('')
   const [isLoading, setIsLoading] = useState(true);

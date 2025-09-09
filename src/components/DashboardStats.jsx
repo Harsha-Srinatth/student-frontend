@@ -12,6 +12,7 @@ export default function DashboardStats() {
         {stats.map((s, i) => (
           <div
             key={i}
+            
             className="text-center rounded-xl bg-white shadow p-4 sm:p-6"
           >
             <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-600">

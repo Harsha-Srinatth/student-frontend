@@ -12,6 +12,7 @@ const Roleforlogin = () => {
       <div className="w-full bg-blue-500 rounded-2xl shadow-lg p-3 ">
         {!role ? (
           <RoleSelector onSelectRole={setRole} />
+          
         ) : (
           <div>
             <button

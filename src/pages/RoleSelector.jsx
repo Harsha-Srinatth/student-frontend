@@ -17,6 +17,7 @@ const RoleSelector = ({ onSelectRole }) => {
             className="py-2 px-4 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition"
           >
             Faculty
+            
           </button>
         </div>
       </div>

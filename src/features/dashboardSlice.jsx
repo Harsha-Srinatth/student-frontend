@@ -30,5 +30,6 @@ const dashboardSlice = createSlice({
   },
 })
 
-export const { toggleActivity, updateGPA } = dashboardSlice.actions
+export const { toggleActivity, updateGPA } = dashboardSlice.actions;
+
 export default dashboardSlice.reducer

@@ -20,7 +20,8 @@ export default function HeroSection() {
       {/* Right image */}
       <div className="mt-10 md:mt-0">
         <img src= "/default3.jpeg"
-         alt="Student Dashboard Illustration" className="w-[400px] md:w-[500px]" />
+         alt="Student Dashboard Illustration" className="w-[400px] md:w-[500px]" 
+         />
       </div>
     </section>
   );

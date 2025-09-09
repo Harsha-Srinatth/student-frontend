@@ -26,7 +26,7 @@ export default function AnalysisSection() {
               className="rounded-2xl bg-gray-50 hover:bg-gray-100 transition p-6 sm:p-8 shadow-sm"
             >
               <h3 className="text-lg sm:text-xl font-semibold text-indigo-600 mb-2">
-                {item.title}
+                { item.title  }
               </h3>
               <p className="text-sm sm:text-base text-gray-600">{item.desc}</p>
             </div>

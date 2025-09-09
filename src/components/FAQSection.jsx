@@ -14,6 +14,8 @@ export default function FAQSection() {
       },
     ];
   
+
+
     return (
       <section className="px-4 sm:px-10 py-12 bg-gray-50">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-8">

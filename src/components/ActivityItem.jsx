@@ -21,6 +21,6 @@ const ActivityItem = ({ activity }) => {
       </div>
     </div>
   );
-};
+}
 
 export default ActivityItem;

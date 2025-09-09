@@ -26,6 +26,7 @@ const StudentRegistration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
       setLoading(true);
       const res = await api.post("/register/student", formData);

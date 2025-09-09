@@ -16,6 +16,7 @@ export default function StudentLogin() {
       const response = await api.post("/login/as/student", {
         studentid,
         password,
+        
       });
 
       // Assuming the response contains token in response.data.token

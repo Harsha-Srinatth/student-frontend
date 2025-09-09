@@ -19,6 +19,7 @@ const ActivityItem = ({ activity, onToggle }) => (
   </label>
 )
 
+
 function DashboardInner() {
   const dispatch = useDispatch()
   const gpa = useSelector(s => s.dashboard.gpa)

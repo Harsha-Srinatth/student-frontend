@@ -12,7 +12,8 @@ export default function FacultyLogin() {
 
   const handleLogin = async () => {
     setLoading(true);
-    setError("");
+    setError(" ");
+    
     try {
       const response = await api.post("/login/as/faculty", {
         email,

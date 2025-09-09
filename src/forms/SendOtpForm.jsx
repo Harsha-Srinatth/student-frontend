@@ -26,6 +26,7 @@ export default function SendOtpForm({ onSent }) {
       />
       <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
         Send OTP
+        
       </button>
     </form>
   );

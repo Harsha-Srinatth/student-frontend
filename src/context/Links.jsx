@@ -3,6 +3,7 @@ export const SidebarLinks = [
         imageURL : '../imges/house-solid.svg',
         label: 'Home',
         route: '/'
+
     },
     {
         imageURL : '../imges/magnifying-glass-solid.svg',
@@ -18,6 +19,7 @@ export const SidebarLinks = [
         route: '/user/posts/user_posts'
     },
 ];
+
 
 export  const BottombarLinks = [
     {

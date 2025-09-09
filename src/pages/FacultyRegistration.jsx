@@ -27,6 +27,7 @@ const FacultyRegistration = () => {
   // submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
 
     try {
       setLoading(true);

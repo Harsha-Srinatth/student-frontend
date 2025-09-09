@@ -8,6 +8,7 @@ export default function DateInputField() {
     const date = e.target.value;
     setSelectedDate(date);
     
+    
     // Basic validation - check if date is valid
     const dateObj = new Date(date);
     const isValidDate = date && !isNaN(dateObj.getTime());

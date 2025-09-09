@@ -10,6 +10,7 @@ const MainDashboard = () => {
       {/* Sidebar - fixed width like Instagram (64px on large screens) */}
       <aside className="hidden lg:block lg:w-64 h-full dark bg-gray-800">
         <Sidebar />
+        
       </aside>
       
       {/* Main Content Container */}

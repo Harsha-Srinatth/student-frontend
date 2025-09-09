@@ -10,12 +10,13 @@ const initialState = {
 };
 
 const activitiesSlice = createSlice({
-  name: "activities",
+  name: "activities ",
   initialState,
   reducers: {
     toggleActivity: (state, action) => {
       const activity = state.list.find((a) => a.id === action.payload);
       if (activity) activity.selected = !activity.selected;
+      
     },
   },
 });

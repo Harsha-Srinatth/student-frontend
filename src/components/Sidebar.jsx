@@ -22,6 +22,8 @@ const Sidebar = () => {
     try {
       Cookies.remove('token');
       Cookies.remove('user');
+
+      
       Cookies.remove('userid');
       navigate('/login');
     } catch (error) {

@@ -9,6 +9,7 @@ export const store = configureStore({
     counter: counterReducer,
     dashboard: dashboardReducer,
     activities: activitiesReducer,
+    
  // you can add more slices here
   },
 });

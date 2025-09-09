@@ -14,6 +14,7 @@ export default function Landing() {
       <DashboardStats />
       <AnalysisSection />
       <FAQSection />
+      
     </div>
   );
 }
