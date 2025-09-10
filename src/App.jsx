@@ -7,7 +7,15 @@ import Roleforlogin from './pages/Roleforlogin';
 import OtpPage from "./forms/OtpPage";
 import Dashboars from './components/Dashboars';
 import ActivitiesList from "./components/ActivitiesList";
-import MainDashboard from "./pages/MainDashboard"
+import MainDashboard from "./pages/MainDashboard";
+import Dashboard from "./pages/MainDashboard"
+
+const ProtectedRoute = ({ children }) => {
+  const token = Cookies.get('token');
+  return token ? children : <Navigate to = '/login' />;
+ 
+};
+{/* <Route path="/home" element={user.role === "faculty" ? <FacultyHome /> : <StudentHome />} /> */}
 
 
 const App = () => {
@@ -19,11 +27,15 @@ const App = () => {
         <Route path="/landing/page" element={<Landing />} />
         <Route path= "/roleoftheuser" element={<RoleOfTheUser />} />
         <Route path= "/opt/verification" element={<OtpPage />} />
-         <Route path= "/dashboard" element={<Dashboars />} />
-         <Route path= "/activity" element={<ActivitiesList />} />
-         <Route path= "/main" element={<MainDashboard />} />
+         {/* <Route path= "/main" element={<Dashboard />} /> */}
 
         <Route path="*" element={<Navigate to="/landing/page" />} />
+
+        <Route path="/" element={<MainDashboard />}>
+             <Route index element={<Dashboars />} />
+             <Route path= "/activity" element={<ActivitiesList />} />
+             {/* <Route path= "/activity" element={<ActivitiesList />} /> */}
+          </Route>
       </Routes>
     </Router>
    

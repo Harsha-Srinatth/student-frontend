@@ -13,8 +13,7 @@ export default function Landing() {
       <HeroSection />
       <DashboardStats />
       <AnalysisSection />
-      <FAQSection />
-      
+      <FAQSection />    
     </div>
   );
 }

@@ -11,10 +11,10 @@ const Sidebar = () => {
   const { pathname } = location;
 
   // Separate states
-  const [fullname, setFullname] = useState('');
-  const [username, setUsername] = useState('');
-  const [image, setImage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  // const [fullname, setFullname] = useState('');
+  // const [username, setUsername] = useState('');
+  // const [image, setImage] = useState('');
+  // const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(pathname);
   const [isTabLoading, setIsTabLoading] = useState(false);
   
@@ -31,44 +31,44 @@ const Sidebar = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setIsLoading(true);
-      try {
-          const token = Cookies.get('token');
-        if (!token) {
-          navigate('/login');
-          return;
-        }
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //         const token = Cookies.get('token');
+  //       if (!token) {
+  //         navigate('/login');
+  //         return;
+  //       }
 
-        const res = await api.get('/all-Details/C-U', {
-          headers: {
-             Authorization: `Bearer ${token}`
-          }
-        });
-        const userInfo = res.data?._doc;
-        const profileImg = res.data?.image;
+  //       const res = await api.get('/all-Details/C-U', {
+  //         headers: {
+  //            Authorization: `Bearer ${token}`
+  //         }
+  //       });
+  //       const userInfo = res.data?._doc;
+  //       const profileImg = res.data?.image;
 
-        if (userInfo) {
-          setFullname(userInfo.fullname || 'Guest');
-          setUsername(userInfo.username || 'guest');
-          setImage(profileImg);
-        }
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //       if (userInfo) {
+  //         setFullname(userInfo.fullname || 'Guest');
+  //         setUsername(userInfo.username || 'guest');
+  //         setImage(profileImg);
+  //       }
+  //     } catch (error) {
+  //       console.error('Failed to fetch user data:', error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    fetchUserData();
-  }, [navigate]);
+  //   fetchUserData();
+  // }, [navigate]);
 
   return (
-    <div className="h-full flex flex-col w-64 bg-zinc-950">
+    <div className="h-full flex flex-col w-64 bg-gray-100 text-black">
       {/* Header Section */}
       <div className="flex-shrink-0 p-3 mt-2">
-        <div className="flex justify-center text-black items-center">
+        <div className="flex justify-center text-blue-600 items-center">
           <Link to="/" className='bg-white font-semibold rounded-lg text-sm px-3 py-1.5 sadow-xl hover:shadow-2xl transition-all duration-300'>
             Smart Student Hub!
           </Link>
@@ -101,7 +101,7 @@ const Sidebar = () => {
                       src={link.imageURL}
                       alt={link.label}
                       className={`w-6 h-6 mr-3 transition-all duration-300 
-                        ${isActive ? 'filter brightness-0 invert scale-110' : 'group-hover:scale-110'}
+                        ${isActive ? 'filter brightness-0 scale-110' : 'group-hover:scale-110'}
                         ${isTabLoading && activeTab === link.route ? 'animate-pulse' : ''}`}
                     />
                     {isTabLoading && activeTab === link.route && (
@@ -110,7 +110,7 @@ const Sidebar = () => {
                       </div>
                     )}
                   </div>
-                  <span className={`text-base font-medium text-white transition-all duration-300
+                  <span className={`text-base font-medium text-black transition-all duration-300
                     ${isActive ? 'font-semibold' : ''}
                     ${isTabLoading && activeTab === link.route ? 'opacity-70' : ''}`}>
                     {link.label}
@@ -160,7 +160,7 @@ const Sidebar = () => {
         {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="group flex items-center p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-red-500 hover:bg-opacity-20 transition-all duration-300 w-full justify-center shadow-lg border border-red-500/20 hover:border-red-500/40"
+          className="group flex items-center p-2 rounded-lg text-blue-600 hover:text-black hover:bg-red-500 hover:bg-opacity-20 transition-all duration-300 w-full justify-center shadow-lg border border-red-500/20 hover:border-red-500/40"
           title="Logout"
         >
           <FaSignOutAlt className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
