@@ -3,7 +3,7 @@ import WelcomeBanner from "./WelcomeBanner";
 import QuickStatsFaculty from "./QuickStatsFaculty";
 import PendingApprovals from "./PendingApprovals";
 import RecentVerifications from "./RecentVerifications";
-import Announcements from "./Announcements"; // reuse same one
+// import Announcements from "./Announcements"; // reuse same one
 
 const HomeFaculty = () => {
   return (
@@ -12,7 +12,7 @@ const HomeFaculty = () => {
       <QuickStatsFaculty />
       <PendingApprovals />
       <RecentVerifications />
-      <Announcements />
+      {/* <Announcements /> */}
     </div>
   );
 };

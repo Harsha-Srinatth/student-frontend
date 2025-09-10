@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { SidebarLinks } from '../context/Links';
+import { StudentSidebarLinks, FacultySidebarLinks } from '../context/Links';
 import { NavLink, useLocation, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Cookies from 'js-cookie';
-import {  FaSignOutAlt } from 'react-icons/fa';
+import { FaSignOutAlt } from 'react-icons/fa';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -21,15 +21,18 @@ const Sidebar = () => {
   const handleLogout = () => {
     try {
       Cookies.remove('token');
+      Cookies.remove('userRole');
       Cookies.remove('user');
-
-      
       Cookies.remove('userid');
-      navigate('/login');
+      navigate('/roleforlogin');
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
+
+  // Get user role and appropriate links
+  const userRole = Cookies.get('userRole');
+  const sidebarLinks = userRole === 'faculty' ? FacultySidebarLinks : StudentSidebarLinks;
 
   // useEffect(() => {
   //   const fetchUserData = async () => {
@@ -68,17 +71,30 @@ const Sidebar = () => {
     <div className="h-full flex flex-col w-64 bg-gray-100 text-black">
       {/* Header Section */}
       <div className="flex-shrink-0 p-3 mt-2">
-        <div className="flex justify-center text-blue-600 items-center">
-          <Link to="/" className='bg-white font-semibold rounded-lg text-sm px-3 py-1.5 sadow-xl hover:shadow-2xl transition-all duration-300'>
-            Smart Student Hub!
+        <div className="flex justify-center items-center">
+          <Link to="/" className={`font-semibold rounded-lg text-sm px-3 py-1.5 shadow-xl hover:shadow-2xl transition-all duration-300 ${
+            userRole === 'faculty' 
+              ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+              : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+          }`}>
+            {userRole === 'faculty' ? 'Faculty Portal' : 'Student Hub'}
           </Link>
+        </div>
+        <div className="text-center mt-2">
+          <span className={`text-xs px-2 py-1 rounded-full ${
+            userRole === 'faculty' 
+              ? 'bg-green-200 text-green-800' 
+              : 'bg-blue-200 text-blue-800'
+          }`}>
+            {userRole === 'faculty' ? 'Faculty' : 'Student'}
+          </span>
         </div>
       </div>
 
       {/* Navigation Section - Takes remaining space */}
       <nav className="flex-1 px-4 mt-10 ">
         <ul className="space-y-3">
-          {SidebarLinks.map((link) => {
+          {sidebarLinks.map((link) => {
             const isActive = pathname === link.route;
             return (
               <li key={link.route}>
