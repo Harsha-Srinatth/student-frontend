@@ -17,6 +17,7 @@ const PendingApprovals = () => {
       setLoading(true);
       const response = await api.get('/faculty/pending-approvals');
       setPendingApprovals(response.data);
+      console.log("from backend" ,response.data)
     } catch (error) {
       setError('Failed to fetch pending approvals');
       console.error('Error fetching pending approvals:', error);

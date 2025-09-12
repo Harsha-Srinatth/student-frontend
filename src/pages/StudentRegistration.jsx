@@ -12,6 +12,7 @@ const StudentRegistration = () => {
     mobileno: "",
     password: "",
     programName: "",
+    facultyid: "",
     semester: "",
     dateofjoin: "",
   });
@@ -42,6 +43,7 @@ const StudentRegistration = () => {
     else if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
     if (!formData.institution.trim()) newErrors.institution = "Institution is required";
     if (!formData.dept.trim()) newErrors.dept = "Department is required";
+    if (!formData.facultyid.trim()) newErrors.dept = "Faculty Id is required";
     if (!formData.programName.trim()) newErrors.programName = "Program name is required";
     if (!formData.dateofjoin.trim()) newErrors.dateofjoin = "Date of joining is required";
 
@@ -73,6 +75,7 @@ const StudentRegistration = () => {
         mobileno: "",
         password: "",
         programName: "",
+        facultyid: "",
         semester: "",
         dateofjoin: "",
       });
@@ -103,6 +106,7 @@ const StudentRegistration = () => {
     { name: "dept", label: "Department", type: "text", required: true },
     { name: "programName", label: "Program Name", type: "text", required: true },
     { name: "semester", label: "Semester", type: "text", required: false },
+    { name: "facultyid", label: "Faculty ID", type: "text", required: true },
     { name: "dateofjoin", label: "Date of Joining", type: "date", required: true },
   ];
 

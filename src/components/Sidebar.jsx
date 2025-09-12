@@ -22,8 +22,6 @@ const Sidebar = () => {
     try {
       Cookies.remove('token');
       Cookies.remove('userRole');
-      Cookies.remove('user');
-      Cookies.remove('userid');
       navigate('/roleforlogin');
     } catch (error) {
       console.error("Error during logout:", error);

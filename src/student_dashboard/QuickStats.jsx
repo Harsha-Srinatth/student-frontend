@@ -1,14 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Award, FileCheck, Activity, BookOpen } from "lucide-react";
-
-const stats = [
-  { icon: <Award size={28} />, label: "Certifications", value: 12 },
-  { icon: <BookOpen size={28} />, label: "Workshops", value: 5 },
-  { icon: <Activity size={28} />, label: "Clubs Joined", value: 3 },
-  { icon: <FileCheck size={28} />, label: "Pending Approvals", value: 2 },
-];
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSDashboardData } from "../features/studentDashSlice";
 
 const QuickStats = () => {
+  const dispatch = useDispatch();
+  const { counts = {}, loading, error } = useSelector(
+    (state) => state.studentDashboard // ✅ must match slice name
+  );
+
+  useEffect(() => {
+    dispatch(fetchSDashboardData());
+  }, [dispatch]);
+
+  const stats = [
+    { icon: <Award size={28} />, label: "Certifications", value: counts?.certificationsCount ?? 0 },
+    { icon: <BookOpen size={28} />, label: "Workshops", value: counts?.workshopsCount ?? 0 },
+    { icon: <Activity size={28} />, label: "Clubs Joined", value: counts?.clubsJoinedCount ?? 0 },
+    { icon: <FileCheck size={28} />, label: "Pending Approvals", value: counts?.pendingApprovalsCount ?? 0 },
+  ];
+
+  if (loading) return <p>Loading stats...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
   return (
     <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {stats.map((s, idx) => (

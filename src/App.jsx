@@ -107,7 +107,7 @@ const App = () => {
           } />
           <Route path="student/upload" element={
             <RoleProtectedRoute allowedRoles={['student']}>
-              <UploadDocument />
+              <UploadDocument studentid="24b91a5748"/>
             </RoleProtectedRoute>
           } />
           <Route path="student/announcements" element={
