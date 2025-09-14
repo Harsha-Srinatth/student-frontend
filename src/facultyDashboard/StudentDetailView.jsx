@@ -33,6 +33,8 @@ const StudentDetailView = ({ student, onBack }) => {
       case 'certificate': return '📜';
       case 'workshop': return '🎓';
       case 'club': return '🏆';
+      case 'internship': return '💼';
+      case 'project': return '💡';
       default: return '📄';
     }
   };
@@ -42,6 +44,8 @@ const StudentDetailView = ({ student, onBack }) => {
       case 'certificate': return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'workshop': return 'bg-purple-50 text-purple-700 border-purple-200';
       case 'club': return 'bg-green-50 text-green-700 border-green-200';
+      case 'internship': return 'bg-orange-50 text-orange-700 border-orange-200';
+      case 'project': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
@@ -57,6 +61,12 @@ const StudentDetailView = ({ student, onBack }) => {
       case 'club':
         const club = student.clubsJoined?.find(c => c.name === approval.description);
         return club;
+      case 'internship':
+        const internship = student.internships?.find(i => `${i.organization} - ${i.role}` === approval.description);
+        return internship;
+      case 'project':
+        const project = student.projects?.find(p => p.title === approval.description);
+        return project;
       default:
         return null;
     }
@@ -182,6 +192,82 @@ const StudentDetailView = ({ student, onBack }) => {
                           </div>
                         </>
                       )}
+                      {approval.type === 'internship' && (
+                        <>
+                          <div>
+                            <span className="font-medium text-gray-700">Organization:</span>
+                            <p className="text-gray-600">{submissionDetails.organization}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Role:</span>
+                            <p className="text-gray-600">{submissionDetails.role}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Start Date:</span>
+                            <p className="text-gray-600">{new Date(submissionDetails.startDate).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">End Date:</span>
+                            <p className="text-gray-600">{new Date(submissionDetails.endDate).toLocaleDateString()}</p>
+                          </div>
+                          {submissionDetails.description && (
+                            <div className="md:col-span-2">
+                              <span className="font-medium text-gray-700">Description:</span>
+                              <p className="text-gray-600">{submissionDetails.description}</p>
+                            </div>
+                          )}
+                          {submissionDetails.recommendationUrl && (
+                            <div className="md:col-span-2">
+                              <span className="font-medium text-gray-700">Recommendation Letter:</span>
+                              <a href={submissionDetails.recommendationUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                View Recommendation
+                              </a>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      {approval.type === 'project' && (
+                        <>
+                          <div>
+                            <span className="font-medium text-gray-700">Title:</span>
+                            <p className="text-gray-600">{submissionDetails.title}</p>
+                          </div>
+                          {submissionDetails.technologies && submissionDetails.technologies.length > 0 && (
+                            <div>
+                              <span className="font-medium text-gray-700">Technologies:</span>
+                              <p className="text-gray-600">{submissionDetails.technologies.join(', ')}</p>
+                            </div>
+                          )}
+                          {submissionDetails.outcome && (
+                            <div>
+                              <span className="font-medium text-gray-700">Outcome:</span>
+                              <p className="text-gray-600">{submissionDetails.outcome}</p>
+                            </div>
+                          )}
+                          {submissionDetails.repoLink && (
+                            <div>
+                              <span className="font-medium text-gray-700">Repository:</span>
+                              <a href={submissionDetails.repoLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                View Repository
+                              </a>
+                            </div>
+                          )}
+                          {submissionDetails.demoLink && (
+                            <div>
+                              <span className="font-medium text-gray-700">Demo:</span>
+                              <a href={submissionDetails.demoLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                View Demo
+                              </a>
+                            </div>
+                          )}
+                          {submissionDetails.description && (
+                            <div className="md:col-span-2">
+                              <span className="font-medium text-gray-700">Description:</span>
+                              <p className="text-gray-600">{submissionDetails.description}</p>
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
                 )}
@@ -190,11 +276,11 @@ const StudentDetailView = ({ student, onBack }) => {
                 {(submissionDetails?.imageUrl || submissionDetails?.certificateUrl) && (
                   <div className="mb-4">
                     <h5 className="font-medium text-gray-900 mb-2">Uploaded Document:</h5>
-                    <div className="border border-gray-200 rounded-lg p-4">
+                    <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                       <img
                         src={submissionDetails.imageUrl || submissionDetails.certificateUrl}
                         alt={`${approval.type} document`}
-                        className="max-w-full max-h-96 rounded-lg shadow-sm mx-auto"
+                        className="max-w-full max-h-96 rounded-lg shadow-sm mx-auto block"
                         onError={(e) => {
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'block';

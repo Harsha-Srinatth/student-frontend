@@ -47,16 +47,12 @@ const Bottombar = () => {
                 flex items-center justify-center 
                 ${isActive ? 'text-black' : 'text-gray-400'}
               `}>
-                <img 
-                  src={link.imageURL}
-                  alt=""
-                  width={isActive ? 22 : 20}
-                  height={isActive ? 22 : 20}
-                  className={`
+                <div  className={`
                     transition-all duration-200
                     ${isActive ? 'opacity-100' : 'opacity-70'}
-                  `}
-                />
+                  `}>
+                    {link.icon}
+                </div>
               </div>
               
               <p className={`

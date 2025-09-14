@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ClipboardCheck, Users, Award, BookOpen, TrendingUp, CheckCircle } from "lucide-react";
+import { ClipboardCheck, FolderCheck, Award, BookOpen, TrendingUp, CheckCircle } from "lucide-react";
 import { fetchFacultyDashboardData } from "../features/facultyDashSlice";
+import { fetchStudentCount } from "../features/studentSlice";
+import { useNavigate } from "react-router-dom";
 
 const QuickStatsFaculty = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { stats = {}, faculty = null, loading, error } = useSelector(
     (state) => state.facultyDashboard
   );
+  const { count: studentCount } = useSelector((state) => state.students);
 
   const [animatedStats, setAnimatedStats] = useState({
     totalStudents: 0,
@@ -15,39 +20,40 @@ const QuickStatsFaculty = () => {
     approvedCertifications: 0,
     approvedWorkshops: 0,
     approvedClubs: 0,
-    totalApproved: 0
+    totalApproved: 0,
   });
 
   useEffect(() => {
     dispatch(fetchFacultyDashboardData());
   }, [dispatch]);
 
-  // Animate numbers
   useEffect(() => {
-    if (stats.totalStudents > 0) {
+    if (faculty?.facultyid) {
+      dispatch(fetchStudentCount());
+    }
+  }, [dispatch, faculty?.facultyid]);
+
+  useEffect(() => {
+    if (stats.totalStudents > 0 || studentCount > 0) {
       const timer = setTimeout(() => {
-        setAnimatedStats(stats);
+        setAnimatedStats({
+          ...stats,
+          totalStudents: studentCount || stats.totalStudents,
+        });
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [stats]);
+  }, [stats, studentCount]);
 
   const statsConfig = [
-    { 
-      icon: <Users size={28} />, 
-      label: "Total Students", 
-      value: animatedStats.totalStudents,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200"
-    },
     { 
       icon: <ClipboardCheck size={28} />, 
       label: "Pending Approvals", 
       value: animatedStats.pendingApprovals,
       color: "text-orange-600",
       bgColor: "bg-orange-50",
-      borderColor: "border-orange-200"
+      borderColor: "border-orange-200",
+      path: "/faculty/pending-approvals"
     },
     { 
       icon: <Award size={28} />, 
@@ -55,7 +61,8 @@ const QuickStatsFaculty = () => {
       value: animatedStats.approvedCertifications,
       color: "text-green-600",
       bgColor: "bg-green-50",
-      borderColor: "border-green-200"
+      borderColor: "border-green-200",
+      path: "/faculty/Approvels/docs/students"
     },
     { 
       icon: <BookOpen size={28} />, 
@@ -63,7 +70,8 @@ const QuickStatsFaculty = () => {
       value: animatedStats.approvedWorkshops,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
-      borderColor: "border-purple-200"
+      borderColor: "border-purple-200",
+      path: "/faculty/Approvels/docs/students"
     },
     { 
       icon: <CheckCircle size={28} />, 
@@ -71,7 +79,17 @@ const QuickStatsFaculty = () => {
       value: animatedStats.approvedClubs,
       color: "text-indigo-600",
       bgColor: "bg-indigo-50",
-      borderColor: "border-indigo-200"
+      borderColor: "border-indigo-200",
+      path: "/faculty/Approvels/docs/students"
+    },
+    { 
+      icon: <FolderCheck size={28} />, 
+      label: "Approved Others", 
+      value: animatedStats.totalStudents,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+      path: "/faculty/Approvels/docs/students"
     },
     { 
       icon: <TrendingUp size={28} />, 
@@ -79,13 +97,13 @@ const QuickStatsFaculty = () => {
       value: animatedStats.totalApproved,
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",
-      borderColor: "border-emerald-200"
+      borderColor: "border-emerald-200",
     }
   ];
 
   if (loading) {
     return (
-      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 animate-fadeIn">
         {[...Array(6)].map((_, idx) => (
           <div
             key={idx}
@@ -115,16 +133,18 @@ const QuickStatsFaculty = () => {
   }
 
   return (
-    <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 animate-fadeIn">
       {statsConfig.map((stat, idx) => (
         <div
           key={idx}
-          className={`flex flex-col items-center justify-center gap-2 p-4 bg-white rounded-2xl shadow hover:shadow-lg transition-all duration-300 border ${stat.borderColor} hover:scale-105`}
+          onClick={() => navigate(stat.path)}
+          className={`cursor-pointer flex flex-col items-center justify-center gap-2 p-4 bg-white rounded-2xl shadow hover:shadow-lg transition-all duration-300 border ${stat.borderColor} hover:scale-105 animate-slideInRight`}
+          style={{ animationDelay: `${idx * 100}ms` }}
         >
-          <div className={`p-2 rounded-lg ${stat.bgColor} ${stat.color}`}>
+          <div className={`p-2 rounded-lg ${stat.bgColor} ${stat.color} transition-transform duration-200 group-hover:scale-110`}>
             {stat.icon}
           </div>
-          <div className={`text-xl font-bold ${stat.color}`}>
+          <div className={`text-xl font-bold ${stat.color} transition-colors duration-200`}>
             {stat.value}
           </div>
           <div className="text-xs text-gray-600 text-center leading-tight">

@@ -30,6 +30,20 @@ import FacultyHome from "./facultyDashboard/FacultyHome";
 import PendingApprovals from "./facultyDashboard/PendingApprovals";
 import RecentVerifications from "./facultyDashboard/RecentVerifications";
 import FacultyAnnouncements from "./facultyDashboard/Announcements";
+import FacultyStudents from "./pages/FacultyStudents";
+//faculty routes
+import StudentList from './components/facultyDashboard/StudentList';
+import ApprovedByYou from './facultyDashboard/ApprovedByYou';
+import StudentAchievements from './student_dashboard/StudentAchievements';
+import FacultySettings from './components/facultyDashboard/FacultySettings';
+import AttendenceManager from "./components/facultyDashboard/AttendenceManager";
+import EventsAndCom from './components/facultyDashboard/EventsAndCom';
+
+//student routes
+import StudentDigitalPortfolio from './components/student_uploads/DigitalPortfolio';
+import StudentPendingApprovels from './components/student_uploads/StudentPendingApprovels';
+import StudentSettings from './components/student_uploads/StudentSettings';
+
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -100,6 +114,11 @@ const App = () => {
               <Home />
             </RoleProtectedRoute>
           } />
+          <Route path="student/achievements/all/docs" element={
+            <RoleProtectedRoute allowedRoles={['student']}>
+              <StudentAchievements />
+            </RoleProtectedRoute>
+          } />
           <Route path="student/activities" element={
             <RoleProtectedRoute allowedRoles={['student']}>
               <ActivitiesList />
@@ -107,12 +126,27 @@ const App = () => {
           } />
           <Route path="student/upload" element={
             <RoleProtectedRoute allowedRoles={['student']}>
-              <UploadDocument studentid="24b91a5748"/>
+              <UploadDocument />
             </RoleProtectedRoute>
           } />
-          <Route path="student/announcements" element={
+          <Route path="student/generate/digital/port-folio" element={
+            <RoleProtectedRoute allowedRoles={['student']}>
+              <StudentDigitalPortfolio />
+            </RoleProtectedRoute>
+          } />
+           <Route path="student/announcements" element={
             <RoleProtectedRoute allowedRoles={['student']}>
               <Announcements />
+            </RoleProtectedRoute>
+          } />
+          <Route path="student/pending/approvels" element={
+            <RoleProtectedRoute allowedRoles={['student']}>
+              <StudentPendingApprovels />
+            </RoleProtectedRoute>
+          } />
+          <Route path="student/settings" element={
+            <RoleProtectedRoute allowedRoles={['student']}>
+              <StudentSettings />
             </RoleProtectedRoute>
           } />
           
@@ -127,6 +161,21 @@ const App = () => {
               <PendingApprovals />
             </RoleProtectedRoute>
           } />
+           <Route path="/faculty/search/student-profiles" element={
+            <RoleProtectedRoute allowedRoles={['faculty']}>
+              <StudentList />
+            </RoleProtectedRoute>
+          } />
+          <Route path="/faculty/Approvels/docs/students" element={
+            <RoleProtectedRoute allowedRoles={['faculty']}>
+              <ApprovedByYou />
+            </RoleProtectedRoute>
+          } />
+           <Route path="/faculty/students/your/organization" element={
+            <RoleProtectedRoute allowedRoles={['faculty']}>
+              <FacultyStudents />
+            </RoleProtectedRoute>
+          } />
           <Route path="faculty/recent-verifications" element={
             <RoleProtectedRoute allowedRoles={['faculty']}>
               <RecentVerifications />
@@ -135,6 +184,26 @@ const App = () => {
           <Route path="faculty/announcements" element={
             <RoleProtectedRoute allowedRoles={['faculty']}>
               <FacultyAnnouncements />
+            </RoleProtectedRoute>
+          } />
+          <Route path="faculty/students" element={
+            <RoleProtectedRoute allowedRoles={['faculty']}>
+              <FacultyStudents />
+            </RoleProtectedRoute>
+          } />
+          <Route path="/faculty/events/competitions" element={
+            <RoleProtectedRoute allowedRoles={['faculty']}>
+              <EventsAndCom />
+            </RoleProtectedRoute>
+          } />
+           <Route path="/faculty/attendancefor/student/section" element={
+            <RoleProtectedRoute allowedRoles={['faculty']}>
+              <AttendenceManager />
+            </RoleProtectedRoute>
+          } />
+          <Route path="faculty/settings" element={
+            <RoleProtectedRoute allowedRoles={['faculty']}>
+              <FacultySettings />
             </RoleProtectedRoute>
           } />
         </Route>

@@ -40,6 +40,8 @@ const PendingApprovals = () => {
       case 'certificate': return '📜';
       case 'workshop': return '🎓';
       case 'club': return '🏆';
+      case 'internship': return '💼';
+      case 'project': return '💡';
       default: return '📄';
     }
   };
@@ -49,6 +51,8 @@ const PendingApprovals = () => {
       case 'certificate': return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'workshop': return 'bg-purple-50 text-purple-700 border-purple-200';
       case 'club': return 'bg-green-50 text-green-700 border-green-200';
+      case 'internship': return 'bg-orange-50 text-orange-700 border-orange-200';
+      case 'project': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
@@ -64,7 +68,7 @@ const PendingApprovals = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-8">
+      <div className="bg-white rounded-2xl shadow-xl p-8 animate-fadeIn">
         <div className="flex items-center justify-center">
           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           <span className="ml-3 text-gray-600">Loading pending approvals...</span>
@@ -96,7 +100,7 @@ const PendingApprovals = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
+    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 animate-fadeIn">
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div>
@@ -129,7 +133,8 @@ const PendingApprovals = () => {
               <div
                 key={student._id}
                 onClick={() => handleStudentClick(student)}
-                className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer group"
+                className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer group animate-slideInRight"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">

@@ -1,109 +1,45 @@
-// Student Sidebar Links
-export const StudentSidebarLinks = [
-    {
-        imageURL: '../imges/house-solid.svg',
-        label: 'Home',
-        route: '/student/home'
-    },
-    {
-        imageURL: '../imges/magnifying-glass-solid.svg',
-        label: 'Activities',
-        route: '/student/activities'
-    },
-    {
-        imageURL: '../imges/square-plus-solid.svg',
-        label: 'Upload Documents',
-        route: '/student/upload'
-    },
-    {
-        imageURL: '../imges/image-solid.svg',
-        label: 'Announcements',
-        route: '/student/announcements'
-    },
-    {
-        imageURL: '../imges/image-solid.svg',
-        label: 'Settings',
-        route: '/settings'
-    },
-];
-
-// Faculty Sidebar Links
-export const FacultySidebarLinks = [
-    {
-        imageURL: '../imges/house-solid.svg',
-        label: 'Home',
-        route: '/faculty/home'
-    },
-    {
-        imageURL: '../imges/magnifying-glass-solid.svg',
-        label: 'Pending Approvals',
-        route: '/faculty/pending-approvals'
-    },
-    {
-        imageURL: '../imges/square-plus-solid.svg',
-        label: 'Recent Verifications',
-        route: '/faculty/recent-verifications'
-    },
-    {
-        imageURL: '../imges/image-solid.svg',
-        label: 'Announcements',
-        route: '/faculty/announcements'
-    },
-    {
-        imageURL: '../imges/image-solid.svg',
-        label: 'Settings',
-        route: '/settings'
-    },
-];
-
-// Student Bottom Bar Links (Mobile)
-export const StudentBottombarLinks = [
-    {
-        imageURL: '../imges/house-solid.svg',
-        label: 'Home',
-        route: '/student/home'
-    },
-    {
-        imageURL: '../imges/magnifying-glass-solid.svg',
-        label: 'Activities',
-        route: '/student/activities'
-    },
-    {
-        imageURL: '../imges/square-plus-solid.svg',
-        label: 'Upload',
-        route: '/student/upload'
-    },
-    {
-        imageURL: '../imges/image-solid.svg',
-        label: 'Announcements',
-        route: '/student/announcements'
-    }
-];
-
-// Faculty Bottom Bar Links (Mobile)
-export const FacultyBottombarLinks = [
-    {
-        imageURL: '../imges/house-solid.svg',
-        label: 'Home',
-        route: '/faculty/home'
-    },
-    {
-        imageURL: '../imges/magnifying-glass-solid.svg',
-        label: 'Approvals',
-        route: '/faculty/pending-approvals'
-    },
-    {
-        imageURL: '../imges/square-plus-solid.svg',
-        label: 'Verifications',
-        route: '/faculty/recent-verifications'
-    },
-    {
-        imageURL: '../imges/image-solid.svg',
-        label: 'Announcements',
-        route: '/faculty/announcements'
-    }
-];
-
-// Legacy exports for backward compatibility
-export const SidebarLinks = StudentSidebarLinks;
-export const BottombarLinks = StudentBottombarLinks;
+import { 
+    Home, Upload, Trophy, IdCard, Hourglass, Megaphone, Settings, 
+    CheckCircle, History, Users, School, Medal, ListChecks 
+  } from "lucide-react";
+  
+  
+  // Student Sidebar Links
+  export const StudentSidebarLinks = [
+    { icon: <Home size={20} />, label: 'Home', route: '/student/home' },
+    { icon: <Upload size={20} />, label: 'Upload Documents', route: '/student/upload' },
+    { icon: <Trophy size={20} />, label: 'My Achievements', route: '/student/achievements/all/docs' },
+    { icon: <IdCard size={20} />, label: 'Digital Portfolio', route: '/student/generate/digital/port-folio' },
+    { icon: <Hourglass size={20} />, label: 'Pending Approvals', route: '/student/pending/approvels' },
+    { icon: <Megaphone size={20} />, label: 'Announcements', route: '/student/announcements' },
+    { icon: <Settings size={20} />, label: 'Settings', route: 'student/settings' },
+  ];
+  
+  // Faculty Sidebar Links
+  export const FacultySidebarLinks = [
+    { icon: <Home size={20} />, label: 'Home', route: '/faculty/home' },
+    { icon: <CheckCircle size={20} />, label: 'Student Activity Validation', route: '/faculty/pending-approvals' },
+    { icon: <History size={20} />, label: 'Recent Verifications', route: '/faculty/recent-verifications' },
+    { icon: <Users size={20} />, label: 'Student Profiles', route: '/faculty/search/student-profiles' },
+    { icon: <School size={20} />, label: 'Attendance Manager', route: '/faculty/attendancefor/student/section' },
+    { icon: <Medal size={20} />, label: 'Events & Competitions', route: '/faculty/events/competitions' },
+    { icon: <Megaphone size={20} />, label: 'Announcements', route: '/faculty/announcements' },
+    { icon: <Settings size={20} />, label: 'Settings', route: 'faculty/settings' },
+  ];
+  
+  // Student Bottom Bar Links (Mobile)
+  export const StudentBottombarLinks = [
+    { icon: <Home size={20} />, label: 'Home', route: '/student/home' },
+    { icon: <ListChecks size={20} />, label: 'Activities', route: '/student/activities' },
+    { icon: <Upload size={20} />, label: 'Upload', route: '/student/upload' },
+    { icon: <Megaphone size={20} />, label: 'Announcements', route: '/student/announcements' },
+  ];
+  
+  // Faculty Bottom Bar Links (Mobile)
+  export const FacultyBottombarLinks = [
+    { icon: <Home size={20} />, label: 'Home', route: '/faculty/home' },
+    { icon: <CheckCircle size={20} />, label: 'Approvals', route: '/faculty/pending-approvals' },
+    { icon: <History size={20} />, label: 'Verifications', route: '/faculty/recent-verifications' },
+    { icon: <Megaphone size={20} />, label: 'Announcements', route: '/faculty/announcements' },
+  ];
+  

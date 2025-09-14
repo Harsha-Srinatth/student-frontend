@@ -5,7 +5,7 @@ import AttendencePer from "./AttendencePer";
 import Credits from "./Credits";
 import RecentActivities from "./RecentActivities";
 import Announcements from "./Announcements";
-
+import RejectedApprovals from "./RejectedApprovels";
 const StudentHome = () => {
  
   return (
@@ -24,13 +24,13 @@ const StudentHome = () => {
           <QuickStats />
         </div>
       </div>
-
-
       <Credits />
       {/* Bottom Row - Activities and Announcements */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RecentActivities />
+        <RejectedApprovals />
         <Announcements />
+        
       </div>
     </div>
   );

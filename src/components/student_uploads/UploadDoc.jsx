@@ -2,13 +2,32 @@ import { useState, useRef } from "react";
 import api from "../../services/api";
 import Cookies from "js-cookie";
 
-export default function UploadDocument({ studentid }) {
+const REQUIRED_FIELDS = {
+  certificate: ["title", "issuer"],
+  workshop: ["title", "organizer"],
+  club: ["title"],
+  internship: ["organization", "role", "startDate", "endDate"],
+  project: ["title"],
+  other: ["description"],
+};
+
+export default function UploadDocument() {
   const [formData, setFormData] = useState({
     type: "certificate",
     title: "",
     issuer: "",
     organizer: "",
+    organization: "",
+    role: "",
+    startDate: "",
+    endDate: "",
     description: "",
+    projects: "",
+    recommendationUrl: "",
+    technologies: "",
+    outcome: "",
+    repoLink: "",
+    demoLink: "",
     date: "",
     image: null,
   });
@@ -17,17 +36,28 @@ export default function UploadDocument({ studentid }) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
   const [errors, setErrors] = useState({});
-  const [isDragOver, setIsDragOver] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [ratioNotice, setRatioNotice] = useState(null);
   const fileInputRef = useRef(null);
 
-  // -----------------------------
-  // Handlers
-  // -----------------------------
+  // Validate required fields for the selected type
+  const validateFields = () => {
+    const required = REQUIRED_FIELDS[formData.type] || [];
+    const newErrors = {};
+    required.forEach((field) => {
+      if (!formData[field] || (typeof formData[field] === "string" && formData[field].trim() === "")) {
+        newErrors[field] = "This field is required.";
+      }
+    });
+    if (formData.image && formData.image.size > 10 * 1024 * 1024) {
+      newErrors.image = "File size must be under 10MB";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // handle input changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-
     if (name === "image") {
       const file = files[0];
       if (file) {
@@ -48,412 +78,488 @@ export default function UploadDocument({ studentid }) {
   const handleImagePreview = (file) => {
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target.result);
-        // Soft-check preferred aspect ratios: 4:5, 3:4, 1.91:1, 1:1
-        const img = new Image();
-        img.onload = () => {
-          const w = img.width;
-          const h = img.height;
-          if (w && h) {
-            const r = w / h;
-            const preferred = [4 / 5, 3 / 4, 1.91 / 1, 1 / 1];
-            const withinTolerance = preferred.some((p) => Math.abs(r - p) < 0.03);
-            if (!withinTolerance) {
-              setRatioNotice(
-                "Tip: For best results, use 4:5, 3:4, 1.91:1, or 1:1 images."
-              );
-            } else {
-              setRatioNotice(null);
-            }
-          }
-        };
-        img.src = e.target.result;
-      };
+      reader.onload = (e) => setImagePreview(e.target.result);
       reader.readAsDataURL(file);
     } else {
       setImagePreview(null);
-      setRatioNotice(null);
     }
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
-
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-
-    if (file.size > 10 * 1024 * 1024) {
-      setErrors({ ...errors, image: "File size must be under 10MB" });
-      return;
-    }
-
-    if (file.type.startsWith("image/") || file.type === "application/pdf") {
-      setFormData({ ...formData, image: file });
-      handleImagePreview(file);
-      setErrors({ ...errors, image: null });
-    } else {
-      setErrors({ ...errors, image: "Please upload only images or PDF files" });
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.date) newErrors.date = "Date is required";
-    if (!formData.image) newErrors.image = "Please upload a file";
-    if (formData.type === "certificate" && !formData.issuer.trim()) {
-      newErrors.issuer = "Issuer is required for certificates";
-    }
-    if (formData.type === "workshop" && !formData.organizer.trim()) {
-      newErrors.organizer = "Organizer is required for workshops";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // -----------------------------
-  // Submit Handler (improved error handling)
-  // -----------------------------
+  // handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsUploading(true);
     setUploadStatus(null);
-    setUploadProgress(0);
-
+    if (!validateFields()) {
+      setUploadStatus({ type: "error", message: "Please fill all required fields." });
+      return;
+    }
+    setIsUploading(true);
     try {
       const data = new FormData();
-
-      // non-file fields
       Object.keys(formData).forEach((key) => {
-        if (key !== "image" && formData[key] !== null && formData[key] !== "") {
-          data.append(key, formData[key]);
-        }
+        if (key !== "image" && formData[key]) data.append(key, formData[key]);
       });
-
-      // image field
-      if (formData.image) {
-        data.append("image", formData.image);
-      }
-
+      if (formData.image) data.append("image", formData.image);
       const token = Cookies.get("token");
-
-      const response = await api.post(`/upload/${studentid}`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
+      await api.post(`/upload/student/Docs`, data, {
+        headers: { Authorization: `Bearer ${token}` },
         onUploadProgress: (evt) => {
           if (evt.total) {
-            const pct = Math.round((evt.loaded * 100) / evt.total);
-            setUploadProgress(pct);
+            setUploadProgress(Math.round((evt.loaded * 100) / evt.total));
           }
         },
       });
-
       setUploadStatus({ type: "success", message: "Document uploaded successfully!" });
-
-      // reset form
       setFormData({
         type: "certificate",
         title: "",
         issuer: "",
         organizer: "",
+        organization: "",
+        role: "",
+        startDate: "",
+        endDate: "",
         description: "",
+        projects: "",
+        recommendationUrl: "",
+        technologies: "",
+        outcome: "",
+        repoLink: "",
+        demoLink: "",
         date: "",
         image: null,
       });
       setImagePreview(null);
-      setRatioNotice(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
-      const backendError =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        (error.response?.data && typeof error.response.data === "object"
-          ? JSON.stringify(error.response.data)
-          : error.response?.data) ||
-        error.message ||
-        "Upload failed";
-    
-      setUploadStatus({ type: "error", message: backendError });
-      console.error("Upload error:", backendError);
+      setUploadStatus({
+        type: "error",
+        message:
+          error.response?.data?.error || error.response?.data?.message || error.message || "Upload failed",
+      });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const removeImage = () => {
-    setFormData({ ...formData, image: null });
-    setImagePreview(null);
-    setErrors({ ...errors, image: null });
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
+  // Check if all required fields are filled for disabling submit
+  const isSubmitDisabled = isUploading || !(REQUIRED_FIELDS[formData.type] || []).every((field) => formData[field] && formData[field].toString().trim() !== "");
 
-  // -----------------------------
-  // UI
-  // -----------------------------
   return (
     <div className="w-full h-full overflow-y-auto">
-      <div className="max-w-4xl mx-auto p-6 sm:p-8 bg-white rounded-2xl shadow-xl border border-gray-100 min-h-fit">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Upload Document</h2>
-          <p className="text-gray-600">Share your achievements and certificates with us</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="max-w-4xl mx-auto p-6 sm:p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">Upload Document</h2>
+        {uploadStatus && (
+          <div className={`mb-4 p-3 rounded-lg text-sm font-medium ${uploadStatus.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+            {uploadStatus.message}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Document Type */}
-          <div className="space-y-3">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Document Type *</label>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Document Type *
+            </label>
             <div className="relative">
               <select
                 name="type"
                 onChange={handleChange}
                 value={formData.type}
-                className="w-full px-4 py-4 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white appearance-none cursor-pointer hover:border-gray-400 shadow-sm"
+                className="w-full px-4 py-3 border border-gray-300 rounded-2xl shadow focus:ring-2 focus:ring-blue-500 transition-all duration-200 bg-white appearance-none cursor-pointer"
+                style={{ minHeight: '48px' }}
               >
                 <option value="certificate">📜 Certificate</option>
                 <option value="workshop">🎓 Workshop</option>
                 <option value="club">🏆 Club Activity</option>
+                <option value="internship">💼 Internship</option>
+                <option value="project">💡 Project</option>
                 <option value="other">📄 Other</option>
               </select>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">▼</span>
+            </div>
+          </div>
+
+          {/* Certificate */}
+          {formData.type === "certificate" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Certificate Title *</label>
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="e.g., Python Basics"
+                  onChange={handleChange}
+                  value={formData.title}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
               </div>
-            </div>
-          </div>
-
-          {/* Title + Date */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Title *</label>
-              <input
-                type="text"
-                name="title"
-                placeholder="Enter document title"
-                onChange={handleChange}
-                value={formData.title}
-                className={`w-full px-4 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm ${
-                  errors.title ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
-                }`}
-              />
-              {errors.title && <p className="text-red-500 text-sm mt-2">{errors.title}</p>}
-            </div>
-
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Date *</label>
-              <input
-                type="date"
-                name="date"
-                onChange={handleChange}
-                value={formData.date}
-                className={`w-full px-4 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm ${
-                  errors.date ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
-                }`}
-              />
-              {errors.date && <p className="text-red-500 text-sm mt-2">{errors.date}</p>}
-            </div>
-          </div>
-
-          {/* Conditional fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {formData.type === "certificate" && (
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Issuer *</label>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Issuer</label>
                 <input
                   type="text"
                   name="issuer"
-                  placeholder="Certificate issuer"
+                  placeholder="e.g., Coursera"
                   onChange={handleChange}
                   value={formData.issuer}
-                  className={`w-full px-4 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm ${
-                    errors.issuer ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
-                  }`}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
-                {errors.issuer && <p className="text-red-500 text-sm mt-2">{errors.issuer}</p>}
               </div>
-            )}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Date Issued</label>
+                <input
+                  type="date"
+                  name="dateIssued"
+                  onChange={handleChange}
+                  value={formData.dateIssued || ""}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          )}
 
-            {formData.type === "workshop" && (
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Organizer *</label>
+          {/* Workshop */}
+          {formData.type === "workshop" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Workshop Title *</label>
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="e.g., Web Dev Bootcamp"
+                  onChange={handleChange}
+                  value={formData.title}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Organizer</label>
                 <input
                   type="text"
                   name="organizer"
-                  placeholder="Workshop organizer"
+                  placeholder="e.g., IIT Bombay"
                   onChange={handleChange}
                   value={formData.organizer}
-                  className={`w-full px-4 py-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm ${
-                    errors.organizer ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
-                  }`}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
-                {errors.organizer && <p className="text-red-500 text-sm mt-2">{errors.organizer}</p>}
               </div>
-            )}
-          </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+                <input
+                  type="date"
+                  name="date"
+                  onChange={handleChange}
+                  value={formData.date || ""}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Certificate URL</label>
+                <input
+                  type="url"
+                  name="certificateUrl"
+                  placeholder="https://drive.google.com/..."
+                  onChange={handleChange}
+                  value={formData.certificateUrl || ""}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          )}
 
-          {/* Description */}
-          <div className="space-y-3">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-            <textarea
-              name="description"
-              placeholder="Describe your achievement or activity..."
-              onChange={handleChange}
-              value={formData.description}
-              rows={4}
-              className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none shadow-sm hover:border-gray-400"
-            />
-          </div>
+          {/* Club */}
+          {formData.type === "club" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Club Name *</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="e.g., Coding Club"
+                  onChange={handleChange}
+                  value={formData.name}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
+                <input
+                  type="text"
+                  name="role"
+                  placeholder="e.g., Member"
+                  onChange={handleChange}
+                  value={formData.role}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Joined On</label>
+                <input
+                  type="date"
+                  name="joinedOn"
+                  onChange={handleChange}
+                  value={formData.joinedOn || ""}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          )}
 
-          {/* File Upload */}
-          <div className="space-y-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Upload File *</label>
+          {/* Internship */}
+          {formData.type === "internship" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Organization *</label>
+                <input
+                  type="text"
+                  name="organization"
+                  placeholder="e.g., Microsoft"
+                  onChange={handleChange}
+                  value={formData.organization}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.organization && <p className="text-xs text-red-500 mt-1">{errors.organization}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Role *</label>
+                <input
+                  type="text"
+                  name="role"
+                  placeholder="e.g., Software Intern"
+                  onChange={handleChange}
+                  value={formData.role}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.role && <p className="text-xs text-red-500 mt-1">{errors.role}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+                <input
+                  type="date"
+                  name="startDate"
+                  onChange={handleChange}
+                  value={formData.startDate || ""}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">End Date</label>
+                <input
+                  type="date"
+                  name="endDate"
+                  onChange={handleChange}
+                  value={formData.endDate || ""}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                <textarea
+                  name="description"
+                  placeholder="Describe your internship..."
+                  onChange={handleChange}
+                  value={formData.description}
+                  rows={3}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Projects (comma separated)</label>
+                <input
+                  type="text"
+                  name="projects"
+                  placeholder="Project1, Project2"
+                  onChange={handleChange}
+                  value={formData.projects}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Recommendation Letter (URL)</label>
+                <input
+                  type="url"
+                  name="recommendationUrl"
+                  placeholder="https://drive.google.com/..."
+                  onChange={handleChange}
+                  value={formData.recommendationUrl}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          )}
 
-            <div
-              className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
-                isDragOver
-                  ? "border-blue-500 bg-blue-50"
-                  : errors.image
-                  ? "border-red-500 bg-red-50"
-                  : "border-gray-300 hover:border-gray-400"
-              }`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                name="image"
-                accept="image/*,.pdf"
+          {/* Project */}
+          {formData.type === "project" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Project Title *</label>
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="e.g., AI Chatbot"
+                  onChange={handleChange}
+                  value={formData.title}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+                {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                <textarea
+                  name="description"
+                  placeholder="Describe your project..."
+                  onChange={handleChange}
+                  value={formData.description}
+                  rows={3}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Technologies (comma separated)</label>
+                <input
+                  type="text"
+                  name="technologies"
+                  placeholder="React, Node.js"
+                  onChange={handleChange}
+                  value={formData.technologies}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Outcome</label>
+                <input
+                  type="text"
+                  name="outcome"
+                  placeholder="e.g., Deployed on cloud"
+                  onChange={handleChange}
+                  value={formData.outcome}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Repository Link</label>
+                <input
+                  type="url"
+                  name="repoLink"
+                  placeholder="https://github.com/..."
+                  onChange={handleChange}
+                  value={formData.repoLink}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Demo Link</label>
+                <input
+                  type="url"
+                  name="demoLink"
+                  placeholder="https://project-demo.com"
+                  onChange={handleChange}
+                  value={formData.demoLink}
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Other */}
+          {formData.type === "other" && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
+              <textarea
+                name="description"
+                placeholder="Describe your achievement or activity..."
                 onChange={handleChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                value={formData.description}
+                rows={4}
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
+              {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
+            </div>
+          )}
 
-              {imagePreview ? (
-                <div className="space-y-4">
-                  <div className="relative inline-block">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="max-w-full max-h-64 rounded-lg shadow-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
-                    >
-                      ×
-                    </button>
-                  </div>
-                  <p className="text-sm text-gray-600">{formData.image?.name}</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-8 h-8 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                      />
+          {/* File Upload (only for types with imageUrl) */}
+          {["certificate", "internship", "project"].includes(formData.type) && (
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Upload Image
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="hidden"
+                  id="customFileInput"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-full shadow hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-8m0 0l-3.5 3.5M12 8l3.5 3.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Choose Image
+                </button>
+                <span className="text-gray-500 text-sm truncate max-w-xs">
+                  {formData.image ? formData.image.name : "No file chosen"}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Supported formats: JPG, PNG (Max size: 10MB)
+              </p>
+              {errors.image && <p className="text-xs text-red-500 mt-1">{errors.image}</p>}
+              {/* Preview Box */}
+              {imagePreview && (
+                <div className="mt-3 border rounded-lg p-3 bg-gray-50 relative max-w-xs">
+                  <button
+                    type="button"
+                    className="absolute top-2 right-2 text-gray-500 hover:text-red-500 bg-white rounded-full p-1 shadow"
+                    onClick={() => {
+                      setFormData({ ...formData, image: null });
+                      setImagePreview(null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                    aria-label="Remove image"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                  </div>
-                  <div>
-                    <p className="text-lg font-medium text-gray-700">Drop your file here</p>
-                    <p className="text-sm text-gray-500">or click to browse</p>
-                    <p className="text-xs text-gray-400 mt-2">Supports: JPG, PNG, PDF (Max 10MB)</p>
-                  </div>
+                  </button>
+                  <p className="text-sm text-gray-600 mb-2">Preview:</p>
+                  <img
+                    src={imagePreview}
+                    alt="File Preview"
+                    className="max-h-40 mx-auto rounded-lg shadow-md object-contain"
+                    style={{ aspectRatio: '4/5', maxWidth: '100%' }}
+                  />
                 </div>
               )}
             </div>
-
-            {errors.image && <p className="text-red-500 text-sm mt-2">{errors.image}</p>}
-          </div>
-
-          {/* Status */}
-          {uploadStatus?.type === "success" && (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center space-x-3">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <p className="text-green-700 font-medium">{uploadStatus.message}</p>
-            </div>
           )}
 
-          {uploadStatus?.type === "error" && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-3">
-              <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </div>
-              <p className="text-red-700 font-medium break-words">{uploadStatus.message}</p>
-            </div>
-          )}
-
-          {ratioNotice && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-700">
-              {ratioNotice}
-            </div>
-          )}
-
+          {/* Progress */}
           {isUploading && (
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div
-                className="bg-blue-600 h-2.5 rounded-full transition-all"
+                className="bg-blue-600 h-2.5 rounded-full"
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
           )}
 
           {/* Submit */}
-          <div className="pt-4">
-            <button
-              type="submit"
-              disabled={isUploading}
-              className={`w-full py-4 px-6 rounded-xl font-semibold text-white transition-all duration-200 ${
-                isUploading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              }`}
-            >
-              {isUploading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Uploading...</span>
-                </div>
-              ) : (
-                "Upload Document"
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isSubmitDisabled}
+            className={`w-full py-4 px-6 rounded-xl font-semibold text-white ${isSubmitDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+          >
+            {isUploading ? "Uploading..." : "Upload Document"}
+          </button>
         </form>
       </div>
     </div>

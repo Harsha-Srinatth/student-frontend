@@ -75,6 +75,8 @@ const facultyDashboardSlice = createSlice({
       totalActivities: 0,
       totalApprovals: 0
     },
+    approvalsGiven: [], // NEW: store all approvals given by faculty
+    recentActivities: [], // NEW: store recent activity log
     metrics: {
       performance: {
         approvalRate: 0,
@@ -110,6 +112,8 @@ const facultyDashboardSlice = createSlice({
         state.loading = false;
         state.faculty = action.payload.faculty;
         state.stats = action.payload.stats;
+        state.approvalsGiven = action.payload.approvalsGiven || [];
+        state.recentActivities = action.payload.recentActivities || [];
         state.error = null;
       })
       .addCase(fetchFacultyDashboardData.rejected, (state, action) => {

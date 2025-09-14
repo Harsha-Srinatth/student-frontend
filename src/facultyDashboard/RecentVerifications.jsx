@@ -43,7 +43,7 @@ const RecentVerifications = () => {
 
   if (activitiesLoading) {
     return (
-      <section className="bg-white rounded-2xl shadow p-6">
+      <section className="bg-white rounded-2xl shadow p-6 animate-fadeIn">
         <h3 className="text-lg font-semibold mb-4">Recent Verifications</h3>
         <div className="space-y-3">
           {[...Array(5)].map((_, idx) => (
@@ -92,7 +92,7 @@ const RecentVerifications = () => {
   }
 
   return (
-    <section className="bg-white rounded-2xl shadow p-6">
+    <section className="bg-white rounded-2xl shadow p-6 animate-fadeIn">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Recent Verifications</h3>
         <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -105,7 +105,8 @@ const RecentVerifications = () => {
         {recentApprovals.map((approval, idx) => (
           <li
             key={idx}
-            className="flex justify-between items-start border-b pb-3 last:border-none hover:bg-gray-50 p-2 rounded-lg transition-colors"
+            className="flex justify-between items-start border-b pb-3 last:border-none hover:bg-gray-50 p-2 rounded-lg transition-all duration-200 hover:shadow-sm animate-slideInRight"
+            style={{ animationDelay: `${idx * 50}ms` }}
           >
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">

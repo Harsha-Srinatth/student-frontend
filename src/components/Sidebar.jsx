@@ -111,13 +111,11 @@ const Sidebar = () => {
                       : 'hover:bg-neutral-800/80 hover:shadow-md hover:shadow-blue-500/20'}`}
                 >
                   <div className="relative">
-                    <img
-                      src={link.imageURL}
-                      alt={link.label}
-                      className={`w-6 h-6 mr-3 transition-all duration-300 
+                    <div className={`w-6 h-6 mr-3 transition-all duration-300 
                         ${isActive ? 'filter brightness-0 scale-110' : 'group-hover:scale-110'}
-                        ${isTabLoading && activeTab === link.route ? 'animate-pulse' : ''}`}
-                    />
+                        ${isTabLoading && activeTab === link.route ? 'animate-pulse' : ''}`}>
+                          {link.icon}
+                    </div>
                     {isTabLoading && activeTab === link.route && (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
