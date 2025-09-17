@@ -6,7 +6,7 @@ import { XCircle, Clock, User, MessageCircle, AlertCircle } from "lucide-react";
 const RejectedApprovals = () => {
   const [selected, setSelected] = useState(null);
   const dispatch = useDispatch();
-  const { pendingApprovals = [], loading, error } = useSelector(
+  const { rejectedApprovals = [], loading, error } = useSelector(
     (state) => state.studentDashboard
   );
 
@@ -14,8 +14,8 @@ const RejectedApprovals = () => {
     dispatch(fetchSDashboardData());
   }, [dispatch]);
 
-  // Filter rejected approvals from pendingApprovals
-  const rejectedApprovals = pendingApprovals.filter(a => a.status === "rejected");
+  // Use the rejectedApprovals array directly from the API response
+  console.log("RejectedApprovals - rejectedApprovals:", rejectedApprovals);
 
   const getTimeAgo = (dateString) => {
     const date = new Date(dateString);
@@ -113,10 +113,10 @@ const RejectedApprovals = () => {
                       <Clock className="w-3 h-3" />
                       <span>Rejected {getTimeAgo(item.reviewedOn || item.requestedOn)}</span>
                     </div>
-                    {item.reviewedBy && (
+                    {(item.reviewedByName || item.reviewedBy) && (
                       <div className="flex items-center gap-1">
                         <User className="w-3 h-3" />
-                        <span>by {item.reviewedBy}</span>
+                        <span>by {item.reviewedByName || item.reviewedBy}</span>
                       </div>
                     )}
                   </div>
@@ -190,10 +190,10 @@ const RejectedApprovals = () => {
                   </div>
                 )}
                 
-                {selected.reviewedBy && (
+                {(selected.reviewedByName || selected.reviewedBy) && (
                   <div>
                     <label className="text-sm font-medium text-gray-700">Rejected By</label>
-                    <p className="text-gray-900">{selected.reviewedBy}</p>
+                    <p className="text-gray-900">{selected.reviewedByName || selected.reviewedBy}</p>
                   </div>
                 )}
                 

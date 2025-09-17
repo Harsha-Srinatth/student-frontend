@@ -12,19 +12,19 @@ import {
     { icon: <IdCard size={20} />, label: 'Digital Portfolio', route: '/student/generate/digital/port-folio' },
     { icon: <Hourglass size={20} />, label: 'Pending Approvals', route: '/student/pending/approvels' },
     { icon: <Megaphone size={20} />, label: 'Announcements', route: '/student/announcements' },
-    { icon: <Settings size={20} />, label: 'Settings', route: 'student/settings' },
+    { icon: <Settings size={20} />, label: 'Settings', route: '/student/settings' },
   ];
   
   // Faculty Sidebar Links
   export const FacultySidebarLinks = [
     { icon: <Home size={20} />, label: 'Home', route: '/faculty/home' },
     { icon: <CheckCircle size={20} />, label: 'Student Activity Validation', route: '/faculty/pending-approvals' },
-    { icon: <History size={20} />, label: 'Recent Verifications', route: '/faculty/recent-verifications' },
+    { icon: <History size={20} />, label: 'Recent Verifications', route: '/faculty/verifications' },
     { icon: <Users size={20} />, label: 'Student Profiles', route: '/faculty/search/student-profiles' },
-    { icon: <School size={20} />, label: 'Attendance Manager', route: '/faculty/attendancefor/student/section' },
+    { icon: <School size={20} />, label: 'Approvels Manager', route: '/faculty/Approvels/docs/students' },
     { icon: <Medal size={20} />, label: 'Events & Competitions', route: '/faculty/events/competitions' },
     { icon: <Megaphone size={20} />, label: 'Announcements', route: '/faculty/announcements' },
-    { icon: <Settings size={20} />, label: 'Settings', route: 'faculty/settings' },
+    { icon: <Settings size={20} />, label: 'Settings', route: '/faculty/settings' },
   ];
   
   // Student Bottom Bar Links (Mobile)
@@ -39,7 +39,7 @@ import {
   export const FacultyBottombarLinks = [
     { icon: <Home size={20} />, label: 'Home', route: '/faculty/home' },
     { icon: <CheckCircle size={20} />, label: 'Approvals', route: '/faculty/pending-approvals' },
-    { icon: <History size={20} />, label: 'Verifications', route: '/faculty/recent-verifications' },
+    { icon: <History size={20} />, label: 'Verifications', route: '/faculty/verifications' },
     { icon: <Megaphone size={20} />, label: 'Announcements', route: '/faculty/announcements' },
   ];
   

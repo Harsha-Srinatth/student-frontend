@@ -31,14 +31,29 @@ export const fetchStudentAchievements = createAsyncThunk(
       const response = await api.get("/student/achievements", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Student achievements API response:", response.data);
-      console.log("Response status:", response.status);
       return response.data;
     } catch (error) {
       console.error("Error fetching student achievements:", error);
       console.error("Error response:", error.response?.data);
       console.error("Error status:", error.response?.status);
       throw new Error(error.response?.data?.message || "Failed to load achievements data");
+    }
+  }
+);
+
+// Thunk to fetch all approvals for the student
+export const fetchAllApprovals = createAsyncThunk(
+  "dashboard/fetchAllApprovals",
+  async () => {
+    const token = Cookies.get("token");
+    try {
+      const response = await api.get("/student/all-approvals", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("this is the response of the all approvals",response.data);
+      return response.data;
+    } catch (error) {
+      return error.response?.data?.message || "Failed to load all approvals";
     }
   }
 );
@@ -54,9 +69,13 @@ const dashboardSlice = createSlice({
       pendingApprovalsCount: 0,
       hackathonsCount: 0,
       projectsCount: 0,
+      approvedCount: 0,
+      rejectedCount: 0,
+      pendingCount: 0,
     },
     pendingApprovals: [], // will include reviewedOn, reviewedBy, message
     rejectedApprovals: [],
+    approvedApprovals: [],
     announcements: [],
     // New achievement data
     achievements: {
@@ -78,7 +97,29 @@ const dashboardSlice = createSlice({
       .addCase(fetchSDashboardData.fulfilled, (state, action) => {
         state.loading = false;
         state.student = action.payload.student;
-        state.counts = action.payload.counts;
+        // Handle both cases: counts object or root-level fields
+        if (action.payload.counts) {
+          state.counts = {
+            ...state.counts,
+            ...action.payload.counts,
+            // Ensure these specific counts are included
+            approvedCount: action.payload.counts.approvedCount ?? 0,
+            rejectedCount: action.payload.counts.rejectedCount ?? 0,
+            pendingCount: action.payload.counts.pendingCount ?? 0,
+          };
+        } else {
+          state.counts = {
+            certificationsCount: action.payload.certificationsCount ?? 0,
+            workshopsCount: action.payload.workshopsCount ?? 0,
+            clubsJoinedCount: action.payload.clubsJoinedCount ?? 0,
+            hackathonsCount: action.payload.hackathonsCount ?? 0,
+            projectsCount: action.payload.projectsCount ?? 0,
+            pendingApprovalsCount: action.payload.pendingApprovalsCount ?? 0,
+            approvedCount: action.payload.approvedCount ?? 0,
+            rejectedCount: action.payload.rejectedCount ?? 0,
+            pendingCount: action.payload.pendingCount ?? 0,
+          };
+        }
         state.announcements = action.payload.announcements;
         state.pendingApprovals = (action.payload.pendingApprovals || []).map((a) => ({
           ...a,
@@ -86,7 +127,13 @@ const dashboardSlice = createSlice({
           reviewedBy: a.reviewedBy,
           message: a.message,
         }));
-        state.rejectedApprovals = action.payload.rejectedApprovals;
+        state.rejectedApprovals = action.payload.rejectedApprovals || [];
+        state.approvedApprovals = action.payload.approvedApprovals || [];
+        
+        // Debug logging
+        console.log("Redux - API Response:", action.payload);
+        console.log("Redux - rejectedApprovals:", action.payload.rejectedApprovals);
+        console.log("Redux - pendingApprovals:", action.payload.pendingApprovals);
       })
       .addCase(fetchSDashboardData.rejected, (state, action) => {
         state.loading = false;
@@ -131,6 +178,20 @@ const dashboardSlice = createSlice({
       .addCase(fetchStudentAchievements.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      })
+      .addCase(fetchAllApprovals.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllApprovals.fulfilled, (state, action) => {
+        state.loading = false;
+        state.pendingApprovals = action.payload.pendingApprovals || [];
+        state.rejectedApprovals = action.payload.rejectedApprovals || [];
+        state.approvedApprovals = action.payload.approvedApprovals || [];
+      })
+      .addCase(fetchAllApprovals.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

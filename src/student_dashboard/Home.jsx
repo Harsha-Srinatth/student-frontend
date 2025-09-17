@@ -9,18 +9,15 @@ import RejectedApprovals from "./RejectedApprovels";
 const StudentHome = () => {
  
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex flex-col gap-6 w-full transition-opacity duration-500 ease-out animate-fadeIn">
       <WelcomeBanner />
 
             {/* Top Row - Quick Stats and Attendance */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Attendance - takes 2/3 width on large screens */}
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+        <div className="h-full">
           <AttendencePer />
         </div>
-
-        {/* Quick Stats - takes 1/3 width on large screens */}
-        <div className="lg:col-span-1 flex flex-col">
+        <div className="h-full">
           <QuickStats />
         </div>
       </div>

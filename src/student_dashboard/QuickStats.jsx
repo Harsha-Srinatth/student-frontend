@@ -15,24 +15,29 @@ const QuickStats = () => {
     dispatch(fetchSDashboardData());
   }, [dispatch]);
 
-  const approvedCount = pendingApprovals.filter(a => a.status === "approved").length;
-  const rejectedCount = pendingApprovals.filter(a => a.status === "rejected").length;
-  const pendingCount = pendingApprovals.filter(a => a.status === "pending").length;
+  // Use the counts from the API response instead of filtering pendingApprovals
+  const approvedCount = counts?.approvedCount ?? 0;
+  const rejectedCount = counts?.rejectedCount ?? 0;
+  const pendingCount = counts?.pendingCount ?? 0;
+
+  // Debug logging to verify data
+  console.log("QuickStats - counts:", counts);
+  console.log("QuickStats - approvedCount:", approvedCount, "rejectedCount:", rejectedCount, "pendingCount:", pendingCount);
 
   const stats = [
     { icon: <Award size={28} />, label: "Certifications", value: counts?.certificationsCount ?? 0, path: "/student/achievements/all/docs" },
     { icon: <BookOpen size={28} />, label: "Workshops", value: counts?.workshopsCount ?? 0, path: "/student/achievements/all/docs" },
     { icon: <Activity size={28} />, label: "Clubs Joined", value: counts?.clubsJoinedCount ?? 0, path: "/student/achievements/all/docs" },
-    { icon: <CheckCircle size={28} />, label: "Approved", value: approvedCount, color: "text-green-600", path: "/student/approvals/approved" },
-    { icon: <XCircle size={28} />, label: "Rejected", value: rejectedCount, color: "text-red-600", path: "/student/approvals/rejected" },
-    { icon: <Clock size={28} />, label: "Pending", value: pendingCount, color: "text-yellow-600", path: "/student/pending/approvels" },
+    { icon: <CheckCircle size={28} />, label: "Approved", value: approvedCount, color: "text-green-600", path: "student/pending/approvels" },
+    { icon: <XCircle size={28} />, label: "Rejected", value: rejectedCount, color: "text-red-600", path: "student/pending/approvels" },
+    { icon: <Clock size={28} />, label: "Pending", value: pendingCount, color: "text-yellow-600", path: "student/pending/approvels" },
   ];
 
   if (loading) return <p>Loading stats...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 h-full">
       <div className="mb-4">
         <h3 className="text-lg font-bold text-gray-800 mb-1">Quick Stats</h3>
         <p className="text-sm text-gray-500">Your activity overview</p>

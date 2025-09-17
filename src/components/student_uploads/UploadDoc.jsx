@@ -3,13 +3,17 @@ import api from "../../services/api";
 import Cookies from "js-cookie";
 
 const REQUIRED_FIELDS = {
-  certificate: ["title", "issuer"],
-  workshop: ["title", "organizer"],
-  club: ["title"],
-  internship: ["organization", "role", "startDate", "endDate"],
+  // Only enforce fields that are marked with * in the UI
+  certificate: ["title"],
+  workshop: ["title"],
+  club: ["title"], // Backend expects 'title' for club name
+  internship: ["organization", "role"],
   project: ["title"],
   other: ["description"],
 };
+
+// Document types that allow/encourage uploading an image proof
+const IMAGE_UPLOAD_TYPES = ["certificate", "workshop", "club", "internship", "project"];
 
 export default function UploadDocument() {
   const [formData, setFormData] = useState({
@@ -29,6 +33,10 @@ export default function UploadDocument() {
     repoLink: "",
     demoLink: "",
     date: "",
+    // ensure bound keys exist to avoid uncontrolled-to-controlled warnings
+    dateIssued: "",
+    certificateUrl: "",
+    joinedOn: "",
     image: null,
   });
 
@@ -44,10 +52,14 @@ export default function UploadDocument() {
     const required = REQUIRED_FIELDS[formData.type] || [];
     const newErrors = {};
     required.forEach((field) => {
-      if (!formData[field] || (typeof formData[field] === "string" && formData[field].trim() === "")) {
+      if ((formData[field] ?? "").toString().trim() === "") {
         newErrors[field] = "This field is required.";
       }
     });
+    // If image upload is shown for this type, require an image file to reduce 400s from backend expecting a file
+    if (IMAGE_UPLOAD_TYPES.includes(formData.type) && !formData.image) {
+      newErrors.image = "Please attach an image.";
+    }
     if (formData.image && formData.image.size > 10 * 1024 * 1024) {
       newErrors.image = "File size must be under 10MB";
     }
@@ -143,7 +155,7 @@ export default function UploadDocument() {
   };
 
   // Check if all required fields are filled for disabling submit
-  const isSubmitDisabled = isUploading || !(REQUIRED_FIELDS[formData.type] || []).every((field) => formData[field] && formData[field].toString().trim() !== "");
+  const isSubmitDisabled = isUploading || !(REQUIRED_FIELDS[formData.type] || []).every((field) => (formData[field] ?? "").toString().trim() !== "");
 
   return (
     <div className="w-full h-full overflow-y-auto">
@@ -177,6 +189,11 @@ export default function UploadDocument() {
               </select>
               <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">▼</span>
             </div>
+            <p className="text-xs text-gray-500 mt-2 transition-all duration-200">
+              {IMAGE_UPLOAD_TYPES.includes(formData.type)
+                ? "You can upload an image (certificate/screenshot) for this entry."
+                : "Image upload is not required for this type. Provide the details below."}
+            </p>
           </div>
 
           {/* Certificate */}
@@ -275,13 +292,13 @@ export default function UploadDocument() {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Club Name *</label>
                 <input
                   type="text"
-                  name="name"
+                  name="title"
                   placeholder="e.g., Coding Club"
                   onChange={handleChange}
-                  value={formData.name}
+                  value={formData.title}
                   className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
-                {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+                {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
@@ -298,9 +315,9 @@ export default function UploadDocument() {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Joined On</label>
                 <input
                   type="date"
-                  name="joinedOn"
+                  name="date"
                   onChange={handleChange}
-                  value={formData.joinedOn || ""}
+                  value={formData.date || ""}
                   className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -479,8 +496,8 @@ export default function UploadDocument() {
             </div>
           )}
 
-          {/* File Upload (only for types with imageUrl) */}
-          {["certificate", "internship", "project"].includes(formData.type) && (
+          {/* File Upload (only for selected types) */}
+          {IMAGE_UPLOAD_TYPES.includes(formData.type) && (
             <div className="mb-4">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Upload Image

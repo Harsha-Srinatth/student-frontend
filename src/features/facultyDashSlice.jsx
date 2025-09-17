@@ -19,6 +19,20 @@ export const fetchFacultyDashboardData = createAsyncThunk(
   }
 );
 
+// Async thunk for fetching pending approvals list
+export const fetchPendingApprovals = createAsyncThunk(
+  'facultyDashboard/fetchPendingApprovals',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/faculty/pending-approvals');
+      console.log("this is the response of the pending approvals",response.data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to fetch pending approvals');
+    }
+  }
+);
+
 // Async thunk for fetching faculty activities
 export const fetchFacultyActivities = createAsyncThunk(
   'facultyDashboard/fetchActivities',
@@ -30,7 +44,8 @@ export const fetchFacultyActivities = createAsyncThunk(
           Authorization: `Bearer ${token}`
         }
       });
-      return response.data;
+      console.log("this is the response of the activities",response.data)
+      return response.data;;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch faculty activities');
     }
@@ -48,6 +63,7 @@ export const fetchFacultyMetrics = createAsyncThunk(
           Authorization: `Bearer ${token}`
         }
       });
+      console.log("this is from merits",response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || 'Failed to fetch faculty metrics');
@@ -59,6 +75,8 @@ const facultyDashboardSlice = createSlice({
   name: 'facultyDashboard',
   initialState: {
     faculty: null,
+    pendingApprovals: [],
+    pendingLoading: false,
     stats: {
       totalStudents: 0,
       pendingApprovals: 0,
@@ -118,6 +136,19 @@ const facultyDashboardSlice = createSlice({
       })
       .addCase(fetchFacultyDashboardData.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
+      })
+      // Pending approvals data
+      .addCase(fetchPendingApprovals.pending, (state) => {
+        state.pendingLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchPendingApprovals.fulfilled, (state, action) => {
+        state.pendingLoading = false;
+        state.pendingApprovals = action.payload || [];
+      })
+      .addCase(fetchPendingApprovals.rejected, (state, action) => {
+        state.pendingLoading = false;
         state.error = action.payload;
       })
       // Activities data

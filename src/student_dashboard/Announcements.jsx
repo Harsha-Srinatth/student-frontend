@@ -7,7 +7,7 @@ const announcements = [
 
 const Announcements = () => {
   return (
-    <section className="bg-white rounded-2xl shadow p-6">
+    <section className="flex flex-col gap-4 w-full bg-white rounded-2xl shadow p-6">
       <h3 className="text-lg font-semibold mb-4">Announcements</h3>
       <ul className="flex flex-col gap-3">
         {announcements.map((a, idx) => (

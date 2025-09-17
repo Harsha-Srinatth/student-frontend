@@ -21,13 +21,18 @@ export default function FacultyLogin() {
       });
 
       const token = response.data.token;
+      const user = response.data.user;
 
       // Save token and user role in cookies (expires in 7 days)
       Cookies.set("token", token, { expires: 7, secure: true });
       Cookies.set("userRole", "faculty", { expires: 7, secure: true });
 
       // Redirect to role-based home
-      window.location.href = "/";
+      if (!user.hasProfilePic) {
+        window.location.href = "/faculty/profile-img/upload";
+      } else {
+        window.location.href = "/"; // or "/dashboard"
+      }
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Login failed");

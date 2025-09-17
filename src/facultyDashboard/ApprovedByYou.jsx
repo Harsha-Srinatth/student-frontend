@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFacultyActivities } from "../features/facultyDashSlice";
+import { Download } from "lucide-react";
+import { generateAchievementPdf } from "../utils/pdfUtil";
 
 const TABS = [
   { key: "certifications", label: "Certifications" },
@@ -32,19 +34,26 @@ const ApprovedByYou = () => {
         (a) => a.type === "workshop"
       );
     } else {
-      filtered = activities.recentApprovals.filter(
-        (a) =>
-          a.type === "club" ||
-          a.type === "hackathon" ||
-          a.type === "other" ||
-          a.type === "clubs" ||
-          a.type === "hackthons"
-      );
+      const othersTypes = new Set([
+        "club",
+        "clubs",
+        "hackathon",
+        "hackathons",
+        "hackthons",
+        "other",
+        "others",
+        "project",
+        "projects",
+        "internship",
+        "internships",
+      ]);
+      filtered = activities.recentApprovals.filter((a) => othersTypes.has((a.type || "").toLowerCase()));
     }
     setTabContent(filtered);
   }, [activities, activeTab]);
 
   return (
+    <div className="flex flex-col gap-6 w-full transition-opacity duration-500 ease-out animate-fadeIn">
     <section className="bg-white rounded-2xl shadow p-6 animate-fadeInUp">
       <h2 className="text-2xl font-bold mb-6 text-blue-700">Approved by You</h2>
       <div className="flex gap-2 mb-4 border-b border-gray-200">
@@ -82,17 +91,38 @@ const ApprovedByYou = () => {
               >
                 <div>
                   <div className="font-semibold text-blue-800 capitalize">{item.description}</div>
-                  <div className="text-xs text-gray-500">{item.studentName} • {new Date(item.approvedOn).toLocaleDateString()}</div>
+                  <div className="text-xs text-gray-500">{item.studentName}{item.institution ? ` • ${item.institution}` : ''} • {new Date(item.approvedOn || item.reviewedOn || item.timestamp).toLocaleDateString()}</div>
                 </div>
-                <span className={`px-3 py-1 text-xs rounded-xl font-medium ${item.status === "approved" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                  {item.status === "approved" ? "Approved" : "Rejected"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    aria-label="Download PDF"
+                    className="p-2 rounded-lg bg-white text-blue-700 hover:bg-blue-600 hover:text-white transition-colors"
+                    onClick={() => {
+                      generateAchievementPdf({
+                        title: item.description,
+                        type: item.type,
+                        studentName: item.studentName,
+                        institution: item.institution,
+                        approvedBy: (item.reviewedBy || item.approvedBy) ? `${item.reviewedBy || item.approvedBy} (Faculty)` : 'Faculty',
+                        approvedOn: item.approvedOn || item.reviewedOn || item.timestamp,
+                        status: item.status,
+                        imageUrl: item.imageUrl || item.certificateUrl,
+                      });
+                    }}
+                  >
+                    <Download size={16} />
+                  </button>
+                  <span className={`px-3 py-1 text-xs rounded-xl font-medium ${item.status === "approved" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                    {item.status === "approved" ? "Approved" : "Rejected"}
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
         )}
       </div>
     </section>
+    </div>
   );
 };
 

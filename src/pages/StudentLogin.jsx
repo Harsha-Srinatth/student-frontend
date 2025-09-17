@@ -16,18 +16,23 @@ export default function StudentLogin() {
       const response = await api.post("/login/as/student", {
         studentid,
         password,
-        
       });
-
-      // Assuming the response contains token in response.data.token
+  
+      // Extract token + user data
       const token = response.data.token;
-
-      // Save token and user role in cookies (expires in 7 days)
+      const user = response.data.user;
+      console.log("responce for student login",response.data.user);
+  
+      // Save token and role
       Cookies.set("token", token, { expires: 7, secure: true });
       Cookies.set("userRole", "student", { expires: 7, secure: true });
-
-      // Redirect to role-based home
-      window.location.href = "/";
+  
+      // ✅ Redirect based on profile picture status
+      if (!user.hasProfilePic) {
+        window.location.href = "/student/profile-img/upload";
+      } else {
+        window.location.href = "/"; // or "/dashboard"
+      }
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Login failed");
@@ -35,9 +40,16 @@ export default function StudentLogin() {
       setLoading(false);
     }
   };
+  
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
+    <div className="w-full max-w-4xl mx-auto p-6"
+    style={{
+      backgroundImage: "url('/logo3.jpg')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+    }}>
       <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
         <div className="flex flex-col lg:flex-row">
           {/* Left Side - Login Form */}

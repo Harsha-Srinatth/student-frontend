@@ -6,14 +6,15 @@ const StudentDetailView = ({ student, onBack }) => {
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
 
-  const handleApproval = async (approvalId, action) => {
+  const handleApproval = async (type, description, action) => {
     try {
       setLoading(true);
-      await api.post(`/faculty/approve/${student.studentid}/${approvalId}`, {
+      await api.post(`/faculty/approve/${student.studentid}/dummy`, {
         action: action,
-        message: message
+        message: message,
+        type: type,
+        description: description
       });
-      
       // Show success message
       setShowMessage(true);
       setTimeout(() => {
@@ -89,6 +90,7 @@ const StudentDetailView = ({ student, onBack }) => {
   }
 
   return (
+    <div className="flex flex-col gap-6 w-full transition-opacity duration-500 ease-out animate-fadeIn">
     <div className="bg-white rounded-2xl shadow-xl border border-gray-100">
       {/* Header */}
       <div className="p-6 border-b border-gray-100">
@@ -273,12 +275,12 @@ const StudentDetailView = ({ student, onBack }) => {
                 )}
 
                 {/* Image Preview */}
-                {(submissionDetails?.imageUrl || submissionDetails?.certificateUrl) && (
+                {(submissionDetails?.imageUrl || submissionDetails?.certificateUrl || approval?.imageUrl) && (
                   <div className="mb-4">
                     <h5 className="font-medium text-gray-900 mb-2">Uploaded Document:</h5>
                     <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                       <img
-                        src={submissionDetails.imageUrl || submissionDetails.certificateUrl}
+                        src={submissionDetails.imageUrl || submissionDetails.certificateUrl || approval.imageUrl}
                         alt={`${approval.type} document`}
                         className="max-w-full max-h-96 rounded-lg shadow-sm mx-auto block"
                         onError={(e) => {
@@ -313,7 +315,7 @@ const StudentDetailView = ({ student, onBack }) => {
                   
                   <div className="flex space-x-3">
                     <button
-                      onClick={() => handleApproval(approval._id || index, 'reject')}
+                      onClick={() => handleApproval(approval.type, approval.description, 'reject')}
                       disabled={loading}
                       className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                     >
@@ -328,7 +330,7 @@ const StudentDetailView = ({ student, onBack }) => {
                     </button>
                     
                     <button
-                      onClick={() => handleApproval(approval._id || index, 'approve')}
+                      onClick={() => handleApproval(approval.type, approval.description, 'approve')}
                       disabled={loading}
                       className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                     >
@@ -343,11 +345,13 @@ const StudentDetailView = ({ student, onBack }) => {
                     </button>
                   </div>
                 </div>
+                {/* No _id warning needed anymore */}
               </div>
             );
           })}
         </div>
       </div>
+    </div>
     </div>
   );
 };

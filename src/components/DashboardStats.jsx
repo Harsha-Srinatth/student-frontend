@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 export default function DashboardStats() {
   const stats = [
     { label: "Verified Records", value: "128K+" },
@@ -7,21 +9,24 @@ export default function DashboardStats() {
   ];
 
   return (
-    <section className="px-4 sm:px-10 py-12 bg-gray-50">
-      <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    <section className="px-6 sm:px-12 py-16 bg-gradient-to-r from-indigo-50 via-white to-indigo-50">
+      <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {stats.map((s, i) => (
-          <div
+          <motion.div
             key={i}
-            
-            className="text-center rounded-xl bg-white shadow p-4 sm:p-6"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: i * 0.2 }}
+            viewport={{ once: true }}
+            className="text-center rounded-2xl bg-white shadow-md hover:shadow-xl p-6 transform hover:-translate-y-2 transition-all duration-300"
           >
-            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-600">
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-indigo-600">
               {s.value}
             </div>
-            <div className="mt-1 text-xs sm:text-sm text-gray-600">
+            <div className="mt-2 text-sm sm:text-base text-gray-600 font-medium">
               {s.label}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>

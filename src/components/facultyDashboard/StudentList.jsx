@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchStudentsByFaculty, fetchStudentDetails, showStudentModal, hideStudentModal } from '../../features/studentSlice';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 const StudentList = () => {
   const dispatch = useDispatch();
@@ -170,16 +172,44 @@ const StudentList = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {filteredStudents.map((student, index) => (
-              <div
-                key={student.studentid}
-                onClick={() => handleStudentClick(student.studentid)}
-                className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer group transform"
-                style={{
-                  animationDelay: `${index * 100}ms`,
-                  animation: 'fadeInUp 0.6s ease-out forwards'
-                }}
-              >
+            {filteredStudents.map((student, index) => {
+              // Generate a dummy attendance percentage for each student (75-100%)
+              const attendance = Math.floor(Math.random() * 26) + 75;
+              // Vibrant, modern color palette for small circles
+              const getAttendanceColor = (percentage) => {
+                if (percentage >= 95) return '#10B981'; // Emerald
+                if (percentage >= 85) return '#0EA5E9'; // Sky Blue
+                if (percentage >= 75) return '#8B5CF6'; // Violet
+                return '#F43F5E'; // Rose
+              };
+              const attendanceColor = getAttendanceColor(attendance);
+              return (
+                <div
+                  key={student.studentid}
+                  onClick={() => handleStudentClick(student.studentid)}
+                  className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer group transform relative"
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    animation: 'fadeInUp 0.6s ease-out forwards'
+                  }}
+                >
+                  {/* Attendance Progress Bar - Top Right */}
+                  <div className="absolute top-4 right-4 z-10">
+                    <div style={{ width: 38, height: 38, filter: `drop-shadow(0 0 4px ${attendanceColor}55)` }}>
+                      <CircularProgressbar
+                        value={attendance}
+                        text={`${attendance}%`}
+                        styles={buildStyles({
+                          pathColor: attendanceColor,
+                          textColor: attendanceColor,
+                          trailColor: '#E5E7EB',
+                          textSize: '2rem',
+                          fontWeight: 'bold',
+                        })}
+                        strokeWidth={8}
+                      />
+                    </div>
+                  </div>
                 {/* Profile Section */}
                 <div className="flex items-center space-x-4 mb-6">
                   <div className="relative">
@@ -266,7 +296,8 @@ const StudentList = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         )}
       </div>

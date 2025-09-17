@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ClipboardCheck, FolderCheck, Award, BookOpen, TrendingUp, CheckCircle } from "lucide-react";
 import { fetchFacultyDashboardData } from "../features/facultyDashSlice";
-import { fetchStudentCount } from "../features/studentSlice";
 import { useNavigate } from "react-router-dom";
 
 const QuickStatsFaculty = () => {
@@ -12,7 +11,6 @@ const QuickStatsFaculty = () => {
   const { stats = {}, faculty = null, loading, error } = useSelector(
     (state) => state.facultyDashboard
   );
-  const { count: studentCount } = useSelector((state) => state.students);
 
   const [animatedStats, setAnimatedStats] = useState({
     totalStudents: 0,
@@ -20,30 +18,22 @@ const QuickStatsFaculty = () => {
     approvedCertifications: 0,
     approvedWorkshops: 0,
     approvedClubs: 0,
+    approvedOthers: 0,
     totalApproved: 0,
   });
 
-  useEffect(() => {
-    dispatch(fetchFacultyDashboardData());
-  }, [dispatch]);
+  // Data is fetched by parent (FacultyHome) to avoid toggling parent loading state repeatedly
 
   useEffect(() => {
-    if (faculty?.facultyid) {
-      dispatch(fetchStudentCount());
-    }
-  }, [dispatch, faculty?.facultyid]);
-
-  useEffect(() => {
-    if (stats.totalStudents > 0 || studentCount > 0) {
+    if (stats && (stats.totalStudents > 0 || stats.pendingApprovals >= 0)) {
       const timer = setTimeout(() => {
         setAnimatedStats({
           ...stats,
-          totalStudents: studentCount || stats.totalStudents,
         });
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [stats, studentCount]);
+  }, [stats]);
 
   const statsConfig = [
     { 
@@ -85,7 +75,7 @@ const QuickStatsFaculty = () => {
     { 
       icon: <FolderCheck size={28} />, 
       label: "Approved Others", 
-      value: animatedStats.totalStudents,
+      value: animatedStats.approvedOthers,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
