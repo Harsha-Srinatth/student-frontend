@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 
 // Public Pages
 import Landing from './pages/Landing.jsx';
-import RoleOfTheUser from './pages/RoleOfTheUser.jsx';
+import RoleOfTheUser from './pages/Roleoftheuser.jsx';
 import Roleforlogin from './pages/Roleforlogin.jsx';
 import OtpPage from "./forms/OtpPage";
 
