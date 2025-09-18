@@ -35,6 +35,22 @@ const StudentList = () => {
     });
   };
 
+  // Compute attendance percentage from student's attendance array
+  const computeAttendancePercentage = (attendanceArray) => {
+    if (!Array.isArray(attendanceArray) || attendanceArray.length === 0) return null;
+    const totalEntries = attendanceArray.length;
+    const presentCount = attendanceArray.reduce((acc, entry) => acc + (entry.present ? 1 : 0), 0);
+    return Math.round((presentCount / totalEntries) * 100);
+  };
+
+  // Color mapping for attendance percentage
+  const getAttendanceColor = (percentage) => {
+    if (percentage >= 95) return '#10B981'; // Emerald
+    if (percentage >= 85) return '#0EA5E9'; // Sky Blue
+    if (percentage >= 75) return '#8B5CF6'; // Violet
+    return '#F43F5E'; // Rose
+  };
+
   if (studentsLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -173,16 +189,8 @@ const StudentList = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {filteredStudents.map((student, index) => {
-              // Generate a dummy attendance percentage for each student (75-100%)
-              const attendance = Math.floor(Math.random() * 26) + 75;
-              // Vibrant, modern color palette for small circles
-              const getAttendanceColor = (percentage) => {
-                if (percentage >= 95) return '#10B981'; // Emerald
-                if (percentage >= 85) return '#0EA5E9'; // Sky Blue
-                if (percentage >= 75) return '#8B5CF6'; // Violet
-                return '#F43F5E'; // Rose
-              };
-              const attendanceColor = getAttendanceColor(attendance);
+              const attendancePct = computeAttendancePercentage(student.attendance);
+              const attendanceColor = attendancePct != null ? getAttendanceColor(attendancePct) : null;
               return (
                 <div
                   key={student.studentid}
@@ -194,22 +202,24 @@ const StudentList = () => {
                   }}
                 >
                   {/* Attendance Progress Bar - Top Right */}
-                  <div className="absolute top-4 right-4 z-10">
-                    <div style={{ width: 38, height: 38, filter: `drop-shadow(0 0 4px ${attendanceColor}55)` }}>
-                      <CircularProgressbar
-                        value={attendance}
-                        text={`${attendance}%`}
-                        styles={buildStyles({
-                          pathColor: attendanceColor,
-                          textColor: attendanceColor,
-                          trailColor: '#E5E7EB',
-                          textSize: '2rem',
-                          fontWeight: 'bold',
-                        })}
-                        strokeWidth={8}
-                      />
+                  {attendancePct != null && (
+                    <div className="absolute top-4 right-4 z-10">
+                      <div style={{ width: 38, height: 38, filter: `drop-shadow(0 0 4px ${attendanceColor}55)` }}>
+                        <CircularProgressbar
+                          value={attendancePct}
+                          text={`${attendancePct}%`}
+                          styles={buildStyles({
+                            pathColor: attendanceColor,
+                            textColor: attendanceColor,
+                            trailColor: '#E5E7EB',
+                            textSize: '2rem',
+                            fontWeight: 'bold',
+                          })}
+                          strokeWidth={8}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
                 {/* Profile Section */}
                 <div className="flex items-center space-x-4 mb-6">
                   <div className="relative">

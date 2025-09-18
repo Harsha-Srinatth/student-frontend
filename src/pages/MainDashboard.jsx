@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from '../components/MainHeader';
+// import Header from '../components/MainHeader';
+import MobileHeader from '../components/MobileHeader';
 import Sidebar from '../components/Sidebar';
 import Bottombar from '../components/Bottombar.jsx';
 
@@ -14,9 +15,10 @@ const MainDashboard = () => {
       
       {/* Main Content Container */}
       <div className="flex flex-1 flex-col min-h-screen">
+        
         {/* Mobile Header - only visible on mobile/tablet */}
-        <div className="lg:hidden p-2 bg-white">
-          <Header />
+        <div className="lg:hidden bg-white">
+          <MobileHeader />
         </div>
         
         {/* Main Content Area */}

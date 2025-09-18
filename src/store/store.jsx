@@ -4,6 +4,8 @@ import activitiesReducer from "../features/activitiesSlice";
 import StudentDashboardReducer from "../features/studentDashSlice";
 import facultyDashboardReducer from "../features/facultyDashSlice";
 import studentReducer from "../features/studentSlice";
+import academicsReducer from "../features/academicsSlice";
+import resultsReducer from "../features/resultsSlice";
 
 
 export const store = configureStore({
@@ -12,7 +14,9 @@ export const store = configureStore({
     activities: activitiesReducer,
     studentDashboard: StudentDashboardReducer,
     facultyDashboard: facultyDashboardReducer,
-    students: studentReducer
+    students: studentReducer,
+    academics: academicsReducer,
+    results: resultsReducer
     
  // you can add more slices here
   },

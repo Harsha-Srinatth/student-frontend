@@ -43,7 +43,10 @@ import StudentDigitalPortfolio from './components/student_uploads/DigitalPortfol
 import StudentPendingApprovels from './components/student_uploads/StudentPendingApprovels';
 import StudentSettings from './components/student_uploads/StudentSettings';
 import AddProfile from './components/student_uploads/AddProfile';
-
+import FacultyAttendance from './components/faculty/FacultyAttendance';
+import FacultyAddMidMarks from './components/faculty/FacultyAddMid';
+import StudentResults from './components/student/StudentResults';
+import StudentClubsEnrol from './components/student/StudentClubsEnrol';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -86,7 +89,7 @@ const App = () => {
     <Router>
       <Routes>
         {/* Public Routes */}
-        <Route path="/landing/page" element={<Landing />} />
+        <Route path="/landing/page" element={<StudentResults />} />
         <Route path="/roleoftheuser" element={<RoleOfTheUser />} />
         <Route path="/roleforlogin" element={<Roleforlogin />} />
         <Route path="/otp/verification" element={<OtpPage />} />
@@ -126,6 +129,16 @@ const App = () => {
           <Route path="student/activities" element={
             <RoleProtectedRoute allowedRoles={['student']}>
               <ActivitiesList />
+            </RoleProtectedRoute>
+          } />
+           <Route path="student/results" element={
+            <RoleProtectedRoute allowedRoles={['student']}>
+              <StudentResults />
+            </RoleProtectedRoute>
+          } />
+           <Route path="student/clubs/enrol" element={
+            <RoleProtectedRoute allowedRoles={['student']}>
+              <StudentClubsEnrol />
             </RoleProtectedRoute>
           } />
           <Route path="student/upload" element={
@@ -170,6 +183,11 @@ const App = () => {
               <StudentList />
             </RoleProtectedRoute>
           } />
+          <Route path="/faculty/add/attendance" element={
+            <RoleProtectedRoute allowedRoles={['faculty']}>
+              <FacultyAttendance />
+            </RoleProtectedRoute>
+          } />
           <Route path="/faculty/Approvels/docs/students" element={
             <RoleProtectedRoute allowedRoles={['faculty']}>
               <ApprovedByYou />
@@ -178,6 +196,11 @@ const App = () => {
           <Route path="faculty/verifications" element={
             <RoleProtectedRoute allowedRoles={['faculty']}>
               <RecentVerifications fullHeight />
+            </RoleProtectedRoute>
+          } />
+           <Route path="faculty/add/marks" element={
+            <RoleProtectedRoute allowedRoles={['faculty']}>
+              <FacultyAddMidMarks />
             </RoleProtectedRoute>
           } />
           <Route path="faculty/announcements" element={

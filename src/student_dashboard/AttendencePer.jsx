@@ -2,22 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { Calendar, TrendingUp, Users, Award } from 'lucide-react';
+import api from '../services/api.jsx';
 
 const AttendencePer = () => {
   const [attendancePercentage, setAttendancePercentage] = useState(0);
   const [animatedPercentage, setAnimatedPercentage] = useState(0);
+  const [presentClasses, setPresentClasses] = useState(0);
+  const [absentClasses, setAbsentClasses] = useState(0);
+  const [totalClasses, setTotalClasses] = useState(0);
 
-  // Generate random attendance percentage between 75-100%
+  // Fetch real attendance stats
   useEffect(() => {
-    const randomPercentage = Math.floor(Math.random() * 26) + 75; // 75-100%
-    setAttendancePercentage(randomPercentage);
-
-    // Animate the progress bar
-    const timer = setTimeout(() => {
-      setAnimatedPercentage(randomPercentage);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    let isMounted = true;
+    const fetchAttendance = async () => {
+      try {
+        const res = await api.get('/student/attendance');
+        const data = res?.data?.data;
+        if (!isMounted || !data) return;
+        setAttendancePercentage(data.attendancePercentage || 0);
+        setPresentClasses(data.presentClasses || 0);
+        setAbsentClasses(data.absentClasses || 0);
+        setTotalClasses(data.totalClasses || 0);
+        const timer = setTimeout(() => {
+          if (isMounted) setAnimatedPercentage(data.attendancePercentage || 0);
+        }, 500);
+        return () => clearTimeout(timer);
+      } catch (e) {
+        // fallback to 0s on error
+        if (!isMounted) return;
+        setAttendancePercentage(0);
+        setPresentClasses(0);
+        setAbsentClasses(0);
+        setTotalClasses(0);
+        setAnimatedPercentage(0);
+      }
+    };
+    fetchAttendance();
+    return () => { isMounted = false; };
   }, []);
 
   // Determine color based on attendance percentage - softer, more attractive colors
@@ -99,9 +120,7 @@ const AttendencePer = () => {
                 <div className="w-2 h-2 bg-emerald-400 rounded-full shadow-sm"></div>
                 <span className="text-sm font-medium text-emerald-700">Present</span>
               </div>
-              <p className="text-2xl font-bold text-emerald-800">
-                {Math.floor((attendancePercentage / 100) * 90)}
-              </p>
+              <p className="text-2xl font-bold text-emerald-800">{presentClasses}</p>
               <p className="text-xs text-emerald-600">days</p>
             </div>
 
@@ -111,9 +130,7 @@ const AttendencePer = () => {
                 <div className="w-2 h-2 bg-rose-400 rounded-full shadow-sm"></div>
                 <span className="text-sm font-medium text-rose-700">Absent</span>
               </div>
-              <p className="text-2xl font-bold text-rose-800">
-                {Math.floor(((100 - attendancePercentage) / 100) * 90)}
-              </p>
+              <p className="text-2xl font-bold text-rose-800">{absentClasses}</p>
               <p className="text-xs text-rose-600">days</p>
             </div>
 
@@ -122,7 +139,7 @@ const AttendencePer = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-700 mb-1">Total Classes</p>
-                  <p className="text-xl font-bold text-slate-800">90</p>
+                  <p className="text-xl font-bold text-slate-800">{totalClasses}</p>
                 </div>
                 <div className="p-2 bg-slate-100 rounded-lg shadow-sm">
                   <Users className="w-5 h-5 text-slate-600" />

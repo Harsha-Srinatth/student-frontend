@@ -11,6 +11,8 @@ import {
     { icon: <Trophy size={20} />, label: 'My Achievements', route: '/student/achievements/all/docs' },
     { icon: <IdCard size={20} />, label: 'Digital Portfolio', route: '/student/generate/digital/port-folio' },
     { icon: <Hourglass size={20} />, label: 'Pending Approvals', route: '/student/pending/approvels' },
+    { icon: <ListChecks size={20} />, label: 'Results', route: '/student/results' },
+    { icon: <ListChecks  size={20} />, label: 'Clubs Enrolment', route: '/student/clubs/enrol' },
     { icon: <Megaphone size={20} />, label: 'Announcements', route: '/student/announcements' },
     { icon: <Settings size={20} />, label: 'Settings', route: '/student/settings' },
   ];
@@ -22,7 +24,9 @@ import {
     { icon: <History size={20} />, label: 'Recent Verifications', route: '/faculty/verifications' },
     { icon: <Users size={20} />, label: 'Student Profiles', route: '/faculty/search/student-profiles' },
     { icon: <School size={20} />, label: 'Approvels Manager', route: '/faculty/Approvels/docs/students' },
-    { icon: <Medal size={20} />, label: 'Events & Competitions', route: '/faculty/events/competitions' },
+    // { icon: <Medal size={20} />, label: 'Events & Competitions', route: '/faculty/events/competitions' },
+    { icon: <ListChecks size={20} />, label: 'Attendance', route: '/faculty/add/attendance' },
+    { icon: <ListChecks size={20} />, label: 'Add Marks', route: '/faculty/add/marks' },
     { icon: <Megaphone size={20} />, label: 'Announcements', route: '/faculty/announcements' },
     { icon: <Settings size={20} />, label: 'Settings', route: '/faculty/settings' },
   ];
