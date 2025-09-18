@@ -2,51 +2,51 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Cookies from 'js-cookie';
 
 // Public Pages
-import Landing from './pages/Landing';
-import RoleOfTheUser from './pages/RoleOfTheUser';
-import Roleforlogin from './pages/Roleforlogin';
+import Landing from './pages/Landing.jsx';
+import RoleOfTheUser from './pages/RoleOfTheUser.jsx';
+import Roleforlogin from './pages/Roleforlogin.jsx';
 import OtpPage from "./forms/OtpPage";
 
 // Registration Pages
-import StudentRegistration from './pages/StudentRegistration';
-import FacultyRegistration from './pages/FacultyRegistration';
+import StudentRegistration from './pages/StudentRegistration.jsx';
+import FacultyRegistration from './pages/FacultyRegistration.jsx';
 
 // Login Pages
-import StudentLogin from './pages/StudentLogin';
-import FacultyLogin from './pages/FacultyLogin';
+import StudentLogin from './pages/StudentLogin.jsx';
+import FacultyLogin from './pages/FacultyLogin.jsx';
 
 // Dashboard Layout
-import MainDashboard from "./pages/MainDashboard";
+import MainDashboard from "./pages/MainDashboard.jsx";
 
 // Student Dashboard Components
-import Dashboars from './components/Dashboars';
-import Home from "./student_dashboard/Home";
-import ActivitiesList from "./components/ActivitiesList";
-import UploadDocument from './components/student_uploads/UploadDoc';
-import Announcements from './student_dashboard/Announcements';
+import Dashboars from './components/Dashboars.jsx';
+import Home from "./student_dashboard/Home.jsx";
+import ActivitiesList from "./components/ActivitiesList.jsx";
+import UploadDocument from './components/student_uploads/UploadDoc.jsx';
+import Announcements from './student_dashboard/Announcements.jsx';
 
 // Faculty Dashboard Components
-import FacultyHome from "./facultyDashboard/FacultyHome";
-import PendingApprovals from "./facultyDashboard/PendingApprovals";
-import RecentVerifications from "./facultyDashboard/RecentVerifications";
+import FacultyHome from "./facultyDashboard/FacultyHome.jsx";
+import PendingApprovals from "./facultyDashboard/PendingApprovals.jsx";
+import RecentVerifications from "./facultyDashboard/RecentVerifications.jsx";
 // import RecentVerificationsPage from "./facultyDashboard/RecentVerificationsPage";
-import FacultyAnnouncements from "./facultyDashboard/Announcements";
+import FacultyAnnouncements from "./facultyDashboard/Announcements.jsx";
 //faculty routes
-import StudentList from './components/facultyDashboard/StudentList';
-import ApprovedByYou from './facultyDashboard/ApprovedByYou';
-import StudentAchievements from './student_dashboard/StudentAchievements';
-import FacultySettings from './components/facultyDashboard/FacultySettings';
-import EventsAndCom from './components/facultyDashboard/EventsAndCom';
-import AddProfileF from './components/facultyDashboard/AddProfileF';
+import StudentList from './components/facultyDashboard/StudentList.jsx';
+import ApprovedByYou from './facultyDashboard/ApprovedByYou.jsx';
+import StudentAchievements from './student_dashboard/StudentAchievements.jsx';
+import FacultySettings from './components/facultyDashboard/FacultySettings.jsx';
+import EventsAndCom from './components/facultyDashboard/EventsAndCom.jsx';
+import AddProfileF from './components/facultyDashboard/AddProfileF.jsx';
 //student routes
-import StudentDigitalPortfolio from './components/student_uploads/DigitalPortfolio';
-import StudentPendingApprovels from './components/student_uploads/StudentPendingApprovels';
-import StudentSettings from './components/student_uploads/StudentSettings';
-import AddProfile from './components/student_uploads/AddProfile';
-import FacultyAttendance from './components/faculty/FacultyAttendance';
-import FacultyAddMidMarks from './components/faculty/FacultyAddMid';
-import StudentResults from './components/student/StudentResults';
-import StudentClubsEnrol from './components/student/StudentClubsEnrol';
+import StudentDigitalPortfolio from './components/student_uploads/DigitalPortfolio.jsx';
+import StudentPendingApprovels from './components/student_uploads/StudentPendingApprovels.jsx';
+import StudentSettings from './components/student_uploads/StudentSettings.jsx';
+import AddProfile from './components/student_uploads/AddProfile.jsx';
+import FacultyAttendance from './components/faculty/FacultyAttendance.jsx';
+import FacultyAddMidMarks from './components/faculty/FacultyAddMid.jsx';
+import StudentResults from './components/student/StudentResults.jsx';
+import StudentClubsEnrol from './components/student/StudentClubsEnrol.jsx';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -89,7 +89,7 @@ const App = () => {
     <Router>
       <Routes>
         {/* Public Routes */}
-        <Route path="/landing/page" element={<StudentResults />} />
+        <Route path="/landing/page" element={<Landing />} />
         <Route path="/roleoftheuser" element={<RoleOfTheUser />} />
         <Route path="/roleforlogin" element={<Roleforlogin />} />
         <Route path="/otp/verification" element={<OtpPage />} />
