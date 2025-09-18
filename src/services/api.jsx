@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "http://localhost:5000", //  backend base URL
+  baseURL: "https://student-activity-tracker.onrender.com", //  backend base URL
   withCredentials: true,           // if you need cookies
 });
 
