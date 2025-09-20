@@ -51,7 +51,7 @@ import StudentClubsEnrol from './components/student/StudentClubsEnrol.jsx';
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const token = Cookies.get('token');
-  return token ? children : <Navigate to="/roleforlogin" />;
+  return token ? children : <Navigate to="/landing/page" />;
 };
 
 // Role-based Protected Route
@@ -60,7 +60,7 @@ const RoleProtectedRoute = ({ children, allowedRoles = [] }) => {
   const userRole = Cookies.get('userRole');
   
   if (!token) {
-    return <Navigate to="/roleforlogin" />;
+    return <Navigate to="/landing/page" />;
   }
   
   if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
