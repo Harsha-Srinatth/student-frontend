@@ -5,7 +5,7 @@ import { fetchResults } from "../../features/resultsSlice";
 import { fetchSDashboardData } from "../../features/studentDashSlice";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { FiAlertCircle, FiCheckCircle } from "react-icons/fi";
+import { FiAlertCircle, FiCheckCircle, FiLock } from "react-icons/fi";
 import {
   ResponsiveContainer,
   BarChart,
@@ -91,11 +91,8 @@ export default function StudentResults() {
   const dispatch = useDispatch();
 
   const dashboardStudent = useSelector((s) => s.studentDashboard.student);
-  const dashboardLoading = useSelector((s) => s.studentDashboard.loading);
-
   const curriculum = useSelector((s) => s.academics.curriculum);
   const curriculumLoading = useSelector((s) => s.academics.curriculumLoading);
-
   const resultsBySem = useSelector((s) => s.results.bySemester);
   const resultsLoading = useSelector((s) => s.results.loading);
 
@@ -164,6 +161,8 @@ export default function StudentResults() {
       Max: s.Max,
     }));
   }, [curriculum, resultsBySem, activeSem]);
+
+  const isFutureSem = activeSem > currentSem;
 
   return (
     <div className="w-full mx-auto max-w-7xl px-4 py-6 space-y-6 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
@@ -243,52 +242,75 @@ export default function StudentResults() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.03 }}
-                whileHover={{ scale: 1.02, boxShadow: "0px 4px 20px rgba(0,0,0,0.1)" }}
+                whileHover={{ scale: 1.02 }}
                 className="flex items-center justify-between gap-3 rounded-xl bg-white p-4 shadow hover:shadow-lg transition"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <div className="text-sm font-medium truncate">{s.name}</div>
-                    <FiCheckCircle className="text-green-500" />
+                    {isFutureSem ? (
+                      <FiLock className="text-gray-400" />
+                    ) : (
+                      <FiCheckCircle className="text-green-500" />
+                    )}
                   </div>
                   <div className="text-xs text-slate-500 truncate">{s.code}</div>
                 </div>
-                <span className="text-xs rounded-full px-2 py-1 bg-green-50 text-green-700 border border-green-200">
-                  Active
-                </span>
+                {isFutureSem ? (
+                  <span className="text-xs rounded-full px-2 py-1 bg-gray-100 text-gray-600 border border-gray-300 flex items-center gap-1">
+                    <FiLock size={12} /> Locked
+                  </span>
+                ) : (
+                  <span className="text-xs rounded-full px-2 py-1 bg-green-50 text-green-700 border border-green-200">
+                    Coming Soon
+                  </span>
+                )}
               </motion.div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Mid Results + Graph */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Mid 1 */}
-        <MidCard mid={1} resultsLoading={resultsLoading} resultsBySem={resultsBySem} activeSem={activeSem} subjectsForSem={subjectsForSem} />
+      {/* Mid Results + Graph (only if not future sem) */}
+      {!isFutureSem && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <MidCard
+            mid={1}
+            resultsLoading={resultsLoading}
+            resultsBySem={resultsBySem}
+            activeSem={activeSem}
+            subjectsForSem={subjectsForSem}
+          />
 
-        {/* Graph in center */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="rounded-2xl bg-white p-4 shadow-lg"
-        >
-          <h3 className="text-lg font-semibold mb-3 text-center">📊 Mid 1 vs Mid 2 Comparison</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Mid1" fill="#60a5fa" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="Mid2" fill="#2563eb" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="rounded-2xl bg-white p-4 shadow-lg"
+          >
+            <h3 className="text-lg font-semibold mb-3 text-center">
+              📊 Mid 1 vs Mid 2 Comparison
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Mid1" fill="#60a5fa" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="Mid2" fill="#2563eb" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
 
-        {/* Mid 2 */}
-        <MidCard mid={2} resultsLoading={resultsLoading} resultsBySem={resultsBySem} activeSem={activeSem} subjectsForSem={subjectsForSem} />
-      </div>
+          <MidCard
+            mid={2}
+            resultsLoading={resultsLoading}
+            resultsBySem={resultsBySem}
+            activeSem={activeSem}
+            subjectsForSem={subjectsForSem}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -363,15 +385,12 @@ function MidCard({ mid, resultsLoading, resultsBySem, activeSem, subjectsForSem 
                 whileHover={{ scale: 1.02 }}
                 className="flex items-center justify-between rounded-lg bg-white p-3 shadow-sm hover:shadow-md transition"
               >
-                {/* Left side: code + marks */}
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{it.name}</span>
                   <span className="text-xs text-slate-500">
                     {it.marks}/{it.max}
                   </span>
                 </div>
-
-                {/* Right side: circle */}
                 <SmallCircle value={it.marks} max={it.max} />
               </motion.div>
             ))}

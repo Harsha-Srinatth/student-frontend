@@ -1,17 +1,44 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const RoleSelector = ({ onSelectRole, title = "Select Your Role", subtitle = "Choose your role to continue" }) => {
+const RoleSelector = ({
+  onSelectRole,
+  title = "Select Your Role",
+  subtitle = "Choose your role to continue"
+}) => {
+  const navigate = useNavigate();
+  const location = useLocation(); // ✅ React Router location
+
   return (
-    <div className="w-full max-w-md mx-auto"
-    style={{
-      backgroundImage: "url('/logo3.jpg')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-    }}>
+    <div
+      className="w-full max-w-md mx-auto p-6 sm:p-8 rounded-2xl shadow-2xl bg-blue-50 transition-all duration-500 hover:shadow-blue-200 relative"
+    >
+      {/* Top-left Back Button */}
+      <button
+        onClick={() => navigate('/landing/page')}
+        className="absolute top-4 left-4 flex items-center space-x-2 text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full 
+                   hover:bg-gray-200 hover:text-gray-800 transition-all duration-300 shadow-sm"
+      >
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        <span className="text-sm font-medium">Back</span>
+      </button>
+
+      {/* Icon + Title */}
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
+          <svg
+            className="w-8 h-8 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         </div>
@@ -19,10 +46,14 @@ const RoleSelector = ({ onSelectRole, title = "Select Your Role", subtitle = "Ch
         <p className="text-gray-600">{subtitle}</p>
       </div>
 
+      {/* Buttons */}
       <div className="space-y-4">
+        {/* Student */}
         <button
           onClick={() => onSelectRole("student")}
-          className="w-full group relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25"
+          className="w-full group relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-700 
+                     hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl 
+                     transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25"
         >
           <div className="flex items-center justify-center space-x-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -36,12 +67,16 @@ const RoleSelector = ({ onSelectRole, title = "Select Your Role", subtitle = "Ch
               <div className="text-sm opacity-90">Access learning resources and track progress</div>
             </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 
+                          transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
         </button>
 
+        {/* Faculty */}
         <button
           onClick={() => onSelectRole("faculty")}
-          className="w-full group relative overflow-hidden bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/25"
+          className="w-full group relative overflow-hidden bg-gradient-to-r from-green-600 to-green-700 
+                     hover:from-green-700 hover:to-green-800 text-white font-semibold py-4 px-6 rounded-xl 
+                     transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/25"
         >
           <div className="flex items-center justify-center space-x-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -54,24 +89,41 @@ const RoleSelector = ({ onSelectRole, title = "Select Your Role", subtitle = "Ch
               <div className="text-sm opacity-90">Manage students and approve submissions</div>
             </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 
+                          transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
         </button>
       </div>
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-500">
-          Already have an account?{" "}
-          <button 
-            onClick={() => window.location.href = '/roleforlogin'}
-            className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-          >
-            Sign in here
-          </button>
-        </p>
-      </div>
+      {/* Conditional Sign In / Sign Up */}
+      {location.pathname === "/roleforlogin" && (
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            Already have an account?{" "}
+            <button
+              onClick={() => navigate('/roleoftheuser')}
+              className="text-green-600 hover:text-green-700 font-medium transition-colors"
+            >
+              Sign in here
+            </button>
+          </p>
+        </div>
+      )}
+
+      {location.pathname === "/roleoftheuser" && (
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            Don't have an account?{" "}
+            <button
+              onClick={() => navigate('/roleforlogin')}
+              className="text-green-600 hover:text-green-700 font-medium transition-colors"
+            >
+              Sign up here
+            </button>
+          </p>
+        </div>
+      )}
     </div>
   );
 };
 
 export default RoleSelector;
-  

@@ -28,30 +28,61 @@ const fieldConfig = {
   dateofjoin: { label: "Date of Joining", type: "date", required: true }
 };
 
+// Capitalize first letter of each word
+const capitalizeWords = (str) =>
+  str.replace(/\b\w/g, (char) => char.toUpperCase());
+
 const StudentRegistration = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState(Object.fromEntries(Object.keys(fieldConfig).map(key => [key, ""])));
+  const [formData, setFormData] = useState(
+    Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""]))
+  );
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [responseMessage, setResponseMessage] = useState(null);
-  const [direction, setDirection] = useState(0); // 1 = next, -1 = back
+  const [direction, setDirection] = useState(0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    let newValue = value;
+
+    // Transformations
+    if (["fullname", "dept", "programName", "institution"].includes(name)) {
+      newValue = capitalizeWords(value);
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
+
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
   const validateStep = () => {
     const stepFields = steps[activeStep].fields;
     const newErrors = {};
-    stepFields.forEach(name => {
+
+    stepFields.forEach((name) => {
       const value = formData[name].trim();
       const config = fieldConfig[name];
-      if (config.required && !value) newErrors[name] = `${config.label} is required`;
-      if (name === "email" && value && !/\S+@\S+\.\S+/.test(value)) newErrors[name] = "Email is invalid";
-      if (name === "password" && value && value.length < 6) newErrors[name] = "Password must be at least 6 characters";
+
+      if (config.required && !value)
+        newErrors[name] = `${config.label} is required`;
+
+      if (name === "email" && value && !/\S+@\S+\.\S+/.test(value))
+        newErrors[name] = "Email is invalid";
+
+      if (name === "password" && value && value.length < 6)
+        newErrors[name] = "Password must be at least 6 characters";
+
+      if (name === "mobileno" && value && !/^\d{10}$/.test(value))
+        newErrors[name] = "Mobile number must be exactly 10 digits";
+      
+      if (name === "facultyid" && value && !/^\d{10}$/.test(value))
+        newErrors[name] = "Faculty Id number must be exactly 10 digits";
+      
+      if (name === "studentid" && value && !/^\d{10}$/.test(value))
+        newErrors[name] = "Student Id number must be exactly 10 digits";
     });
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -59,13 +90,13 @@ const StudentRegistration = () => {
   const handleNext = () => {
     if (validateStep()) {
       setDirection(1);
-      setActiveStep(prev => prev + 1);
+      setActiveStep((prev) => prev + 1);
     }
   };
 
   const handleBack = () => {
     setDirection(-1);
-    setActiveStep(prev => prev - 1);
+    setActiveStep((prev) => prev - 1);
   };
 
   const handleSubmit = async (e) => {
@@ -75,28 +106,35 @@ const StudentRegistration = () => {
     try {
       setLoading(true);
       setResponseMessage(null);
-      const res = await api.post("/register/student", formData);
+
+      // Format data for backend
+      const formattedData = {
+        ...formData,
+        studentid: formData.studentid.toUpperCase(),
+        facultyid: formData.facultyid.toUpperCase(),
+      };
+
+      const res = await api.post("/register/student", formattedData);
       setResponseMessage({ type: "success", text: res.data.message });
-      setFormData(Object.fromEntries(Object.keys(fieldConfig).map(key => [key, ""])));
-      setTimeout(() => window.location.href = "/roleforlogin", 2000);
+      setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""])));
+
+      setTimeout(() => (window.location.href = "/roleforlogin"), 2000);
     } catch (error) {
-      setResponseMessage({ type: "error", text: error.response?.data?.message || "Registration failed. Please try again." });
+      setResponseMessage({
+        type: "error",
+        text:
+          error.response?.data?.message ||
+          "Registration failed. Please try again."
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Framer Motion animation variants
   const variants = {
-    enter: (direction) => ({
-      x: direction > 0 ? 300 : -300,
-      opacity: 0
-    }),
+    enter: (direction) => ({ x: direction > 0 ? 300 : -300, opacity: 0 }),
     center: { x: 0, opacity: 1 },
-    exit: (direction) => ({
-      x: direction < 0 ? 300 : -300,
-      opacity: 0
-    })
+    exit: (direction) => ({ x: direction < 0 ? 300 : -300, opacity: 0 })
   };
 
   return (
@@ -110,8 +148,14 @@ const StudentRegistration = () => {
       <div className="flex justify-between mb-6">
         {steps.map((step, index) => (
           <div key={index} className="flex-1">
-            <div className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center font-bold transition-all duration-300
-              ${index === activeStep ? "bg-blue-600 text-white" : index < activeStep ? "bg-green-500 text-white" : "bg-gray-200 text-gray-600"}`}>
+            <div
+              className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center font-bold transition-all duration-300
+              ${index === activeStep
+                  ? "bg-blue-600 text-white"
+                  : index < activeStep
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-200 text-gray-600"}`}
+            >
               {index < activeStep ? "✓" : index + 1}
             </div>
             <p className="text-center mt-2 text-sm font-medium">{step.title}</p>
@@ -119,11 +163,14 @@ const StudentRegistration = () => {
         ))}
       </div>
 
-      {/* Response Message */}
       {responseMessage && (
-        <div className={`mb-4 p-3 rounded-xl border ${
-          responseMessage.type === "success" ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700"
-        }`}>
+        <div
+          className={`mb-4 p-3 rounded-xl border ${
+            responseMessage.type === "success"
+              ? "bg-green-50 border-green-200 text-green-700"
+              : "bg-red-50 border-red-200 text-red-700"
+          }`}
+        >
           {responseMessage.text}
         </div>
       )}
@@ -140,12 +187,13 @@ const StudentRegistration = () => {
             transition={{ type: "tween", duration: 0.4 }}
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
-            {steps[activeStep].fields.map(name => {
+            {steps[activeStep].fields.map((name) => {
               const config = fieldConfig[name];
               return (
                 <div key={name} className="flex flex-col">
                   <label className="text-sm font-semibold text-gray-700 mb-1">
-                    {config.label}{config.required && <span className="text-red-500">*</span>}
+                    {config.label}
+                    {config.required && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type={config.type}
@@ -154,17 +202,20 @@ const StudentRegistration = () => {
                     onChange={handleChange}
                     placeholder={`Enter ${config.label.toLowerCase()}`}
                     className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                      errors[name] ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                      errors[name]
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-300 hover:border-gray-400"
                     }`}
                   />
-                  {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name]}</p>}
+                  {errors[name] && (
+                    <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
+                  )}
                 </div>
-              )
+              );
             })}
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation Buttons */}
         <div className="flex justify-between mt-6">
           {activeStep > 0 && (
             <button
@@ -189,7 +240,9 @@ const StudentRegistration = () => {
               type="submit"
               disabled={loading}
               className={`ml-auto px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${
-                loading ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
               }`}
             >
               {loading ? "Creating Account..." : "Create Student Account"}
@@ -201,9 +254,9 @@ const StudentRegistration = () => {
       <div className="text-center mt-6">
         <p className="text-sm text-gray-600">
           Already have an account?{" "}
-          <button 
+          <button
             type="button"
-            onClick={() => window.location.href = '/roleforlogin'}
+            onClick={() => (window.location.href = "/roleforlogin")}
             className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
           >
             Sign in here

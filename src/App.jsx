@@ -156,7 +156,7 @@ const App = () => {
               <Announcements />
             </RoleProtectedRoute>
           } />
-          <Route path="student/pending/approvels" element={
+          <Route path="/student/pending/approvels" element={
             <RoleProtectedRoute allowedRoles={['student']}>
               <StudentPendingApprovels />
             </RoleProtectedRoute>

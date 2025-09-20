@@ -43,14 +43,8 @@ export default function StudentLogin() {
   
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6"
-    style={{
-      backgroundImage: "url('/logo3.jpg')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-    }}>
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto p-6">
+      <div className="bg-blue-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
         <div className="flex flex-col lg:flex-row">
           {/* Left Side - Login Form */}
           <div className="w-full lg:w-1/2 p-8 lg:p-12">

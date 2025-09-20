@@ -28,9 +28,9 @@ const QuickStats = () => {
     { icon: <Award size={28} />, label: "Certifications", value: counts?.certificationsCount ?? 0, path: "/student/achievements/all/docs" },
     { icon: <BookOpen size={28} />, label: "Workshops", value: counts?.workshopsCount ?? 0, path: "/student/achievements/all/docs" },
     { icon: <Activity size={28} />, label: "Clubs Joined", value: counts?.clubsJoinedCount ?? 0, path: "/student/achievements/all/docs" },
-    { icon: <CheckCircle size={28} />, label: "Approved", value: approvedCount, color: "text-green-600", path: "student/pending/approvels" },
-    { icon: <XCircle size={28} />, label: "Rejected", value: rejectedCount, color: "text-red-600", path: "student/pending/approvels" },
-    { icon: <Clock size={28} />, label: "Pending", value: pendingCount, color: "text-yellow-600", path: "student/pending/approvels" },
+    { icon: <CheckCircle size={28} />, label: "Approved", value: approvedCount, color: "text-green-600", path: "/student/pending/approvels" },
+    { icon: <XCircle size={28} />, label: "Rejected", value: rejectedCount, color: "text-red-600", path: "/student/pending/approvels" },
+    { icon: <Clock size={28} />, label: "Pending", value: pendingCount, color: "text-yellow-600", path: "/student/pending/approvels" },
   ];
 
   if (loading) return <p>Loading stats...</p>;

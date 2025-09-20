@@ -38,7 +38,7 @@ const Roleforlogin = () => {
                 </button>
               </div>
               
-              <div className="pt-16">
+              <div className="">
                 {role === "student" ? (
                   <StudentLogin />
                 ) : (

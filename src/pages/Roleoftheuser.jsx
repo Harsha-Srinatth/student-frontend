@@ -16,13 +16,7 @@ const RoleOfTheUser = () => {
     }}
     >
       <div className="w-full max-w-4xl">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
-        style={{
-          backgroundImage: "url('/logo3.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}>
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
           {!role ? (
             <div className="p-8">
               <RoleSelector 
