@@ -64,7 +64,7 @@ const RoleProtectedRoute = ({ children, allowedRoles = [] }) => {
   }
   
   if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
-    return <Navigate to="/unauthorized" />;
+    return <Navigate to="/landing/page" />;
   }
   
   return children;
@@ -80,7 +80,7 @@ const RoleBasedHome = () => {
     return <Navigate to="/student/home" replace />;
   } else {
     // If no role is set, redirect to login
-    return <Navigate to="/roleforlogin" replace />;
+    return <Navigate to="/landing/page" replace />;
   }
 };
 
