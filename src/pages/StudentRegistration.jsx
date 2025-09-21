@@ -46,8 +46,11 @@ const StudentRegistration = () => {
     const { name, value } = e.target;
     let newValue = value;
 
-    // Transformations
-    if (["fullname", "dept", "programName", "institution"].includes(name)) {
+    // Keep only digits for mobile number, and limit to 10 digits
+    if (["mobileno"].includes(name)) {
+      // remove non-digits, then limit length to 10
+      newValue = value.replace(/\D/g, "").slice(0, 10);
+    } else if (["fullname", "dept", "programName", "institution"].includes(name)) {
       newValue = capitalizeWords(value);
     }
 
@@ -61,26 +64,34 @@ const StudentRegistration = () => {
     const newErrors = {};
 
     stepFields.forEach((name) => {
-      const value = formData[name].trim();
+      // Use trimmed value for general fields
+      const rawValue = formData[name] ?? "";
+      const trimmed = typeof rawValue === "string" ? rawValue.trim() : rawValue;
       const config = fieldConfig[name];
 
-      if (config.required && !value)
+      if (config.required && !trimmed) {
         newErrors[name] = `${config.label} is required`;
+        return;
+      }
 
-      if (name === "email" && value && !/\S+@\S+\.\S+/.test(value))
+      if (name === "email" && trimmed && !/\S+@\S+\.\S+/.test(trimmed)) {
         newErrors[name] = "Email is invalid";
+        return;
+      }
 
-      if (name === "password" && value && value.length < 6)
+      if (name === "password" && trimmed && trimmed.length < 6) {
         newErrors[name] = "Password must be at least 6 characters";
+        return;
+      }
 
-      if (name === "mobileno" && value && !/^\d{10}$/.test(value))
-        newErrors[name] = "Mobile number must be exactly 10 digits";
-      
-      if (name === "facultyid" && value && !/^\d{10}$/.test(value))
-        newErrors[name] = "Faculty Id number must be exactly 10 digits";
-      
-      if (name === "studentid" && value && !/^\d{10}$/.test(value))
-        newErrors[name] = "Student Id number must be exactly 10 digits";
+      // For numeric-only fields check digits-only length
+      if (name === "mobileno") {
+        const digits = rawValue.replace(/\D/g, "");
+        if (digits && digits.length !== 10) {
+          newErrors[name] = "Mobile number must be exactly 10 digits";
+        }
+        return;
+      }
     });
 
     setErrors(newErrors);
@@ -101,29 +112,42 @@ const StudentRegistration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // validate last step
     if (!validateStep()) return;
 
     try {
       setLoading(true);
       setResponseMessage(null);
 
-      // Format data for backend
-      const formattedData = {
-        ...formData,
-        studentid: formData.studentid.toUpperCase(),
-        facultyid: formData.facultyid.toUpperCase(),
-      };
+      // Prepare data for backend: trim and ensure ids/mobile are digits-only
+      const cleaned = { ...formData };
 
-      const res = await api.post("/register/student", formattedData);
-      setResponseMessage({ type: "success", text: res.data.message });
+      // Trim general string fields
+      Object.keys(cleaned).forEach((k) => {
+        if (typeof cleaned[k] === "string") cleaned[k] = cleaned[k].trim();
+      });
+
+      // Force digits-only for ids and mobile
+      cleaned.mobileno = (cleaned.mobileno || "").replace(/\D/g, "");
+
+      // If your backend expects uppercase alphanumeric IDs, you can convert here:
+      // cleaned.studentid = cleaned.studentid.toUpperCase();
+      // cleaned.facultyid = cleaned.facultyid.toUpperCase();
+      // But if they are numeric, don't upper-case.
+
+      const res = await api.post("/register/student", cleaned);
+
+      setResponseMessage({ type: "success", text: res.data?.message || "Registration successful" });
       setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""])));
-
-      setTimeout(() => (window.location.href = "/roleforlogin"), 2000);
+      setErrors({});
+      // navigate after short delay (if desired)
+      setTimeout(() => (window.location.href = "/roleforlogin"), 1200);
     } catch (error) {
+      console.error("Registration error:", error);
       setResponseMessage({
         type: "error",
         text:
-          error.response?.data?.message ||
+          error?.response?.data?.message ||
           "Registration failed. Please try again."
       });
     } finally {

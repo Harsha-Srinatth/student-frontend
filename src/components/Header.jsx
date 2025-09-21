@@ -1,47 +1,120 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { GraduationCap, Menu, X } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function HeroSection() {
+export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navItems = [
+    { name: "Home", href: "#home" },
+    { name: "Features", href: "#features" },
+    { name: "Analytics", href: "#analytics" },
+    { name: "About", href: "#about" },
+    { name: "FAQ", href: "#faq" },
+  ];
+
   return (
-    <section
-      id="home"
-      className="relative min-h-screen flex items-center justify-center px-6 md:px-16 lg:px-24 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50"
+    <motion.header
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg"
     >
-      {/* Background blobs */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-indigo-200 rounded-full blur-3xl opacity-40"></div>
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-fuchsia-200 rounded-full blur-3xl opacity-40"></div>
-      </div>
-
-      {/* Content */}
-      <div className="text-center max-w-3xl">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-gray-800 leading-tight">
-          Welcome to{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-fuchsia-600">
-            Smart Student Hub
-          </span>
-        </h1>
-        <p className="mt-6 text-lg md:text-xl text-gray-600">
-          Your one-stop platform to manage achievements, projects, internships,
-          and more — all in one place.
-        </p>
-
-        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            to="/roleoftheuser"
-            className="px-6 py-3 rounded-xl text-white font-medium bg-gradient-to-r from-indigo-600 to-fuchsia-600 hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center gap-2 justify-center"
-          >
-            Get Started <ArrowRight className="w-5 h-5" />
+      <div className="max-w-7xl mx-auto px-6 sm:px-12">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-200">
+              <GraduationCap className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Smart Student Hub
+            </span>
           </Link>
-          <Link
-            to="/roleforlogin"
-            className="px-6 py-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-300"
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-8">
+            {navItems.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="text-slate-700 hover:text-indigo-600 font-medium transition-colors duration-200 relative group"
+              >
+                {item.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
+              </a>
+            ))}
+          </nav>
+
+          {/* Desktop CTA */}
+          <div className="hidden md:flex items-center gap-4">
+            <Link
+              to="/roleforlogin"
+              className="px-4 py-2 text-slate-700 hover:text-indigo-600 font-medium transition-colors duration-200"
+            >
+              Login
+            </Link>
+            <Link
+              to="/roleoftheuser"
+              className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            >
+              Get Started
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-2 text-slate-700 hover:text-indigo-600 transition-colors duration-200"
           >
-            Login
-          </Link>
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
-    </section>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-white/95 backdrop-blur-lg border-t border-white/20 shadow-lg"
+          >
+            <div className="px-6 py-4 space-y-4">
+              {navItems.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-slate-700 hover:text-indigo-600 font-medium transition-colors duration-200"
+                >
+                  {item.name}
+                </a>
+              ))}
+              <div className="pt-4 border-t border-slate-200 space-y-3">
+                <Link
+                  to="/roleforlogin"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-slate-700 hover:text-indigo-600 font-medium transition-colors duration-200"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/roleoftheuser"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg text-center"
+                >
+                  Get Started
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 }

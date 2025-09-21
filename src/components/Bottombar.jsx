@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { StudentSidebarLinks, FacultySidebarLinks } from "../context/Links";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { Plus } from "lucide-react"; // Using Grid icon to represent "View More"
+import { Plus, LogOut } from "lucide-react"; // Added logout icon
 
 const Bottombar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { pathname } = location;
   const userRole = Cookies.get("userRole");
 
@@ -27,6 +28,13 @@ const Bottombar = () => {
         ];
 
   const [isOpen, setIsOpen] = useState(false);
+
+  // 🔹 Logout handler
+  const handleLogout = () => {
+    Cookies.remove("userRole");
+    Cookies.remove("token");
+    navigate("/landing/page");
+  };
 
   return (
     <>
@@ -95,6 +103,16 @@ const Bottombar = () => {
                 </span>
               </Link>
             ))}
+
+            {/* 🔹 Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="flex flex-col items-center justify-center p-3 rounded-lg 
+                hover:bg-red-600/30 transition-all duration-200 text-red-400"
+            >
+              <LogOut size={24} />
+              <span className="text-xs mt-1 text-red-400">Logout</span>
+            </button>
           </div>
         </div>
       )}

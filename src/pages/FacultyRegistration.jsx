@@ -26,7 +26,7 @@ const fieldConfig = {
 };
 
 // Capitalize first letter of each word
-const capitalizeWords = (str) =>
+const capitalizeWords = (str = "") =>
   str.replace(/\b\w/g, (char) => char.toUpperCase());
 
 const FacultyRegistration = () => {
@@ -43,8 +43,10 @@ const FacultyRegistration = () => {
     const { name, value } = e.target;
     let newValue = value;
 
-    // Transform certain fields
-    if (["fullname", "dept", "institution"].includes(name)) {
+    // Keep only digits for mobile, limit to 10 digits
+    if (["mobile"].includes(name)) {
+      newValue = (value || "").replace(/\D/g, "").slice(0, 10);
+    } else if (["fullname", "dept", "institution"].includes(name)) {
       newValue = capitalizeWords(value);
     }
 
@@ -57,23 +59,32 @@ const FacultyRegistration = () => {
     const newErrors = {};
 
     stepFields.forEach((name) => {
-      const value = formData[name].trim();
+      const raw = formData[name] ?? "";
+      const value = typeof raw === "string" ? raw.trim() : raw;
       const config = fieldConfig[name];
 
-      if (config.required && !value)
+      if (config.required && !value) {
         newErrors[name] = `${config.label} is required`;
+        return;
+      }
 
-      if (name === "email" && value && !/\S+@\S+\.\S+/.test(value))
+      if (name === "email" && value && !/\S+@\S+\.\S+/.test(value)) {
         newErrors[name] = "Email is invalid";
+        return;
+      }
 
-      if (name === "password" && value && value.length < 6)
+      if (name === "password" && value && value.length < 6) {
         newErrors[name] = "Password must be at least 6 characters";
+        return;
+      }
 
-      if (name === "mobile" && value && !/^\d{10}$/.test(value))
-        newErrors[name] = "Mobile number must be exactly 10 digits";
-
-      if (name === "facultyid" && value && !/^\d{10}$/.test(value))
-        newErrors[name] = "Faculty Id number must be exactly 10 digits";
+      if (name === "mobile") {
+        const digits = (raw || "").replace(/\D/g, "");
+        if (digits && digits.length !== 10) {
+          newErrors[name] = "Mobile number must be exactly 10 digits";
+        }
+        return;
+      }
     });
 
     setErrors(newErrors);
@@ -100,19 +111,29 @@ const FacultyRegistration = () => {
       setLoading(true);
       setResponseMessage(null);
 
-      const formattedData = {
-        ...formData,
-        facultyid: formData.facultyid.toUpperCase()
-      };
+      // Prepare payload: trim strings and ensure ids/mobile are digits-only
+      const cleaned = { ...formData };
+      Object.keys(cleaned).forEach((k) => {
+        if (typeof cleaned[k] === "string") cleaned[k] = cleaned[k].trim();
+      });
 
-      const res = await api.post("/register/faculty", formattedData);
-      setResponseMessage({ type: "success", text: res.data.message });
+      cleaned.facultyid = (cleaned.facultyid || "").replace(/\D/g, "");
+      cleaned.mobile = (cleaned.mobile || "").replace(/\D/g, "");
+
+      // If backend expects uppercase alphanumeric IDs, uncomment below:
+      // cleaned.facultyid = cleaned.facultyid.toUpperCase();
+
+      const res = await api.post("/register/faculty", cleaned);
+
+      setResponseMessage({ type: "success", text: res.data?.message || "Registration successful" });
       setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""])));
-      setTimeout(() => window.location.href = "/roleforlogin", 2000);
+      setErrors({});
+      setTimeout(() => (window.location.href = "/roleforlogin"), 1200);
     } catch (error) {
+      console.error("Registration error:", error);
       setResponseMessage({
         type: "error",
-        text: error.response?.data?.message || "Registration failed. Please try again."
+        text: error?.response?.data?.message || "Registration failed. Please try again."
       });
     } finally {
       setLoading(false);

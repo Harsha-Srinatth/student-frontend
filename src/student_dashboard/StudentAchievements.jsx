@@ -35,21 +35,6 @@ const StudentAchievements = () => {
     return list.filter((a) => (a.status || "").toLowerCase() === "verified");
   }, [achievements, activeTab, verifiedOnly]);
 
-  const getTabCount = () => {
-    switch (activeTab) {
-      case 'academic':
-        return counts.certificationsCount || 0;
-      case 'extracurricular':
-        return counts.workshopsCount || 0;
-      case 'hackathons':
-        return counts.hackathonsCount || 0;
-      case 'projects':
-        return counts.projectsCount || 0;
-      default:
-        return 0;
-    }
-  };
-
   const handleAchievementClick = (achievement) => {
     setSelectedAchievement(achievement);
     setIsModalOpen(true);
@@ -167,7 +152,6 @@ const StudentAchievements = () => {
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
-          const count = getTabCount();
           
           return (
             <button
@@ -181,13 +165,6 @@ const StudentAchievements = () => {
             >
               <Icon className={`w-5 h-5 ${isActive ? getTabIconColor(tab.color) : ''}`} />
               <span>{tab.label}</span>
-              {count > 0 && (
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  isActive ? 'bg-white bg-opacity-50' : 'bg-gray-200'
-                }`}>
-                  {count}
-                </span>
-              )}
             </button>
           );
         })}

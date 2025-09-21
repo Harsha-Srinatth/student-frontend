@@ -2,6 +2,22 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentsByFaculty } from "../../features/studentSlice";
 import { fetchCurriculum, saveMidMarks } from "../../features/academicsSlice";
+import { 
+  Search, 
+  Users, 
+  BookOpen, 
+  Calendar, 
+  Trophy, 
+  Save, 
+  CheckCircle2, 
+  AlertTriangle, 
+  XCircle,
+  Loader2,
+  GraduationCap,
+  FileText,
+  Star,
+  Target
+} from "lucide-react";
 
 export default function FacultyAddMidMarks() {
   const dispatch = useDispatch();
@@ -18,6 +34,7 @@ export default function FacultyAddMidMarks() {
   const [notice, setNotice] = useState("");
   const [noticeType, setNoticeType] = useState("success");
   const [search, setSearch] = useState("");
+  const [focusedInput, setFocusedInput] = useState("");
 
   // Sort students by ID
   const sortedStudents = useMemo(() => {
@@ -86,6 +103,10 @@ export default function FacultyAddMidMarks() {
     return Object.values(picked).reduce((a, b) => a + (Number(b) || 0), 0);
   }, [marks, visibleSubjects]);
 
+  const totalPossible = useMemo(() => {
+    return visibleSubjects.reduce((sum, s) => sum + (Number(s.max) || 30), 0);
+  }, [visibleSubjects]);
+
   const handleChange = (code, value, max) => {
     const n = Math.max(0, Math.min(Number(value || 0), max));
     setMarks((m) => ({ ...m, [code]: n }));
@@ -128,7 +149,7 @@ export default function FacultyAddMidMarks() {
 
       if (result?.count === 6) {
         setNoticeType("success");
-        setNotice("Marks saved successfully ✅");
+        setNotice("Marks saved successfully!");
 
         // Clear marks
         setMarks({});
@@ -166,149 +187,370 @@ export default function FacultyAddMidMarks() {
     );
   }, [sortedStudents, search]);
 
+  const getNoticeIcon = () => {
+    switch (noticeType) {
+      case "success":
+        return <CheckCircle2 className="w-5 h-5" />;
+      case "error":
+        return <XCircle className="w-5 h-5" />;
+      case "warning":
+        return <AlertTriangle className="w-5 h-5" />;
+      default:
+        return <CheckCircle2 className="w-5 h-5" />;
+    }
+  };
+
+  const getCurrentStudent = () => {
+    return sortedStudents.find(s => s.studentid === studentId);
+  };
+
   return (
-    <div className="relative w-full min-h-[80vh]">
-      {/* Toast */}
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+      {/* Animated Toast Notifications */}
       {notice && (
-        <div
-          className={`fixed top-4 right-4 z-50 rounded-xl px-4 py-3 shadow-lg text-sm animate-fade-in ${
+        <div className={`top-6 right-6 z-50 transform transition-all duration-500 ease-out ${
+          notice ? 'translate-x-0 opacity-100 scale-100' : 'translate-x-full opacity-0 scale-95'
+        }`}>
+          <div className={`flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl border backdrop-blur-md ${
             noticeType === "success"
-              ? "bg-green-50 text-green-800 border border-green-200"
+              ? "bg-emerald-50/90 border-emerald-200/50 text-emerald-800"
               : noticeType === "error"
-              ? "bg-rose-50 text-rose-800 border border-rose-200"
-              : "bg-amber-50 text-amber-900 border border-amber-200"
-          }`}
-        >
-          {notice}
+              ? "bg-rose-50/90 border-rose-200/50 text-rose-800"
+              : "bg-amber-50/90 border-amber-200/50 text-amber-800"
+          }`}>
+            <div className={`p-1 rounded-lg ${
+              noticeType === "success"
+                ? "bg-emerald-100 text-emerald-600"
+                : noticeType === "error"
+                ? "bg-rose-100 text-rose-600"
+                : "bg-amber-100 text-amber-600"
+            }`}>
+              {getNoticeIcon()}
+            </div>
+            <span className="font-medium">{notice}</span>
+          </div>
         </div>
       )}
 
-      <div className="w-full mx-auto max-w-6xl p-4 sm:p-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-          <div className="space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-sky-600 animate-fade-in">
-              Add Mid Marks (Subject-wise)
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Select student, semester & mid exam before entering marks.
-            </p>
-          </div>
-
-          {/* Search bar */}
-          <div className="flex flex-col">
-            <label className="text-xs text-slate-600 mb-1">Search Student</label>
-            <input
-              type="text"
-              placeholder="Search by name, ID or RegNo"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="h-11 rounded-xl border border-indigo-100/70 px-3 bg-white/70 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/30"
-            />
-          </div>
-        </div>
-
-        {/* Dropdowns */}
-        <div className="flex flex-wrap items-center gap-4 animate-fade-in mb-6">
-          <div className="flex flex-col">
-            <label className="text-xs text-slate-600 mb-1">Select Student</label>
-            <select
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              className="h-11 rounded-xl border border-indigo-100/70 px-3 bg-white/70 shadow-sm focus:ring-2 focus:ring-indigo-400/30"
-            >
-              {filteredStudents.map((s) => (
-                <option key={s.studentid} value={s.studentid}>
-                  {s.fullname} - Regno: {s.studentid}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col">
-            <label className="text-xs text-slate-600 mb-1">Semester</label>
-            <select
-              value={semester}
-              onChange={(e) => setSemester(Number(e.target.value))}
-              className="h-11 rounded-xl border border-indigo-100/70 px-3 bg-white/70 shadow-sm focus:ring-2 focus:ring-indigo-400/30"
-            >
-              {Array.from({ length: 8 }).map((_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  Sem {i + 1}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col">
-            <label className="text-xs text-slate-600 mb-1">Mid Exam</label>
-            <select
-              value={midNumber}
-              onChange={(e) => setMidNumber(Number(e.target.value))}
-              className="h-11 rounded-xl border border-indigo-100/70 px-3 bg-white/70 shadow-sm focus:ring-2 focus:ring-indigo-400/30"
-            >
-              <option value={1}>Mid 1</option>
-              <option value={2}>Mid 2</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Subject Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {visibleSubjects.map((s, idx) => (
-            <div
-              key={s.code}
-              className="group relative rounded-2xl border border-indigo-100/70 p-4 bg-white/80 shadow-sm hover:shadow-xl transition-all duration-300"
-              style={{ animation: `fadeInUp 0.35s ease ${idx * 0.05}s both` }}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-slate-800">{s.name}</div>
-                  <div className="text-xs text-muted-foreground">{s.code}</div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Sticky Header Section */}
+        <div className="mb-8 pb-6 backdrop-blur-lg bg-white/70 border border-slate-200/50 rounded-3xl shadow-md">
+          <div className="p-6">
+            {/* Header Title */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
+                    <GraduationCap className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
+                      Add Mid Exam Marks
+                    </h1>
+                    <p className="text-slate-600 mt-1">Manage student assessments with precision and ease</p>
+                  </div>
                 </div>
-                <span className="text-xs rounded-full px-2 py-0.5 bg-indigo-50 text-indigo-700 border">
-                  Max {s.max}
-                </span>
               </div>
-              <div className="mt-3">
+
+              {/* Search Bar */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-slate-400" />
+                </div>
                 <input
-                  type="number"
-                  min={0}
-                  max={s.max}
-                  value={marks[s.code] ?? ""}
-                  onChange={(e) => handleChange(s.code, e.target.value, s.max)}
-                  placeholder={`Enter marks (0-${s.max})`}
-                  className="w-full h-11 rounded-xl border px-3 shadow-inner focus:border-indigo-300 focus:ring-4 focus:ring-indigo-400/20"
+                  type="text"
+                  placeholder="Search students..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full lg:w-80 pl-12 pr-4 py-3.5 bg-white/70 border border-white/30 rounded-2xl shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-200/50 focus:border-indigo-300/50 transition-all duration-300 backdrop-blur-sm"
                 />
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Save Button */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mt-6">
-          <div className="text-sm text-muted-foreground">
-            Total entered:{" "}
-            <span className="font-medium text-foreground">{totalEntered}</span>
+            {/* Controls Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Student Selection */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <Users className="w-4 h-4 text-indigo-600" />
+                  Select Student
+                </label>
+                <div className="relative">
+                  <select
+                    value={studentId}
+                    onChange={(e) => setStudentId(e.target.value)}
+                    className="w-full px-4 py-3.5 bg-white/80 border border-white/40 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-200/50 focus:border-indigo-300/50 transition-all duration-300 appearance-none cursor-pointer backdrop-blur-sm"
+                  >
+                    {filteredStudents.map((s) => (
+                      <option key={s.studentid} value={s.studentid}>
+                        {s.fullname} - {s.studentid}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Semester Selection */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <BookOpen className="w-4 h-4 text-indigo-600" />
+                  Semester
+                </label>
+                <div className="relative">
+                  <select
+                    value={semester}
+                    onChange={(e) => setSemester(Number(e.target.value))}
+                    className="w-full px-4 py-3.5 bg-white/80 border border-white/40 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-200/50 focus:border-indigo-300/50 transition-all duration-300 appearance-none cursor-pointer backdrop-blur-sm"
+                  >
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        Semester {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mid Exam Selection */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <Calendar className="w-4 h-4 text-indigo-600" />
+                  Mid Exam
+                </label>
+                <div className="relative">
+                  <select
+                    value={midNumber}
+                    onChange={(e) => setMidNumber(Number(e.target.value))}
+                    className="w-full px-4 py-3.5 bg-white/80 border border-white/40 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-200/50 focus:border-indigo-300/50 transition-all duration-300 appearance-none cursor-pointer backdrop-blur-sm"
+                  >
+                    <option value={1}>Mid Exam 1</option>
+                    <option value={2}>Mid Exam 2</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Student Info Card */}
+            {getCurrentStudent() && (
+              <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl border border-indigo-100">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-lg">
+                      {getCurrentStudent()?.fullname?.charAt(0)?.toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-slate-800">{getCurrentStudent()?.fullname}</h3>
+                    <p className="text-slate-600 text-sm">Student ID: {getCurrentStudent()?.studentid} | Username: {getCurrentStudent()?.username}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <button
-            onClick={handleSave}
-            disabled={saving || marksSaving}
-            className="h-11 px-6 rounded-xl text-white bg-gradient-to-r from-indigo-600 via-violet-600 to-sky-600 hover:from-indigo-500 hover:via-violet-500 hover:to-sky-500"
-          >
-            {saving || marksSaving ? "Saving..." : "Save Mid Marks"}
-          </button>
         </div>
 
-        {/* Animations */}
-        <style>{`
-          @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          .animate-fade-in { animation: fadeInUp 0.4s ease both }
-        `}</style>
+        {/* Subjects Grid */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
+              <FileText className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-800">Subject Marks Entry</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent"></div>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-white/50 rounded-2xl p-6 h-40 border border-white/30"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {visibleSubjects.map((subject, index) => (
+                <div
+                  key={subject.code}
+                  className="group relative bg-white/80 backdrop-blur-sm border border-white/40 rounded-2xl p-6 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    animation: 'slideInUp 0.6s ease-out both'
+                  }}
+                >
+                  {/* Subject Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-slate-800 leading-tight group-hover:text-indigo-700 transition-colors duration-200">
+                        {subject.name}
+                      </h3>
+                      <p className="text-slate-500 text-sm mt-1">Code: {subject.code}</p>
+                    </div>
+                    <div className="ml-3">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-semibold rounded-full shadow-lg">
+                        <Target className="w-3 h-3" />
+                        {subject.max || 30}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Marks Input */}
+                  <div className="relative">
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min={0}
+                        max={subject.max || 30}
+                        value={marks[subject.code] ?? ""}
+                        onChange={(e) => handleChange(subject.code, e.target.value, subject.max || 30)}
+                        onFocus={() => setFocusedInput(subject.code)}
+                        onBlur={() => setFocusedInput("")}
+                        placeholder="0"
+                        className="w-full px-4 py-4 bg-slate-50/50 border border-slate-200/50 rounded-xl text-lg font-semibold text-center focus:outline-none focus:ring-4 focus:ring-indigo-200/50 focus:border-indigo-400/50 focus:bg-white transition-all duration-300 placeholder-slate-400"
+                      />
+                      <div className={`absolute inset-x-0 -bottom-1 h-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300 ${
+                        focusedInput === subject.code ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                      }`}></div>
+                    </div>
+                    <div className="flex justify-between text-xs text-slate-500 mt-2">
+                      <span>Min: 0</span>
+                      <span>Max: {subject.max || 30}</span>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mt-4">
+                    <div className="flex justify-between text-xs text-slate-500 mb-1">
+                      <span>Progress</span>
+                      <span>{Math.round(((marks[subject.code] || 0) / (subject.max || 30)) * 100)}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-emerald-500 to-teal-600 h-2 rounded-full transition-all duration-500 ease-out"
+                        style={{
+                          width: `${Math.min(((marks[subject.code] || 0) / (subject.max || 30)) * 100, 100)}%`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Summary & Save Section */}
+        <div className="bg-white/80 backdrop-blur-sm border border-white/40 rounded-2xl p-6 shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            {/* Score Summary */}
+            <div className="flex items-center gap-8">
+              <div className="text-center">
+                <div className="flex items-center gap-2 mb-1">
+                  <Star className="w-5 h-5 text-amber-500" />
+                  <span className="text-sm font-medium text-slate-600">Total Entered</span>
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  {totalEntered}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center gap-2 mb-1">
+                  <Trophy className="w-5 h-5 text-indigo-500" />
+                  <span className="text-sm font-medium text-slate-600">Total Possible</span>
+                </div>
+                <div className="text-3xl font-bold text-slate-700">
+                  {totalPossible}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center gap-2 mb-1">
+                  <Target className="w-5 h-5 text-purple-500" />
+                  <span className="text-sm font-medium text-slate-600">Percentage</span>
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  {totalPossible > 0 ? Math.round((totalEntered / totalPossible) * 100) : 0}%
+                </div>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <button
+              onClick={handleSave}
+              disabled={saving || marksSaving}
+              className="group relative px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none transition-all duration-300"
+            >
+              <div className="flex items-center gap-3">
+                {saving || marksSaving ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Save className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+                )}
+                <span className="text-lg">
+                  {saving || marksSaving ? "Saving..." : "Save Mid Marks"}
+                </span>
+              </div>
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-400 via-purple-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Custom Animations */}
+      <style jsx>{`
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .animate-fade-in {
+          animation: fadeIn 0.4s ease-out;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+      `}</style>
     </div>
   );
 }
