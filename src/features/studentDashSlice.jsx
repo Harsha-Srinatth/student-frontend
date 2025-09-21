@@ -97,6 +97,7 @@ const dashboardSlice = createSlice({
       .addCase(fetchSDashboardData.fulfilled, (state, action) => {
         state.loading = false;
         state.student = action.payload.student;
+        state.student.profileImage = action.payload.student.profileImage || null;
         // Handle both cases: counts object or root-level fields
         if (action.payload.counts) {
           state.counts = {

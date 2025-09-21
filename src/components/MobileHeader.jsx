@@ -1,16 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Cookies from "js-cookie";
+import { useSelector } from "react-redux";
+import { User } from "lucide-react"; // 👈 Import from lucide-react
 
 const MobileHeader = () => {
-  // Get values from cookies
-  const userRole = Cookies.get("userRole") || "student";
-  const fullname = Cookies.get("fullname") || Cookies.get("name") || "";
-  const username = Cookies.get("username") || "";
-  const imageUrl = Cookies.get("imageUrl") || "";
+  // Get user data from Redux state
+  const student = useSelector((state) => state.studentDashboard.student);
+
+  const userRole = student?.role || "student";
+  const fullname = student?.fullname || "";
+  const imageUrl = student?.profileImage || ""; // ⚡ Use profileImage from backend
 
   // Display name fallback
-  const displayName = fullname || username || "User";
+  const displayName = fullname || "User";
 
   // Routes
   const homeRoute = userRole === "faculty" ? "/faculty/home" : "/student/home";
@@ -40,7 +42,6 @@ const MobileHeader = () => {
           />
         </div>
 
-
         {/* App name + tagline */}
         <div className="flex flex-col">
           <span className="text-sm font-bold text-white truncate">
@@ -68,11 +69,12 @@ const MobileHeader = () => {
                 transition shadow-md"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 
-              text-white flex items-center justify-center text-sm font-semibold 
-              border-2 border-transparent group-hover:border-purple-400 
+            <div className="w-9 h-9 rounded-full bg-gray-700 
+              flex items-center justify-center border-2 
+              border-transparent group-hover:border-purple-400 
               shadow-md transition">
-              {(displayName || "U").charAt(0).toUpperCase()}
+              {/* Default profile icon from lucide-react */}
+              <User className="w-5 h-5 text-gray-300" />
             </div>
           )}
         </Link>
