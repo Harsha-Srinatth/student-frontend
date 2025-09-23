@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   {
@@ -33,6 +34,7 @@ const capitalizeWords = (str) =>
   str.replace(/\b\w/g, (char) => char.toUpperCase());
 
 const StudentRegistration = () => {
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(
     Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""]))
@@ -141,7 +143,7 @@ const StudentRegistration = () => {
       setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""])));
       setErrors({});
       // navigate after short delay (if desired)
-      setTimeout(() => (window.location.href = "/roleforlogin"), 1200);
+      setTimeout(() => (navigate("/roleforlogin")), 1200);
     } catch (error) {
       console.error("Registration error:", error);
       setResponseMessage({
@@ -280,7 +282,7 @@ const StudentRegistration = () => {
           Already have an account?{" "}
           <button
             type="button"
-            onClick={() => (window.location.href = "/roleforlogin")}
+            onClick={() => (navigate("/roleforlogin"))}
             className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
           >
             Sign in here

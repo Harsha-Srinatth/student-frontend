@@ -2,9 +2,11 @@
 import React, { useState } from "react";
 import api from "../services/api"; // axios instance
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 //  docker-compose down
 //  docker-compose up -d --build
 export default function FacultyLogin() {
+  const  navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,9 +31,9 @@ export default function FacultyLogin() {
 
       // Redirect to role-based home
       if (!user.hasProfilePic) {
-        window.location.href = "/faculty/profile-img/upload";
+         navigate("/faculty/profile-img/upload");
       } else {
-        window.location.href = "/"; // or "/dashboard"
+        navigate("/"); // or "/dashboard"
       }
     } catch (err) {
       console.error(err);
@@ -128,7 +130,7 @@ export default function FacultyLogin() {
                 <p className="text-sm text-gray-600">
                   Don't have an account?{" "}
                   <button 
-                    onClick={() => window.location.href = '/roleoftheuser'}
+                    onClick={() =>  navigate('/roleoftheuser')}
                     className="text-green-600 hover:text-green-700 font-medium transition-colors"
                   >
                     Create one here

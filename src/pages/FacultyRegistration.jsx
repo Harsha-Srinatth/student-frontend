@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   {
@@ -12,7 +13,6 @@ const steps = [
     fields: ["institution", "dept", "dateofjoin"]
   }
 ];
-
 const fieldConfig = {
   facultyid: { label: "Faculty ID", type: "text", required: true },
   fullname: { label: "Full Name", type: "text", required: true },
@@ -30,6 +30,7 @@ const capitalizeWords = (str = "") =>
   str.replace(/\b\w/g, (char) => char.toUpperCase());
 
 const FacultyRegistration = () => {
+  const  navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(
     Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""]))
@@ -128,7 +129,7 @@ const FacultyRegistration = () => {
       setResponseMessage({ type: "success", text: res.data?.message || "Registration successful" });
       setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""])));
       setErrors({});
-      setTimeout(() => (window.location.href = "/roleforlogin"), 1200);
+      setTimeout(() => ( navigate("/roleforlogin")), 1200);
     } catch (error) {
       console.error("Registration error:", error);
       setResponseMessage({
@@ -265,7 +266,7 @@ const FacultyRegistration = () => {
           Already have an account?{" "}
           <button
             type="button"
-            onClick={() => (window.location.href = "/roleforlogin")}
+            onClick={() => (navigate("/roleforlogin"))}
             className="text-green-600 hover:text-green-700 font-medium transition-colors"
           >
             Sign in here

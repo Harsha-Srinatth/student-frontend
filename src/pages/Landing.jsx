@@ -5,7 +5,7 @@ import AnalysisSection from "../components/AnalysisSection";
 import AboutSection from "../components/About";
 import FAQSection from "../components/FAQSection";
 import BackgroundBlobs from "../components/BackgroundBlobs";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 
 export default function Landing() {
   return (
@@ -13,46 +13,46 @@ export default function Landing() {
       <BackgroundBlobs />
       
       <Header />
-
+{/* 
       <motion.div 
         initial={{ opacity: 0, y: 50, scale: 0.95 }} 
         animate={{ opacity: 1, y: 0, scale: 1 }} 
         transition={{ duration: 0.5, ease: "easeOut" }}
-      >
+      > */}
         <HeroSection />
-      </motion.div>
+      {/* </motion.div> */}
 
-      <motion.div 
+      {/* <motion.div 
         initial={{ opacity: 0, y: 50, scale: 0.95 }} 
         animate={{ opacity: 1, y: 0, scale: 1 }} 
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-      >
+      > */}
         <DashboardStats />
-      </motion.div>
+      {/* </motion.div> */}
 
-      <motion.div 
+      {/* <motion.div 
         initial={{ opacity: 0, y: 50, scale: 0.95 }} 
         animate={{ opacity: 1, y: 0, scale: 1 }} 
         transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-      >
+      > */}
         <AnalysisSection />
-      </motion.div>
+      {/* </motion.div> */}
 
-      <motion.div 
+      {/* <motion.div 
         initial={{ opacity: 0, y: 50, scale: 0.95 }} 
         animate={{ opacity: 1, y: 0, scale: 1 }} 
         transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
-      >
+      > */}
         <AboutSection />
-      </motion.div>
+      {/* </motion.div> */}
 
-      <motion.div 
+      {/* <motion.div 
         initial={{ opacity: 0, y: 50, scale: 0.95 }} 
         animate={{ opacity: 1, y: 0, scale: 1 }} 
         transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
-      >
+      > */}
         <FAQSection />
-      </motion.div>
+      {/* </motion.div> */}
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../../services/api';
 import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 
 const AddProfile = () => {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -23,7 +25,7 @@ const AddProfile = () => {
   useEffect(() => {
     if (uploadSuccess) {
       const timer = setTimeout(() => {
-        window.location.href = '/'; // change to your dashboard route
+        navigate('/'); // change to your dashboard route
       }, 2000);
       return () => clearTimeout(timer);
     }
@@ -98,7 +100,7 @@ const AddProfile = () => {
   };
 
   const handleSkip = () => {
-    window.location.href = '/'; // change to your main dashboard route
+    navigate('/'); // change to your main dashboard route
   };
 
   return (

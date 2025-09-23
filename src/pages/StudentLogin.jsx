@@ -2,8 +2,10 @@
 import React, { useState } from "react";
 import api from "../services/api"; // axios instance
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 export default function StudentLogin() {
+  const navigate = useNavigate();
   const [studentid, setStudentid] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,9 +31,9 @@ export default function StudentLogin() {
   
       // ✅ Redirect based on profile picture status
       if (!user.hasProfilePic) {
-        window.location.href = "/student/profile-img/upload";
+        navigate("/student/profile-img/upload");
       } else {
-        window.location.href = "/"; // or "/dashboard"
+        navigate("/"); // or "/dashboard"
       }
     } catch (err) {
       console.error(err);
@@ -120,7 +122,7 @@ export default function StudentLogin() {
                 <p className="text-sm text-gray-600">
                   Don't have an account?{" "}
                   <button 
-                    onClick={() => window.location.href = '/roleoftheuser'}
+                    onClick={() => navigate('/roleoftheuser')}
                     className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
                   >
                     Create one here
