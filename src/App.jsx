@@ -31,6 +31,7 @@ import StudentSettings from './components/student_uploads/StudentSettings.jsx';
 import AddProfile from './components/student_uploads/AddProfile.jsx';
 import StudentResults from './components/student/StudentResults.jsx';
 import StudentClubsEnrol from './components/student/StudentClubsEnrol.jsx';
+import LeaveRequestDashboard from './components/student/LeaveRequestDash.jsx';
 
 // Faculty Dashboard Components
 import FacultyHome from "./facultyDashboard/FacultyHome.jsx";
@@ -44,7 +45,7 @@ import EventsAndCom from './components/facultyDashboard/EventsAndCom.jsx';
 import AddProfileF from './components/facultyDashboard/AddProfileF.jsx';
 import FacultyAttendance from './components/faculty/FacultyAttendance.jsx';
 import FacultyAddMidMarks from './components/faculty/FacultyAddMid.jsx';
-
+import FacultyDashboard from './components/faculty/LeaveReqDash.jsx';
 // 🔒 Protected Route
 const ProtectedRoute = ({ children }) => {
   const token = Cookies.get('token');
@@ -117,6 +118,7 @@ const App = () => {
         <Route path="student/announcements" element={<RoleProtectedRoute allowedRoles={['student']}><Announcements /></RoleProtectedRoute>} />
         <Route path="student/pending/approvels" element={<RoleProtectedRoute allowedRoles={['student']}><StudentPendingApprovels /></RoleProtectedRoute>} />
         <Route path="student/settings" element={<RoleProtectedRoute allowedRoles={['student']}><StudentSettings /></RoleProtectedRoute>} />
+        <Route path="/student/leaveRequests" element={<RoleProtectedRoute allowedRoles={['student']}><LeaveRequestDashboard /></RoleProtectedRoute>} />
         
         {/* Faculty Routes */}
         <Route path="faculty/home" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyHome /></RoleProtectedRoute>} />
@@ -129,6 +131,7 @@ const App = () => {
         <Route path="faculty/announcements" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyAnnouncements /></RoleProtectedRoute>} />
         <Route path="faculty/events/competitions" element={<RoleProtectedRoute allowedRoles={['faculty']}><EventsAndCom /></RoleProtectedRoute>} />
         <Route path="faculty/settings" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultySettings /></RoleProtectedRoute>} />
+        <Route path="/faculty/leave-requests" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyDashboard /></RoleProtectedRoute>} />
       </Route>
       
       {/* Legacy Redirects */}

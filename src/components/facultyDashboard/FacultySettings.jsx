@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector , useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { FileCheck, BookOpen, Users, Shield, Settings, Mail, Phone, User, Calendar, IdCard, Building2, Briefcase } from "lucide-react";
+import { FileCheck, BookOpen, Users, Shield, Settings, Mail, Phone, User, Calendar, IdCard, Building2, Briefcase,Clock } from "lucide-react";
 import { fetchFacultyDashboardData, fetchFacultyMetrics } from "../../features/facultyDashSlice";
 import FacultyMeritsCard from "./facultyMerits";
 
@@ -87,38 +87,45 @@ const FacultySettings = () => {
         designation: "Professor",
       };
 
-  const settingsMenu = [
-    {
-      icon: <FileCheck className="w-8 h-8 text-green-600" />,
-      title: "Approvals",
-      desc: "Approve student activities",
-      path: "/faculty/approvals",
-    },
-    {
-      icon: <BookOpen className="w-8 h-8 text-purple-600" />,
-      title: "Documents",
-      desc: "Upload & verify docs",
-      path: "/faculty/docs",
-    },
-    {
-      icon: <Users className="w-8 h-8 text-blue-600" />,
-      title: "Students",
-      desc: "Manage assigned students",
-      path: "/faculty/students",
-    },
-    {
-      icon: <Shield className="w-8 h-8 text-red-600" />,
-      title: "Security",
-      desc: "Change password & privacy",
-      path: "/faculty/security",
-    },
-    {
-      icon: <Settings className="w-8 h-8 text-gray-600" />,
-      title: "Preferences",
-      desc: "Customize faculty portal",
-      path: "/faculty/preferences",
-    },
-  ];
+      const settingsMenu = [
+        {
+          icon: <FileCheck className="w-8 h-8 text-green-600" />,
+          title: "Approvals",
+          desc: "Approve student activities",
+          path: "/faculty/approvals",
+        },
+        {
+          icon: <BookOpen className="w-8 h-8 text-purple-600" />,
+          title: "Documents",
+          desc: "Upload & verify docs",
+          path: "/faculty/docs",
+        },
+        {
+          icon: <Users className="w-8 h-8 text-blue-600" />,
+          title: "Students",
+          desc: "Manage assigned students",
+          path: "/faculty/students",
+        },
+        {
+          icon: <Clock className="w-8 h-8 text-orange-600" />, // ⏰ leave requests icon
+          title: "Leave Requests",
+          desc: "Review student leave requests",
+          path: "/faculty/leave-requests",
+        },
+        {
+          icon: <Shield className="w-8 h-8 text-red-600" />,
+          title: "Security",
+          desc: "Change password & privacy",
+          path: "/faculty/security",
+        },
+        {
+          icon: <Settings className="w-8 h-8 text-gray-600" />,
+          title: "Preferences",
+          desc: "Customize faculty portal",
+          path: "/faculty/preferences",
+        },
+      ];
+      
 
   return (
     <div className="flex flex-col gap-6 w-full transition-opacity duration-500 ease-out animate-fadeIn">

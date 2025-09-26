@@ -73,7 +73,7 @@ const StudentSettings = ({ student }) => {
       icon: <FileText className="w-8 h-8 text-green-600" />,
       title: "Leave Requests",
       desc: "Apply & track leave status",
-      path: "/student/leave",
+      path: "/student/leaveRequests",
     },
     {
       icon: <BookOpen className="w-8 h-8 text-purple-600" />,

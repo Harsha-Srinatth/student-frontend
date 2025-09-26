@@ -3,27 +3,31 @@ import Cookies from "js-cookie";
 import api from '../../services/api';
 
 const CLUBS = [
-  { id: "tech-coders", name: "Tech Coders", category: "Technology", img: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" },
-  { id: "ai-ml", name: "AI & ML Society", category: "Technology", img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop" },
-  { id: "robotics", name: "Robotics Club", category: "Technology", img: "https://images.unsplash.com/photo-1581091215367-59ab6b3c8278?q=80&w=1200&auto=format&fit=crop" },
-  { id: "cybersec", name: "Cybersecurity", category: "Technology", img: "https://images.unsplash.com/photo-1555949963-aa79dcee981d?q=80&w=1200&auto=format&fit=crop" },
-  { id: "web-dev", name: "Web Dev Guild", category: "Technology", img: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1200&auto=format&fit=crop" },
-  { id: "dance", name: "Dance Crew", category: "Arts", img: "https://images.unsplash.com/photo-1535525153412-a4492a010d66?q=80&w=1200&auto=format&fit=crop" },
-  { id: "music", name: "Music Society", category: "Arts", img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop" },
-  { id: "drama", name: "Drama Club", category: "Arts", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop" },
-  { id: "photography", name: "Photography", category: "Arts", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200&auto=format&fit=crop" },
-  { id: "literature", name: "Literature", category: "Arts", img: "https://images.unsplash.com/photo-1519682337058-a94d519337bc?q=80&w=1200&auto=format&fit=crop" },
-  { id: "football", name: "Football", category: "Sports", img: "https://images.unsplash.com/photo-1502877338535-766e1452684a?q=80&w=1200&auto=format&fit=crop" },
-  { id: "basketball", name: "Basketball", category: "Sports", img: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=1200&auto=format&fit=crop" },
-  { id: "badminton", name: "Badminton", category: "Sports", img: "https://images.unsplash.com/photo-1608817781969-27d2d0f4d6c9?q=80&w=1200&auto=format&fit=crop" },
-  { id: "cricket", name: "Cricket", category: "Sports", img: "https://images.unsplash.com/photo-1540747913346-19e32dc3e37c?q=80&w=1200&auto=format&fit=crop" },
-  { id: "yoga", name: "Yoga & Wellness", category: "Sports", img: "https://images.unsplash.com/photo-1528712306091-ed0763094c98?q=80&w=1200&auto=format&fit=crop" },
-  { id: "eco", name: "Eco & Sustainability", category: "Social", img: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=1200&auto=format&fit=crop" },
-  { id: "community", name: "Community Service", category: "Social", img: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=1200&auto=format&fit=crop" },
-  { id: "entrepreneur", name: "Entrepreneurship", category: "Social", img: "https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d6?q=80&w=1200&auto=format&fit=crop" },
-  { id: "debate", name: "Debate Society", category: "Social", img: "https://images.unsplash.com/photo-1520975693416-631e2a2f3e1f?q=80&w=1200&auto=format&fit=crop" },
-  { id: "language", name: "Language Exchange", category: "Social", img: "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop" },
+  { id: "tech-coders", name: "Tech Coders", category: "Technology", img: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80" },
+  { id: "ai-ml", name: "AI & ML Society", category: "Technology", img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80" },
+  { id: "robotics", name: "Robotics Club", category: "Technology", img: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1200&q=80" },
+  { id: "cybersec", name: "Cybersecurity", category: "Technology", img: "https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?auto=format&fit=crop&w=1200&q=80" },
+  { id: "web-dev", name: "Web Dev Guild", category: "Technology", img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" },
+
+  { id: "dance", name: "Dance Crew", category: "Arts", img: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80" },
+  { id: "music", name: "Music Society", category: "Arts", img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80" },
+  { id: "drama", name: "Drama Club", category: "Arts", img: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=1200&q=80" }, // 🎭 fixed
+  { id: "photography", name: "Photography", category: "Arts", img: "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=1200&q=80" },
+  { id: "literature", name: "Literature", category: "Arts", img: "https://images.unsplash.com/photo-1524578271613-d550eacf6090?auto=format&fit=crop&w=1200&q=80" },
+
+  { id: "football", name: "Football", category: "Sports", img: "https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf?auto=format&fit=crop&w=1200&q=80" },
+  { id: "basketball", name: "Basketball", category: "Sports", img: "https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1200&q=80" },
+  { id: "badminton", name: "Badminton", category: "Sports", img: "https://images.unsplash.com/photo-1599058917212-d750089bc07c?auto=format&fit=crop&w=1200&q=80" }, // 🏸 fixed
+  { id: "cricket", name: "Cricket", category: "Sports", img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80" },
+  { id: "yoga", name: "Yoga & Wellness", category: "Sports", img: "https://images.unsplash.com/photo-1593810450967-f9c42742e326?auto=format&fit=crop&w=1200&q=80" },
+
+  { id: "eco", name: "Eco & Sustainability", category: "Social", img: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80" },
+  { id: "community", name: "Community Service", category: "Social", img: "https://images.unsplash.com/photo-1515168833906-d2a3b82b302a?auto=format&fit=crop&w=1200&q=80" },
+  { id: "entrepreneur", name: "Entrepreneurship", category: "Social", img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80" },
+  { id: "debate", name: "Debate Society", category: "Social", img: "https://images.unsplash.com/photo-1551836022-4c4c79ecde51?auto=format&fit=crop&w=1200&q=80" },
+  { id: "language", name: "Language Exchange", category: "Social", img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80" },
 ];
+
 
 const categories = ["All", "Technology", "Arts", "Sports", "Social"];
 
