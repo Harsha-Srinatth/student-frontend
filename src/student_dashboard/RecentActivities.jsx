@@ -16,6 +16,7 @@ const RecentActivities = () => {
   } = useSelector((state) => state.studentDashboard);
 
   useEffect(() => {
+    // fetchSDashboardData will use cache if data is fresh (< 5 min old)
     dispatch(fetchSDashboardData());
   }, [dispatch]);
 

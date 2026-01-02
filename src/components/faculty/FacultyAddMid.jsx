@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStudentsByFaculty } from "../../features/studentSlice";
+import { fetchStudentsByFaculty } from "../../features/facultySlice";
 import { fetchCurriculum, saveMidMarks } from "../../features/academicsSlice";
 import { 
   Search, 

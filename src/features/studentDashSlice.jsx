@@ -2,46 +2,48 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../services/api";
 import Cookies from "js-cookie";
 
-// Thunk to fetch student dashboard data
+/**
+ * Fetch student dashboard data
+ * Redux store acts as cache - components should check state first before calling
+ */
 export const fetchSDashboardData = createAsyncThunk(
   "dashboard/fetchDashboardData",
-  async () => {
+  async (_, { rejectWithValue }) => {
     const token = Cookies.get("token");
     try {
-      const response = await api.get("/student/home",
-      {
+      const response = await api.get("/student/home", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("data for student dashboard", response.data)
       return response.data;
     } catch (error) {
-      return error.response?.data?.message || "Failed to load dashboard data"
-      ;
+      throw new Error(error.response?.data?.message || "Failed to load dashboard data");
     }
   }
 );
 
-// Thunk to fetch student achievements data
+/**
+ * Fetch student achievements data
+ * Redux store acts as cache - components should check state first before calling
+ */
 export const fetchStudentAchievements = createAsyncThunk(
   "dashboard/fetchStudentAchievements",
   async () => {
     const token = Cookies.get("token");
-    console.log("Fetching student achievements with token:", token ? "present" : "missing");
     try {
       const response = await api.get("/student/achievements", {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching student achievements:", error);
-      console.error("Error response:", error.response?.data);
-      console.error("Error status:", error.response?.status);
       throw new Error(error.response?.data?.message || "Failed to load achievements data");
     }
   }
 );
 
-// Thunk to fetch all approvals for the student
+/**
+ * Fetch all approvals for the student
+ * Redux store acts as cache - components should check state first before calling
+ */
 export const fetchAllApprovals = createAsyncThunk(
   "dashboard/fetchAllApprovals",
   async () => {
@@ -50,18 +52,27 @@ export const fetchAllApprovals = createAsyncThunk(
       const response = await api.get("/student/all-approvals", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("this is the response of the all approvals",response.data);
       return response.data;
     } catch (error) {
-      return error.response?.data?.message || "Failed to load all approvals";
+      throw new Error(error.response?.data?.message || "Failed to load all approvals");
     }
   }
 );
 
+/**
+ * Helper function to check if data is stale
+ * Components can use this to decide if they need to refresh
+ */
+export const isDataStale = (lastFetched, maxAgeMinutes = 5) => {
+  if (!lastFetched) return true;
+  const cacheAge = Date.now() - lastFetched;
+  return cacheAge > (maxAgeMinutes * 60 * 1000);
+};
+
 const dashboardSlice = createSlice({
   name: "studentDashboard",
   initialState: {
-    student: "student",
+    student: null,
     counts: {
       certificationsCount: 0,
       workshopsCount: 0,
@@ -73,21 +84,52 @@ const dashboardSlice = createSlice({
       rejectedCount: 0,
       pendingCount: 0,
     },
-    pendingApprovals: [], // will include reviewedOn, reviewedBy, message
+    pendingApprovals: [],
     rejectedApprovals: [],
     approvedApprovals: [],
     announcements: [],
-    // New achievement data
     achievements: {
-      academic: [], // certifications
-      extracurricular: [], // workshops
-      hackathons: [], // hackathons
-      projects: [], // projects
+      academic: [],
+      extracurricular: [],
+      hackathons: [],
+      projects: [],
     },
     loading: false,
     error: null,
+    // Timestamps for stale checking (Redux is the cache, timestamps help determine freshness)
+    lastFetched: null,
+    achievementsLastFetched: null,
+    approvalsLastFetched: null,
   },
-  reducers: {},
+  reducers: {
+    // Clear cache if needed (e.g., after logout or data update)
+    clearDashboardCache: (state) => {
+      state.student = null;
+      state.counts = {
+        certificationsCount: 0,
+        workshopsCount: 0,
+        clubsJoinedCount: 0,
+        pendingApprovalsCount: 0,
+        hackathonsCount: 0,
+        projectsCount: 0,
+        approvedCount: 0,
+        rejectedCount: 0,
+        pendingCount: 0,
+      };
+      state.pendingApprovals = [];
+      state.rejectedApprovals = [];
+      state.approvedApprovals = [];
+      state.achievements = {
+        academic: [],
+        extracurricular: [],
+        hackathons: [],
+        projects: [],
+      };
+      state.lastFetched = null;
+      state.achievementsLastFetched = null;
+      state.approvalsLastFetched = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSDashboardData.pending, (state) => {
@@ -97,31 +139,21 @@ const dashboardSlice = createSlice({
       .addCase(fetchSDashboardData.fulfilled, (state, action) => {
         state.loading = false;
         state.student = action.payload.student;
-        state.student.profileImage = action.payload.student.profileImage || null;
-        // Handle both cases: counts object or root-level fields
+        if (state.student) {
+          state.student.profileImage = action.payload.student?.profileImage || null;
+        }
+        
         if (action.payload.counts) {
           state.counts = {
             ...state.counts,
             ...action.payload.counts,
-            // Ensure these specific counts are included
             approvedCount: action.payload.counts.approvedCount ?? 0,
             rejectedCount: action.payload.counts.rejectedCount ?? 0,
             pendingCount: action.payload.counts.pendingCount ?? 0,
           };
-        } else {
-          state.counts = {
-            certificationsCount: action.payload.certificationsCount ?? 0,
-            workshopsCount: action.payload.workshopsCount ?? 0,
-            clubsJoinedCount: action.payload.clubsJoinedCount ?? 0,
-            hackathonsCount: action.payload.hackathonsCount ?? 0,
-            projectsCount: action.payload.projectsCount ?? 0,
-            pendingApprovalsCount: action.payload.pendingApprovalsCount ?? 0,
-            approvedCount: action.payload.approvedCount ?? 0,
-            rejectedCount: action.payload.rejectedCount ?? 0,
-            pendingCount: action.payload.pendingCount ?? 0,
-          };
         }
-        state.announcements = action.payload.announcements;
+        
+        state.announcements = action.payload.announcements || [];
         state.pendingApprovals = (action.payload.pendingApprovals || []).map((a) => ({
           ...a,
           reviewedOn: a.reviewedOn,
@@ -131,10 +163,8 @@ const dashboardSlice = createSlice({
         state.rejectedApprovals = action.payload.rejectedApprovals || [];
         state.approvedApprovals = action.payload.approvedApprovals || [];
         
-        // Debug logging
-        console.log("Redux - API Response:", action.payload);
-        console.log("Redux - rejectedApprovals:", action.payload.rejectedApprovals);
-        console.log("Redux - pendingApprovals:", action.payload.pendingApprovals);
+        // Update timestamp (Redux is the cache)
+        state.lastFetched = Date.now();
       })
       .addCase(fetchSDashboardData.rejected, (state, action) => {
         state.loading = false;
@@ -146,13 +176,11 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchStudentAchievements.fulfilled, (state, action) => {
         state.loading = false;
-        console.log("Redux: Received achievements data:", action.payload);
         
-        // Ensure we have the correct data structure
         if (action.payload && action.payload.achievements) {
           state.achievements = action.payload.achievements;
+          state.achievementsLastFetched = Date.now();
         } else {
-          console.warn("No achievements data received:", action.payload);
           state.achievements = {
             academic: [],
             extracurricular: [],
@@ -160,21 +188,6 @@ const dashboardSlice = createSlice({
             projects: [],
           };
         }
-        
-        if (action.payload && action.payload.counts) {
-          state.counts = {
-            ...state.counts,
-            certificationsCount: action.payload.counts.certificationsCount || 0,
-            workshopsCount: action.payload.counts.workshopsCount || 0,
-            hackathonsCount: action.payload.counts.hackathonsCount || 0,
-            projectsCount: action.payload.counts.projectsCount || 0,
-          };
-        }
-        
-        console.log("Redux: Updated state:", {
-          achievements: state.achievements,
-          counts: state.counts
-        });
       })
       .addCase(fetchStudentAchievements.rejected, (state, action) => {
         state.loading = false;
@@ -189,12 +202,14 @@ const dashboardSlice = createSlice({
         state.pendingApprovals = action.payload.pendingApprovals || [];
         state.rejectedApprovals = action.payload.rejectedApprovals || [];
         state.approvedApprovals = action.payload.approvedApprovals || [];
+        state.approvalsLastFetched = Date.now();
       })
       .addCase(fetchAllApprovals.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.error.message;
       });
   },
 });
 
+export const { clearDashboardCache } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

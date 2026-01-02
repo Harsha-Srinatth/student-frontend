@@ -22,7 +22,7 @@ import MainDashboard from "./pages/MainDashboard.jsx";
 // Student Dashboard Components
 import Home from "./student_dashboard/Home.jsx";
 import ActivitiesList from "./components/ActivitiesList.jsx";
-import UploadDocument from './components/student_uploads/UploadDoc.jsx';
+import UploadDocument from './components/student_uploads/uploadDocuments/UploadDoc.jsx';
 import Announcements from './student_dashboard/Announcements.jsx';
 import StudentAchievements from './student_dashboard/StudentAchievements.jsx';
 import StudentDigitalPortfolio from './components/student_uploads/DigitalPortfolio.jsx';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchStudentsByFaculty, fetchStudentDetails, showStudentModal, hideStudentModal } from '../../features/studentSlice';
+import { fetchStudentsByFaculty, fetchStudentDetails, showStudentModal, hideStudentModal } from '../../features/facultySlice';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 

@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchSDashboardData } from "../features/studentDashSlice";
+import { fetchSDashboardData, isDataStale } from "../features/studentDashSlice";
 import { XCircle, Clock, User, MessageCircle, AlertCircle } from "lucide-react";
 
 const RejectedApprovals = () => {
   const [selected, setSelected] = useState(null);
   const dispatch = useDispatch();
-  const { rejectedApprovals = [], loading, error } = useSelector(
+  const { rejectedApprovals = [], loading, error, lastFetched } = useSelector(
     (state) => state.studentDashboard
   );
 
   useEffect(() => {
-    dispatch(fetchSDashboardData());
-  }, [dispatch]);
-
-  // Use the rejectedApprovals array directly from the API response
-  console.log("RejectedApprovals - rejectedApprovals:", rejectedApprovals);
+    // Redux store is the cache - only fetch if data doesn't exist or is stale (>5 min)
+    const hasData = rejectedApprovals.length > 0 || lastFetched;
+    const isStale = isDataStale(lastFetched, 5);
+    
+    if (!hasData || isStale) {
+      dispatch(fetchSDashboardData());
+    }
+  }, [dispatch, rejectedApprovals.length, lastFetched]);
 
   const getTimeAgo = (dateString) => {
     const date = new Date(dateString);

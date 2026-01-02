@@ -3,7 +3,7 @@ import dashboardReducer from "../features/dashboardSlice";
 import activitiesReducer from "../features/activitiesSlice";
 import StudentDashboardReducer from "../features/studentDashSlice";
 import facultyDashboardReducer from "../features/facultyDashSlice";
-import studentReducer from "../features/studentSlice";
+import studentReducer from "../features/facultySlice";
 import academicsReducer from "../features/academicsSlice";
 import resultsReducer from "../features/resultsSlice";
 import studentLeaveReducer from "../features/studentLeaveSlice"; // ✅ already imported

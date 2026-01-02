@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
-import { fetchStudentsByFaculty } from "../../features/studentSlice";
+import { fetchStudentsByFaculty } from "../../features/facultySlice";
 import { submitAttendance } from "../../features/academicsSlice";
 import { toast } from "react-hot-toast";
 import { 

@@ -1,28 +1,29 @@
 import React, { useEffect } from "react";
 import { Award, Activity, BookOpen, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSDashboardData } from "../features/studentDashSlice";
+import { fetchSDashboardData, isDataStale } from "../features/studentDashSlice";
 import { useNavigate } from "react-router-dom";
 
 const QuickStats = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { counts = {}, pendingApprovals = [], loading, error } = useSelector(
+  const { counts = {}, pendingApprovals = [], loading, error, lastFetched } = useSelector(
     (state) => state.studentDashboard
   );
 
   useEffect(() => {
-    dispatch(fetchSDashboardData());
-  }, [dispatch]);
+    // Redux store is the cache - only fetch if data doesn't exist or is stale (>5 min)
+    const hasData = counts && Object.keys(counts).length > 0;
+    const isStale = isDataStale(lastFetched, 5);
+    
+    if (!hasData || isStale) {
+      dispatch(fetchSDashboardData());
+    }
+  }, [dispatch, counts, lastFetched]);
 
-  // Use the counts from the API response instead of filtering pendingApprovals
   const approvedCount = counts?.approvedCount ?? 0;
   const rejectedCount = counts?.rejectedCount ?? 0;
   const pendingCount = counts?.pendingCount ?? 0;
-
-  // Debug logging to verify data
-  console.log("QuickStats - counts:", counts);
-  console.log("QuickStats - approvedCount:", approvedCount, "rejectedCount:", rejectedCount, "pendingCount:", pendingCount);
 
   const stats = [
     { icon: <Award size={28} />, label: "Certifications", value: counts?.certificationsCount ?? 0, path: "/student/achievements/all/docs" },
