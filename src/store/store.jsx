@@ -1,13 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
-import dashboardReducer from "../features/dashboardSlice";
-import activitiesReducer from "../features/activitiesSlice";
-import StudentDashboardReducer from "../features/studentDashSlice";
-import facultyDashboardReducer from "../features/facultyDashSlice";
-import studentReducer from "../features/facultySlice";
-import academicsReducer from "../features/academicsSlice";
-import resultsReducer from "../features/resultsSlice";
-import studentLeaveReducer from "../features/studentLeaveSlice"; // ✅ already imported
-import facultyLeaveReducer from "../features/facultyLeaveReqSlice"; // ✅ import the faculty slice
+import dashboardReducer from "../features/shared/dashboardSlice";
+import activitiesReducer from "../features/shared/activitiesSlice";
+import StudentDashboardReducer from "../features/student/studentDashSlice";
+import facultyDashboardReducer from "../features/faculty/facultyDashSlice";
+import studentReducer from "../features/faculty/facultySlice";
+import academicsReducer from "../features/shared/academicsSlice";
+import resultsReducer from "../features/shared/resultsSlice";
+import studentLeaveReducer from "../features/student/studentLeaveSlice";
+import facultyLeaveReducer from "../features/faculty/facultyLeaveReqSlice";
+import clubsReducer from "../features/shared/clubsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -19,7 +20,8 @@ export const store = configureStore({
     academics: academicsReducer,
     results: resultsReducer,
     studentLeave: studentLeaveReducer,
-    facultyLeave: facultyLeaveReducer, // ✅ hooked up here
+    facultyLeave: facultyLeaveReducer,
+    clubs: clubsReducer,
     // you can add more slices here
   },
 });

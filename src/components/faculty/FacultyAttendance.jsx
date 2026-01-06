@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
-import { fetchStudentsByFaculty } from "../../features/facultySlice";
-import { submitAttendance } from "../../features/academicsSlice";
+import { fetchStudentsByFaculty } from "../../features/faculty/facultySlice";
+import { submitAttendance } from "../../features/shared/academicsSlice";
 import { toast } from "react-hot-toast";
 import { 
   Search, 
@@ -27,10 +27,14 @@ const FacultyAttendance = () => {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    dispatch(fetchStudentsByFaculty());
-  }, [dispatch]);
+    // Only fetch if students not already in Redux or data is stale
+    if (!students || students.length === 0) {
+      dispatch(fetchStudentsByFaculty());
+    }
+  }, [dispatch, students]);
 
   useEffect(() => {
+    // Students are already sorted by studentid from the backend
     const normalized = (students || []).map((s) => ({
       id: s.studentid || s.id,
       name: s.fullname || s.name,
@@ -38,13 +42,7 @@ const FacultyAttendance = () => {
       present: true,
     }));
   
-    const sorted = [...normalized].sort((a, b) => {
-      const aId = a.id.toString();
-      const bId = b.id.toString();
-      return aId.localeCompare(bId, undefined, { numeric: true });
-    });
-  
-    setRows(sorted);
+    setRows(normalized);
   }, [students]);
 
   const filtered = useMemo(() => {

@@ -78,3 +78,12 @@ html {
     opacity: 1;
   }
 }
+
+/* Ensure date input text is always visible when value exists */
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #1f2937;
+  opacity: 1;
+}

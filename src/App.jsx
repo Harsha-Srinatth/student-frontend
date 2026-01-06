@@ -3,46 +3,47 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 // Public Pages
-import Landing from './pages/Landing.jsx';
-import RoleOfTheUser from './pages/Roleoftheuser.jsx';
-import Roleforlogin from './pages/Roleforlogin.jsx';
+import Landing from './pages/auth/Landing.jsx';
+import RoleOfTheUser from './pages/auth/Roleoftheuser.jsx';
+import Roleforlogin from './pages/auth/Roleforlogin.jsx';
 import OtpPage from "./forms/OtpPage";
 
 // Registration Pages
-import StudentRegistration from './pages/StudentRegistration.jsx';
-import FacultyRegistration from './pages/FacultyRegistration.jsx';
+import StudentRegistration from './pages/auth/StudentRegistration.jsx';
+import FacultyRegistration from './pages/auth/FacultyRegistration.jsx';
 
 // Login Pages
-import StudentLogin from './pages/StudentLogin.jsx';
-import FacultyLogin from './pages/FacultyLogin.jsx';
+import StudentLogin from './pages/auth/StudentLogin.jsx';
+import FacultyLogin from './pages/auth/FacultyLogin.jsx';
 
 // Dashboard Layout
 import MainDashboard from "./pages/MainDashboard.jsx";
 
 // Student Dashboard Components
-import Home from "./student_dashboard/Home.jsx";
-import ActivitiesList from "./components/ActivitiesList.jsx";
-import UploadDocument from './components/student_uploads/uploadDocuments/UploadDoc.jsx';
-import Announcements from './student_dashboard/Announcements.jsx';
-import StudentAchievements from './student_dashboard/StudentAchievements.jsx';
-import StudentDigitalPortfolio from './components/student_uploads/DigitalPortfolio.jsx';
-import StudentPendingApprovels from './components/student_uploads/StudentPendingApprovels.jsx';
-import StudentSettings from './components/student_uploads/StudentSettings.jsx';
-import AddProfile from './components/student_uploads/AddProfile.jsx';
+import Home from "./pages/student/student_dashboard/Home.jsx";
+import ActivitiesList from "./components/shared/ActivitiesList.jsx";
+import UploadDocument from './components/student/student_uploads/uploadDocuments/UploadDoc.jsx';
+import Announcements from './pages/student/student_dashboard/Announcements.jsx';
+import StudentAchievements from './pages/student/student_dashboard/StudentAchievements.jsx';
+import StudentDigitalPortfolio from './components/student/student_uploads/DigitalPortfolio.jsx';
+import StudentPendingApprovels from './components/student/student_uploads/StudentPendingApprovels.jsx';
+import StudentSettings from './components/student/student_uploads/StudentSettings.jsx';
+import UpdateStudentProfile from './components/student/student_uploads/UpdateStudentProfile.jsx';
+import AddProfile from './components/student/student_uploads/AddProfile.jsx';
 import StudentResults from './components/student/StudentResults.jsx';
 import StudentClubsEnrol from './components/student/StudentClubsEnrol.jsx';
 import LeaveRequestDashboard from './components/student/LeaveRequestDash.jsx';
 
 // Faculty Dashboard Components
-import FacultyHome from "./facultyDashboard/FacultyHome.jsx";
-import PendingApprovals from "./facultyDashboard/PendingApprovals.jsx";
-import RecentVerifications from "./facultyDashboard/RecentVerifications.jsx";
-import FacultyAnnouncements from "./facultyDashboard/Announcements.jsx";
-import StudentList from './components/facultyDashboard/StudentList.jsx';
-import ApprovedByYou from './facultyDashboard/ApprovedByYou.jsx';
-import FacultySettings from './components/facultyDashboard/FacultySettings.jsx';
-import EventsAndCom from './components/facultyDashboard/EventsAndCom.jsx';
-import AddProfileF from './components/facultyDashboard/AddProfileF.jsx';
+import FacultyHome from "./pages/faculty/facultyDashboard/FacultyHome.jsx";
+import PendingApprovals from "./pages/faculty/facultyDashboard/PendingApprovals.jsx";
+import RecentVerifications from "./pages/faculty/facultyDashboard/RecentVerifications.jsx";
+import FacultyAnnouncements from "./pages/faculty/facultyDashboard/Announcements.jsx";
+import StudentList from './components/faculty/facultyDashboard/StudentList.jsx';
+import ApprovedByYou from './pages/faculty/facultyDashboard/ApprovedByYou.jsx';
+import FacultySettings from './components/faculty/facultyDashboard/FacultySettings.jsx';
+import EventsAndCom from './components/faculty/facultyDashboard/EventsAndCom.jsx';
+import AddProfileF from './components/faculty/facultyDashboard/AddProfileF.jsx';
 import FacultyAttendance from './components/faculty/FacultyAttendance.jsx';
 import FacultyAddMidMarks from './components/faculty/FacultyAddMid.jsx';
 import FacultyDashboard from './components/faculty/LeaveReqDash.jsx';
@@ -118,6 +119,7 @@ const App = () => {
         <Route path="student/announcements" element={<RoleProtectedRoute allowedRoles={['student']}><Announcements /></RoleProtectedRoute>} />
         <Route path="student/pending/approvels" element={<RoleProtectedRoute allowedRoles={['student']}><StudentPendingApprovels /></RoleProtectedRoute>} />
         <Route path="student/settings" element={<RoleProtectedRoute allowedRoles={['student']}><StudentSettings /></RoleProtectedRoute>} />
+        <Route path="student/profile/update" element={<RoleProtectedRoute allowedRoles={['student']}><UpdateStudentProfile /></RoleProtectedRoute>} />
         <Route path="/student/leaveRequests" element={<RoleProtectedRoute allowedRoles={['student']}><LeaveRequestDashboard /></RoleProtectedRoute>} />
         
         {/* Faculty Routes */}

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStudentsByFaculty } from "../../features/facultySlice";
-import { fetchCurriculum, saveMidMarks } from "../../features/academicsSlice";
+import { fetchStudentsByFaculty } from "../../features/faculty/facultySlice";
+import { fetchCurriculum, saveMidMarks } from "../../features/shared/academicsSlice";
 import { 
   Search, 
   Users, 
@@ -36,14 +36,8 @@ export default function FacultyAddMidMarks() {
   const [search, setSearch] = useState("");
   const [focusedInput, setFocusedInput] = useState("");
 
-  // Sort students by ID
-  const sortedStudents = useMemo(() => {
-    return [...(students || [])].sort((a, b) =>
-      a.studentid.toString().localeCompare(b.studentid.toString(), undefined, {
-        numeric: true,
-      })
-    );
-  }, [students]);
+  // Students are already sorted by studentid from the backend
+  const sortedStudents = students || [];
 
   // First student as default
   useEffect(() => {
@@ -52,10 +46,12 @@ export default function FacultyAddMidMarks() {
     }
   }, [sortedStudents, studentId]);
 
-  // Load faculty students
+  // Load faculty students - only if not already in Redux
   useEffect(() => {
-    dispatch(fetchStudentsByFaculty());
-  }, [dispatch]);
+    if (!students || students.length === 0) {
+      dispatch(fetchStudentsByFaculty());
+    }
+  }, [dispatch, students]);
 
   // Fetch curriculum
   useEffect(() => {

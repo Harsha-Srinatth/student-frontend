@@ -1,9 +1,9 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 // import Header from '../components/MainHeader';
-import MobileHeader from '../components/MobileHeader';
-import Sidebar from '../components/Sidebar';
-import Bottombar from '../components/Bottombar.jsx';
+import MobileHeader from '../components/shared/MobileHeader';
+import Sidebar from '../components/shared/Sidebar';
+import Bottombar from '../components/shared/Bottombar.jsx';
 
 const MainDashboard = () => {
   return (

@@ -4,9 +4,9 @@ import {
   fetchLeaveRequests,
   submitLeaveRequest,
   fetchLeaveRequestDetails,
-} from "../../features/studentLeaveSlice";
-import LeaveRequestForm from "../../components/student/LeaveRequestForm";
-import LeaveRequestModal from "../../components/student/LeaveReqModel";
+} from "../../features/student/studentLeaveSlice";
+import LeaveRequestForm from "./LeaveRequestForm";
+import LeaveRequestModal from "./LeaveReqModel";
 import { 
   Plus, BarChart3, Clock, CheckCircle, XCircle, Search, 
   Filter, Calendar, AlertCircle, FileText, Eye, Users

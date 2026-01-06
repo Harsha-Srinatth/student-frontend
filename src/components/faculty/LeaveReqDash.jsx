@@ -5,8 +5,8 @@ import {
   Search, Filter
 } from 'lucide-react';
 
-import FacultyLeaveRequestCard from '../../components/faculty/LeaveReqCard';
-import FacultyLeaveRequestModal from '../../components/faculty/LeaveReqModel';
+import FacultyLeaveRequestCard from './LeaveReqCard';
+import FacultyLeaveRequestModal from './LeaveReqModel';
 
 // Thunks & selectors from your redux slice
 import {
@@ -19,7 +19,7 @@ import {
   selectFacultyProfile,
   selectFacultyLoading,
   selectFacultyError
-} from '../../features/facultyLeaveReqSlice';
+} from '../../features/faculty/facultyLeaveReqSlice';
 
 const FacultyDashboard = () => {
   const dispatch = useDispatch();

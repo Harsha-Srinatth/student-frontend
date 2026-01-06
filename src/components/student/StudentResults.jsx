@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCurriculum } from "../../features/academicsSlice";
-import { fetchResults } from "../../features/resultsSlice";
-import { fetchSDashboardData } from "../../features/studentDashSlice";
+import { fetchCurriculum } from "../../features/shared/academicsSlice";
+import { fetchResults } from "../../features/shared/resultsSlice";
+import { fetchSDashboardData } from "../../features/student/studentDashSlice";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { FiAlertCircle, FiCheckCircle, FiLock } from "react-icons/fi";
