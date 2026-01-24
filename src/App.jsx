@@ -51,9 +51,9 @@ import FacultyAddMidMarks from './components/faculty/FacultyAddMid.jsx';
 import FacultyDashboard from './components/faculty/LeaveReqDash.jsx';
 
 // Admin Dashboard Components
-import AdminDashboard from './pages/admin/AdminDashboard.jsx';
-import AnnouncementsManagement from './pages/admin/AnnouncementsManagement.jsx';
-import Analytics from './pages/admin/Analytics.jsx';
+import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
+import AnnouncementsManagement from './pages/Admin/AnnouncementsManagement.jsx';
+import Analytics from './pages/Admin/Analytics.jsx';
 // 🔒 Protected Route
 const ProtectedRoute = ({ children }) => {
   const token = Cookies.get('token');
