@@ -5,21 +5,44 @@ import axios from 'axios';
 // Vite uses VITE_ prefix for environment variables
 let API_BASE_URL = import.meta.env.VITE_API_URL;
 
-// If no env variable or if it's just a port number, use default
-if (!API_BASE_URL || /^\d+$/.test(API_BASE_URL)) {
-  // Default to port 3000 for local development
-  API_BASE_URL = 'http://localhost:3000';
+// Check if we're in production (Vercel sets this automatically)
+const isProduction = import.meta.env.PROD;
+const isDevelopment = import.meta.env.DEV;
+
+// If no env variable is set
+if (!API_BASE_URL || API_BASE_URL.trim() === '') {
+  if (isProduction) {
+    // In production, we MUST have an API URL - log error
+    console.error('❌ VITE_API_URL environment variable is not set in production!');
+    console.error('Please set VITE_API_URL in your Vercel environment variables.');
+    // You can set a default production URL here if needed
+    // API_BASE_URL = 'https://your-backend-api.vercel.app';
+  } else {
+    // Default to localhost for development
+    API_BASE_URL = 'http://localhost:3000';
+    console.log('🔧 Using default API URL for development:', API_BASE_URL);
+  }
 }
 
-// Ensure API_BASE_URL is a valid full URL (not just a port number)
+// If it's just a port number, construct the full URL
+if (/^\d+$/.test(API_BASE_URL)) {
+  API_BASE_URL = isProduction 
+    ? `https://your-backend-api.vercel.app` // Replace with your actual backend URL
+    : `http://localhost:${API_BASE_URL}`;
+}
+
+// Ensure API_BASE_URL is a valid full URL
 if (!API_BASE_URL.startsWith('http://') && !API_BASE_URL.startsWith('https://')) {
-  // If it's just a port number, construct the full URL
-  if (/^\d+$/.test(API_BASE_URL)) {
-    API_BASE_URL = `http://localhost:${API_BASE_URL}`;
+  if (isProduction) {
+    console.error('❌ Invalid VITE_API_URL format. Must be a full URL (e.g., https://api.example.com)');
   } else {
-    // Default fallback to port 3000
-    API_BASE_URL = 'http://localhost:3000';
+    API_BASE_URL = `http://localhost:3000`;
   }
+}
+
+// Log the API URL being used (only in development for security)
+if (isDevelopment) {
+  console.log('🌐 API Base URL:', API_BASE_URL);
 }
 
 const api = axios.create({
