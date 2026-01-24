@@ -13,6 +13,9 @@ dist
 dist-ssr
 *.local
 
+#api.jsx file is not to be pushed to the repository
+/src/services/api.jsx
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

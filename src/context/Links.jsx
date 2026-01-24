@@ -47,3 +47,18 @@ export const FacultyBottombarLinks = [
   { icon: <History size={20} />, label: 'Verifications', route: '/faculty/verifications' },
   { icon: <Megaphone size={20} />, label: 'Announcements', route: '/faculty/announcements' },
 ];
+
+// 👨‍💼 Admin Sidebar Links
+export const AdminSidebarLinks = [
+  { icon: <Home size={20} />, label: 'Dashboard', route: '/admin/dashboard' },
+  { icon: <Megaphone size={20} />, label: 'Announcements', route: '/admin/announcements' },
+  { icon: <BarChart3 size={20} />, label: 'Analytics', route: '/admin/analytics' },
+  { icon: <Settings size={20} />, label: 'Settings', route: '/admin/settings' },
+];
+
+// 📱 Admin Bottom Bar (Mobile)
+export const AdminBottombarLinks = [
+  { icon: <Home size={20} />, label: 'Home', route: '/admin/dashboard' },
+  { icon: <Megaphone size={20} />, label: 'Announcements', route: '/admin/announcements' },
+  { icon: <BarChart3 size={20} />, label: 'Analytics', route: '/admin/analytics' },
+];

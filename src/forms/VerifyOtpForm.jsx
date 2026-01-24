@@ -1,16 +1,21 @@
 import { useState } from "react";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 export default function VerifyOtpForm({ mobile }) {
   const [otp, setOtp] = useState("");
-
+  const navigate = useNavigate();
   const handleVerify = async (e) => {
     e.preventDefault();
     try {
       const res = await api.post("/otp/verify", { mobile, otp });
-      alert(res.data.message);
+      if (res.data.success) {
+        alert(res.data.message || "OTP verified successfully");
+        navigate("/");
+      }
     } catch (err) {
-      alert("Invalid OTP");
+      const errorMessage = err.response?.data?.message || "Invalid or expired OTP";
+      alert(errorMessage);
     }
   };
 

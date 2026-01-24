@@ -106,6 +106,30 @@ export const fetchFacultyMetrics = createAsyncThunk(
   }
 );
 
+/**
+ * Fetch announcements for the faculty
+ * Redux store acts as cache - components should check state first before calling
+ */
+export const fetchFacultyAnnouncements = createAsyncThunk(
+  'facultyDashboard/fetchAnnouncements',
+  async (_, { rejectWithValue, getState }) => {
+    const state = getState();
+    const { announcements, announcementsLastFetched } = state.facultyDashboard;
+    
+    // If data exists and is fresh (less than 2 minutes old), skip fetch
+    if (announcements && announcements.length > 0 && announcementsLastFetched && Date.now() - announcementsLastFetched < 2 * 60 * 1000) {
+      return { fromCache: true, data: announcements };
+    }
+    
+    try {
+      const response = await api.get('/faculty/announcements');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to load announcements');
+    }
+  }
+);
+
 const facultyDashboardSlice = createSlice({
   name: 'facultyDashboard',
   initialState: {
@@ -130,6 +154,8 @@ const facultyDashboardSlice = createSlice({
     },
     approvalsGiven: [], // Store all approvals given by faculty
     recentActivities: [], // Store recent activity log
+    announcements: [], // Store announcements
+    announcementsLastFetched: null, // Timestamp for announcements cache
     metrics: {
       performance: {
         approvalRate: 0,
@@ -152,6 +178,44 @@ const facultyDashboardSlice = createSlice({
     },
     updateStats: (state, action) => {
       state.stats = { ...state.stats, ...action.payload };
+    },
+    // Real-time update handlers
+    updateStatsRealtime: (state, action) => {
+      if (action.payload) {
+        console.log('🔄 Updating faculty stats in Redux:', {
+          previous: state.stats,
+          incoming: action.payload,
+        });
+        state.stats = { ...state.stats, ...action.payload };
+        console.log('✅ Updated faculty stats:', state.stats);
+      } else {
+        console.warn('⚠️ updateStatsRealtime called with no payload');
+      }
+    },
+    updatePendingApprovalsRealtime: (state, action) => {
+      if (action.payload !== undefined) {
+        state.pendingApprovals = action.payload;
+        // Update pending count in stats
+        if (Array.isArray(action.payload)) {
+          state.stats.pendingApprovals = action.payload.length;
+        }
+      }
+    },
+    updateActivitiesRealtime: (state, action) => {
+      if (action.payload) {
+        state.activities = action.payload;
+      }
+    },
+    updateMetricsRealtime: (state, action) => {
+      if (action.payload) {
+        state.metrics = action.payload;
+      }
+    },
+    updateAnnouncementsRealtime: (state, action) => {
+      if (action.payload) {
+        state.announcements = action.payload;
+        state.announcementsLastFetched = Date.now();
+      }
     },
     // Invalidate cache to force refresh on next fetch
     // Clears data so next fetch will go to API
@@ -244,9 +308,35 @@ const facultyDashboardSlice = createSlice({
       .addCase(fetchFacultyMetrics.rejected, (state, action) => {
         state.metricsLoading = false;
         state.error = action.payload;
+      })
+      // Fetch announcements
+      .addCase(fetchFacultyAnnouncements.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFacultyAnnouncements.fulfilled, (state, action) => {
+        state.loading = false;
+        if (!action.payload.fromCache) {
+          state.announcements = action.payload.data || [];
+          state.announcementsLastFetched = Date.now();
+        }
+      })
+      .addCase(fetchFacultyAnnouncements.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   }
 });
 
-export const { clearError, updateStats, invalidateCache, updatePendingApprovalsCount } = facultyDashboardSlice.actions;
+export const { 
+  clearError, 
+  updateStats, 
+  invalidateCache, 
+  updatePendingApprovalsCount,
+  updateStatsRealtime,
+  updatePendingApprovalsRealtime,
+  updateActivitiesRealtime,
+  updateMetricsRealtime,
+  updateAnnouncementsRealtime,
+} = facultyDashboardSlice.actions;
 export default facultyDashboardSlice.reducer;

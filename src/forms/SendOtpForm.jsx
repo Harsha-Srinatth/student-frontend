@@ -7,11 +7,14 @@ export default function SendOtpForm({ onSent }) {
   const handleSend = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/otp/send", { mobile });
-      alert("OTP generated (check backend console)");
-      onSent(mobile);
+      const res = await api.post("/otp/send", { mobile });
+      if (res.data.success) {
+        alert(res.data.message || "OTP sent successfully");
+        onSent(mobile);
+      }
     } catch (err) {
-      alert("Failed to send OTP");
+      const errorMessage = err.response?.data?.message || "Failed to send OTP";
+      alert(errorMessage);
     }
   };
 

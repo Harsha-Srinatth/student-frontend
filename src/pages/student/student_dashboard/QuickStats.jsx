@@ -1,27 +1,45 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Award, Activity, BookOpen, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSDashboardData, isDataStale } from "../../../features/student/studentDashSlice";
 import { useNavigate } from "react-router-dom";
 import LoadingSkeleton from "../../../components/shared/LoadingSkeleton";
 import ErrorState from "../../../components/shared/ErrorState";
+import { mergeCounts } from "../../../utils/realtimeHelpers";
 
 const QuickStats = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { counts = {}, pendingApprovals = [], loading, error, lastFetched } = useSelector(
-    (state) => state.studentDashboard
-  );
+  const studentDashboard = useSelector((state) => state.studentDashboard);
+  const realtimeData = useSelector((state) => state.realtime?.student);
+  
+  // Merge real-time counts with existing counts
+  const counts = useMemo(() => {
+    const baseCounts = studentDashboard.counts || {};
+    const realtimeCounts = realtimeData?.counts || {};
+    return mergeCounts(baseCounts, realtimeCounts);
+  }, [studentDashboard.counts, realtimeData?.counts]);
+  
+  const { pendingApprovals = [], loading, error, lastFetched } = studentDashboard;
+
+  // Check for real-time updates
+  const lastRealtimeUpdate = useSelector((state) => state.realtime?.lastUpdated?.student);
 
   useEffect(() => {
     // Redux store is the cache - only fetch if data doesn't exist or is stale (>5 min)
     const hasData = counts && Object.keys(counts).length > 0;
     const isStale = isDataStale(lastFetched, 5);
     
-    if (!hasData || isStale) {
+    // Refetch if real-time update occurred and we haven't fetched recently
+    const shouldRefetchForRealtime = lastRealtimeUpdate && 
+      (Date.now() - lastRealtimeUpdate < 5000) && 
+      lastFetched && 
+      (lastRealtimeUpdate > lastFetched);
+    
+    if (!hasData || isStale || shouldRefetchForRealtime) {
       dispatch(fetchSDashboardData());
     }
-  }, [dispatch, counts, lastFetched]);
+  }, [dispatch, counts, lastFetched, lastRealtimeUpdate]);
 
   const approvedCount = counts?.approvedCount ?? 0;
   const rejectedCount = counts?.rejectedCount ?? 0;

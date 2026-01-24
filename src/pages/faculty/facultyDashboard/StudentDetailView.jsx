@@ -9,7 +9,7 @@ const StudentDetailView = ({ student, onBack }) => {
   const handleApproval = async (type, description, action) => {
     try {
       setLoading(true);
-      await api.post(`/faculty/approve/${student.studentid}/dummy`, {
+      await api.post(`/faculty/approve/${student.studentid}`, {
         action: action,
         message: message,
         type: type,
@@ -60,7 +60,7 @@ const StudentDetailView = ({ student, onBack }) => {
         const workshop = student.workshops?.find(w => w.title === approval.description);
         return workshop;
       case 'club':
-        const club = student.clubsJoined?.find(c => c.name === approval.description);
+        const club = student.clubsJoined?.find(c => (c.title === approval.description || c.clubName === approval.description));
         return club;
       case 'internship':
         const internship = student.internships?.find(i => `${i.organization} - ${i.role}` === approval.description);
@@ -280,7 +280,7 @@ const StudentDetailView = ({ student, onBack }) => {
                     <h5 className="font-medium text-gray-900 mb-2">Uploaded Document:</h5>
                     <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                       <img
-                        src={submissionDetails.imageUrl || submissionDetails.certificateUrl || approval.imageUrl}
+                        src={submissionDetails?.imageUrl || submissionDetails?.certificateUrl || approval?.imageUrl}
                         alt={`${approval.type} document`}
                         className="max-w-full max-h-96 rounded-lg shadow-sm mx-auto block"
                         onError={(e) => {

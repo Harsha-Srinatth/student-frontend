@@ -1,0 +1,145 @@
+import React, { useState } from "react";
+import api from "../../services/api";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+
+export default function AdminLogin() {
+  const navigate = useNavigate();
+  const [adminId, setAdminId] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await api.post("/admin/login", {
+        adminId,
+        password,
+      });
+
+      const token = response.data.token;
+      const user = response.data.user;
+
+      Cookies.set("token", token, { expires: 7, secure: true });
+      Cookies.set("userRole", "admin", { expires: 7, secure: true });
+      Cookies.set("adminId", user.adminId, { expires: 7, secure: true });
+      Cookies.set("collegeId", user.collegeId, { expires: 7, secure: true });
+
+      navigate("/admin/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-4xl mx-auto p-6">
+      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="flex flex-col lg:flex-row">
+          {/* Left Side - Login Form */}
+          <div className="w-full lg:w-1/2 p-8 lg:p-12">
+            <div className="max-w-md mx-auto">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Admin Portal</h2>
+                <p className="text-gray-600">Sign in to manage your college</p>
+              </div>
+
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span className="text-red-700 font-medium">{error}</span>
+                  </div>
+                </div>
+              )}
+
+              <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">Admin ID</label>
+                  <input
+                    type="text"
+                    placeholder="Enter your admin ID"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                    value={adminId}
+                    onChange={(e) => setAdminId(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">Password</label>
+                  <input
+                    type="password"
+                    placeholder="Enter your password"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full py-4 px-6 rounded-xl font-semibold text-white transition-all duration-200 ${
+                    loading 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                  }`}
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Signing in...</span>
+                    </div>
+                  ) : (
+                    'Sign In'
+                  )}
+                </button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  Don't have an account?{" "}
+                  <button 
+                    onClick={() => navigate('/admin/register')}
+                    className="text-purple-600 hover:text-purple-700 font-medium transition-colors"
+                  >
+                    Register here
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side - Illustration */}
+          <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-purple-50 to-indigo-50 items-center justify-center p-8">
+            <div className="text-center">
+              <div className="w-64 h-64 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-32 h-32 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Admin Control Center</h3>
+              <p className="text-gray-600 text-lg max-w-sm mx-auto">
+                Manage announcements, view analytics, and monitor department performance all in one place.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StudentSidebarLinks, FacultySidebarLinks } from "../../context/Links";
+import { StudentSidebarLinks, FacultySidebarLinks, AdminSidebarLinks } from "../../context/Links";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { FaSignOutAlt } from "react-icons/fa";
@@ -24,6 +24,7 @@ const Sidebar = () => {
 
   const userRole = Cookies.get("userRole");
   const rawLinks =
+    userRole === "admin" ? AdminSidebarLinks :
     userRole === "faculty" ? FacultySidebarLinks : StudentSidebarLinks;
 
   // 🎨 Assign hover colors dynamically to links
@@ -61,17 +62,19 @@ const Sidebar = () => {
          </div>
 
           <h1 className="font-bold text-lg bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            {userRole === "faculty" ? "Faculty Portal" : "Student Hub"}
+            {userRole === "admin" ? "Admin Portal" : userRole === "faculty" ? "Faculty Portal" : "Student Hub"}
           </h1>
         </div>
         <span
           className={`mt-2 text-xs px-3 py-1 rounded-full shadow-sm ${
-            userRole === "faculty"
+            userRole === "admin"
+              ? "bg-purple-200/20 text-purple-300 border border-purple-400/30"
+              : userRole === "faculty"
               ? "bg-green-200/20 text-green-300 border border-green-400/30"
               : "bg-blue-200/20 text-blue-300 border border-blue-400/30"
           }`}
         >
-          {userRole === "faculty" ? "Faculty" : "Student"}
+          {userRole === "admin" ? "Admin" : userRole === "faculty" ? "Faculty" : "Student"}
         </span>
       </div>
 

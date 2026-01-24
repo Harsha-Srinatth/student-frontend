@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import RoleSelector from "./RoleSelector";
 import StudentRegistration from "./StudentRegistration";
 import FacultyRegistration from "./FacultyRegistration";
+import AdminRegistration from "./AdminRegistration";
 
 const RoleOfTheUser = () => {
   const [role, setRole] = useState("");
@@ -42,8 +43,10 @@ const RoleOfTheUser = () => {
               <div className="pt-16">
                 {role === "student" ? (
                   <StudentRegistration />
-                ) : (
+                ) : role === "faculty" ? (
                   <FacultyRegistration />
+                ) : (
+                  <AdminRegistration />
                 )}
               </div>
             </div>

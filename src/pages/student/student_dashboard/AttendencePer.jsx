@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { Calendar, TrendingUp, Users, Award } from 'lucide-react';
@@ -10,6 +11,9 @@ const AttendencePer = () => {
   const [presentClasses, setPresentClasses] = useState(0);
   const [absentClasses, setAbsentClasses] = useState(0);
   const [totalClasses, setTotalClasses] = useState(0);
+  
+  // Listen to real-time attendance updates from Redux
+  const attendanceUpdate = useSelector((state) => state.realtime?.student?.attendance);
 
   // Fetch real attendance stats
   useEffect(() => {
@@ -40,6 +44,32 @@ const AttendencePer = () => {
     fetchAttendance();
     return () => { isMounted = false; };
   }, []);
+
+  // Refetch when attendance update is received via socket
+  useEffect(() => {
+    if (attendanceUpdate && attendanceUpdate.updated) {
+      console.log('🔄 Attendance updated, refetching data...', attendanceUpdate);
+      // Small delay to ensure backend has saved the data
+      const timer = setTimeout(async () => {
+        try {
+          const res = await api.get('/student/attendance');
+          const data = res?.data?.data;
+          if (data) {
+            setAttendancePercentage(data.attendancePercentage || 0);
+            setPresentClasses(data.presentClasses || 0);
+            setAbsentClasses(data.absentClasses || 0);
+            setTotalClasses(data.totalClasses || 0);
+            setTimeout(() => {
+              setAnimatedPercentage(data.attendancePercentage || 0);
+            }, 500);
+          }
+        } catch (e) {
+          console.error('Error refetching attendance:', e);
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [attendanceUpdate]);
 
   // Determine color based on attendance percentage - softer, more attractive colors
   const getAttendanceColor = (percentage) => {

@@ -6,7 +6,7 @@ const DownloadPortfolio = ({ studentid }) => {
   const handleDownload = async () => {
     try {
       const response = await api.get(
-        `student/${studentid}/portfolio-pdf`,
+        `student/portfolio-pdf`,
         {
           responseType: "blob", // important for binary files
         }

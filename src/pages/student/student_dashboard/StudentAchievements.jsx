@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStudentAchievements } from "../../../features/student/studentDashSlice";
+import { fetchStudentAchievements, isDataStale } from "../../../features/student/studentDashSlice";
 import AchievementDetailModal from "../../../components/student/student_uploads/AchievementDetailModal";
 import { Award, Users, Code, Briefcase, Calendar, ExternalLink, Eye, CheckCircle, XCircle, Clock, Download } from "lucide-react";
 import { generateAchievementPdf } from "../../../utils/pdfUtil";
@@ -8,13 +8,14 @@ import { generateAchievementPdf } from "../../../utils/pdfUtil";
 const TABS = [
   { key: "academic", label: "Academic", icon: Award, color: "blue" },
   { key: "extracurricular", label: "Extracurricular", icon: Users, color: "green" },
+  { key: "clubs", label: "Clubs", icon: Briefcase, color: "orange" },
   { key: "hackathons", label: "Hackathons", icon: Code, color: "purple" },
   { key: "projects", label: "Projects", icon: Briefcase, color: "orange" },
 ];
 
 const StudentAchievements = () => {
   const dispatch = useDispatch();
-  const { achievements = {}, counts = {}, loading, error, student: studentProfile } = useSelector(
+  const { achievements = {}, counts = {}, loading, error, student: studentProfile, achievementsLastFetched } = useSelector(
     (state) => state.studentDashboard
   );
 
@@ -24,13 +25,19 @@ const StudentAchievements = () => {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchStudentAchievements());
-  }, [dispatch]);
+    // Redux store acts as cache - check if data is stale before fetching
+    if (isDataStale(achievementsLastFetched)) {
+      dispatch(fetchStudentAchievements());
+    }
+  }, [dispatch, achievementsLastFetched]);
 
-  const getTabContent = () => achievements[activeTab] || [];
+  // Memoize active tab info to avoid repeated TABS.find() calls
+  const activeTabInfo = useMemo(() => {
+    return TABS.find(tab => tab.key === activeTab) || TABS[0];
+  }, [activeTab]);
 
   const filteredContent = useMemo(() => {
-    const list = getTabContent();
+    const list = achievements[activeTab] || [];
     if (!verifiedOnly) return list;
     return list.filter((a) => {
       const status = (a.status || "").toLowerCase();
@@ -72,14 +79,15 @@ const StudentAchievements = () => {
     });
   };
 
-  const normalizeStatus = (status) => {
+  // Memoize normalizeStatus to avoid repeated string operations
+  const normalizeStatus = useCallback((status) => {
     if (!status || typeof status !== 'string') return 'pending';
     const s = status.toLowerCase();
     if (s.includes('verify') || s === 'approved') return 'approved';
     if (s.includes('reject')) return 'rejected';
     if (s.includes('pend')) return 'pending';
     return s;
-  };
+  }, []);
 
   const modalTypeMap = {
     academic: 'certification',
@@ -98,26 +106,146 @@ const StudentAchievements = () => {
     </div>
   );
 
-  const EmptyState = () => (
-    <div className="text-center py-12">
-      <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-        {React.createElement(TABS.find(tab => tab.key === activeTab)?.icon || Award, { 
-          className: "w-8 h-8 text-gray-400" 
-        })}
+  const EmptyState = memo(() => {
+    const Icon = activeTabInfo.icon;
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+          <Icon className="w-8 h-8 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-600 mb-2">No {activeTabInfo.label} Found</h3>
+        <p className="text-gray-500">You haven't added any {activeTabInfo.label.toLowerCase()} yet.</p>
       </div>
-      <h3 className="text-lg font-medium text-gray-600 mb-2">No {TABS.find(tab => tab.key === activeTab)?.label} Found</h3>
-      <p className="text-gray-500">You haven't added any {TABS.find(tab => tab.key === activeTab)?.label.toLowerCase()} yet.</p>
-    </div>
-  );
+    );
+  });
 
-  // Sort achievements by latest first
-  const sortedAchievements = useMemo(() => {
-    return [...(verifiedOnly ? filteredContent : getTabContent())].sort((a, b) => {
-      const dateA = new Date(a.verifiedDate || a.dateIssued || a.date || a.joinedOn || 0);
-      const dateB = new Date(b.verifiedDate || b.dateIssued || b.date || b.joinedOn || 0);
-      return dateB - dateA;
-    });
-  }, [filteredContent, getTabContent, verifiedOnly]);
+  // Backend sends sorted achievements, so we just use filtered content
+  const sortedAchievements = filteredContent;
+
+  // Memoize achievement card component to prevent unnecessary re-renders
+  const AchievementCard = memo(({ achievement, idx, onClick, onDownload, activeTabInfo, normalizeStatus, getTabColor, getTabIconColor, formatDate }) => {
+    const status = normalizeStatus(achievement.status);
+    const Icon = activeTabInfo.icon;
+    const tabColor = getTabColor(activeTabInfo.color);
+    const tabIconColor = getTabIconColor(activeTabInfo.color);
+    
+    return (
+      <div
+        key={achievement.id || idx}
+        onClick={onClick}
+        className="group cursor-pointer bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-4 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-105"
+      >
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg bg-gradient-to-br ${tabColor}`}>
+              <Icon className={`w-5 h-5 ${tabIconColor}`} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-gray-800 truncate group-hover:text-gray-900">
+                {achievement.title || achievement.name}
+              </h3>
+              <p className="text-sm text-gray-600 truncate">
+                {achievement.issuer || achievement.organizer || achievement.role}
+              </p>
+              {achievement.verifiedBy && (
+                <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                  <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                    {achievement.verifiedByAvatar ? (
+                      <img
+                        src={achievement.verifiedByAvatar}
+                        alt="Reviewer"
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <span className="text-[10px] font-medium text-gray-600">
+                        {(achievement.verifiedBy || "?")
+                          .toString()
+                          .split(' ')
+                          .map((n) => n[0])
+                          .slice(0,2)
+                          .join('')}
+                      </span>
+                    )}
+                  </div>
+                  <span>Reviewed by {achievement.verifiedBy}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {achievement.status && (
+              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                status === 'approved' 
+                  ? 'bg-green-100 text-green-700' 
+                  : status === 'rejected'
+                  ? 'bg-red-100 text-red-700'
+                  : 'bg-yellow-100 text-yellow-700'
+              }`}>
+                {status === 'approved' ? (
+                  <div className="flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
+                    Approved
+                  </div>
+                ) : status === 'rejected' ? (
+                  <div className="flex items-center gap-1">
+                    <XCircle className="w-3 h-3" />
+                    Rejected
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    Pending
+                  </div>
+                )}
+              </div>
+            )}
+            <button
+              aria-label="Download PDF"
+              className="p-1.5 rounded bg-white text-blue-700 hover:bg-blue-600 hover:text-white transition-colors"
+              onClick={onDownload}
+            >
+              <Download className="w-4 h-4" />
+            </button>
+            <Eye className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <Calendar className="w-3 h-3" />
+            <span>
+              {formatDate(achievement.verifiedDate || achievement.dateIssued || achievement.date || achievement.joinedOn)}
+            </span>
+          </div>
+
+          {achievement.description && (
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {achievement.description}
+            </p>
+          )}
+
+          {achievement.technologies && achievement.technologies.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {achievement.technologies.slice(0, 3).map((tech, techIdx) => (
+                <span
+                  key={techIdx}
+                  className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
+                >
+                  {tech}
+                </span>
+              ))}
+              {achievement.technologies.length > 3 && (
+                <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                  +{achievement.technologies.length - 3}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  });
 
   return (
     <section className="w-full bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
@@ -145,7 +273,7 @@ const StudentAchievements = () => {
           </label>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="w-4 h-4" />
-            <span>Last updated: {new Date().toLocaleDateString()}</span>
+            <span>Last updated: {achievementsLastFetched ? formatDate(new Date(achievementsLastFetched).toISOString()) : 'Never'}</span>
           </div>
         </div>
       </div>
@@ -191,135 +319,30 @@ const StudentAchievements = () => {
           <div className="w-full">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {sortedAchievements.map((achievement, idx) => (
-                <div
+                <AchievementCard
                   key={achievement.id || idx}
+                  achievement={achievement}
+                  idx={idx}
+                  activeTabInfo={activeTabInfo}
+                  normalizeStatus={normalizeStatus}
+                  getTabColor={getTabColor}
+                  getTabIconColor={getTabIconColor}
+                  formatDate={formatDate}
                   onClick={() => handleAchievementClick(achievement)}
-                  className="group cursor-pointer bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-4 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-105"
-                >
-                  {/* Achievement Card JSX remains unchanged */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg bg-gradient-to-br ${getTabColor(TABS.find(tab => tab.key === activeTab)?.color)}`}>
-                        {React.createElement(TABS.find(tab => tab.key === activeTab)?.icon || Award, { 
-                          className: `w-5 h-5 ${getTabIconColor(TABS.find(tab => tab.key === activeTab)?.color)}`
-                        })}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-800 truncate group-hover:text-gray-900">
-                          {achievement.title || achievement.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 truncate">
-                          {achievement.issuer || achievement.organizer || achievement.role}
-                        </p>
-                        {achievement.verifiedBy && (
-                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                            <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                              {achievement.verifiedByAvatar ? (
-                                <img
-                                  src={achievement.verifiedByAvatar}
-                                  alt="Reviewer"
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => { e.target.style.display = 'none'; }}
-                                />
-                              ) : (
-                                <span className="text-[10px] font-medium text-gray-600">
-                                  {(achievement.verifiedBy || "?")
-                                    .toString()
-                                    .split(' ')
-                                    .map((n) => n[0])
-                                    .slice(0,2)
-                                    .join('')}
-                                </span>
-                              )}
-                            </div>
-                            <span>Reviewed by {achievement.verifiedBy}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {achievement.status && (
-                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          normalizeStatus(achievement.status) === 'approved' 
-                            ? 'bg-green-100 text-green-700' 
-                            : normalizeStatus(achievement.status) === 'rejected'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-yellow-100 text-yellow-700'
-                        }`}>
-                          {normalizeStatus(achievement.status) === 'approved' ? (
-                            <div className="flex items-center gap-1">
-                              <CheckCircle className="w-3 h-3" />
-                              Approved
-                            </div>
-                          ) : normalizeStatus(achievement.status) === 'rejected' ? (
-                            <div className="flex items-center gap-1">
-                              <XCircle className="w-3 h-3" />
-                              Rejected
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              Pending
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      <button
-                        aria-label="Download PDF"
-                        className="p-1.5 rounded bg-white text-blue-700 hover:bg-blue-600 hover:text-white transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          generateAchievementPdf({
-                            title: achievement.title || achievement.name,
-                            type: achievement.type,
-                            studentName: (studentProfile && studentProfile.fullname) || '',
-                            institution: (studentProfile && (studentProfile.institution || studentProfile.institute)) || '',
-                            approvedBy: achievement.verifiedByName || achievement.verifiedBy,
-                            approvedOn: achievement.verifiedDate,
-                            status: achievement.status,
-                            imageUrl: achievement.certificateUrl || achievement.imageUrl,
-                          });
-                        }}
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                      <Eye className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Calendar className="w-3 h-3" />
-                      <span>
-                        {formatDate(achievement.verifiedDate || achievement.dateIssued || achievement.date || achievement.joinedOn)}
-                      </span>
-                    </div>
-
-                    {achievement.description && (
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {achievement.description}
-                      </p>
-                    )}
-
-                    {achievement.technologies && achievement.technologies.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {achievement.technologies.slice(0, 3).map((tech, techIdx) => (
-                          <span
-                            key={techIdx}
-                            className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                        {achievement.technologies.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-                            +{achievement.technologies.length - 3}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  onDownload={(e) => {
+                    e.stopPropagation();
+                    generateAchievementPdf({
+                      title: achievement.title || achievement.name,
+                      type: achievement.type,
+                      studentName: (studentProfile && studentProfile.fullname) || '',
+                      institution: (studentProfile && (studentProfile.institution || studentProfile.institute)) || '',
+                      approvedBy: achievement.verifiedByName || achievement.verifiedBy,
+                      approvedOn: achievement.verifiedDate,
+                      status: achievement.status,
+                      imageUrl: achievement.certificateUrl || achievement.imageUrl,
+                    });
+                  }}
+                />
               ))}
             </div>
           </div>

@@ -9,6 +9,10 @@ import resultsReducer from "../features/shared/resultsSlice";
 import studentLeaveReducer from "../features/student/studentLeaveSlice";
 import facultyLeaveReducer from "../features/faculty/facultyLeaveReqSlice";
 import clubsReducer from "../features/shared/clubsSlice";
+import realtimeReducer from "../features/shared/realtimeSlice";
+import adminDashboardReducer from "../features/Admin/adminDashSlice";
+import adminAnnouncementsReducer from "../features/Admin/adminAnnouncementsSlice";
+import { socketMiddleware } from "../middleware/socketMiddleware";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +26,45 @@ export const store = configureStore({
     studentLeave: studentLeaveReducer,
     facultyLeave: facultyLeaveReducer,
     clubs: clubsReducer,
+    realtime: realtimeReducer,
+    adminDashboard: adminDashboardReducer,
+    adminAnnouncements: adminAnnouncementsReducer,
     // you can add more slices here
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      // Disable serializable check in development to improve performance
+      // The state contains Date objects and other non-serializable data which is fine
+      serializableCheck: {
+        // Ignore these action types
+        ignoredActions: [
+          // Socket events may contain non-serializable data
+          'realtime/updateStudentCounts',
+          'realtime/updateStudentApprovals',
+          'realtime/updateStudentAnnouncements',
+          'studentDashboard/updateCountsRealtime',
+          'studentDashboard/updateApprovalsRealtime',
+          'studentDashboard/updateAnnouncementsRealtime',
+          'adminAnnouncements/updateAnnouncementsRealtime',
+          'adminDashboard/updateStatsRealtime',
+        ],
+        // Ignore these paths in the state (Date objects, etc.)
+        ignoredActionPaths: [
+          'payload.reviewedOn',
+          'payload.requestedOn',
+          'payload.timestamp',
+          'payload.date',
+          'meta.arg',
+        ],
+        // Ignore these paths in the state
+        ignoredPaths: [
+          'studentDashboard.lastFetched',
+          'studentDashboard.achievementsLastFetched',
+          'studentDashboard.approvalsLastFetched',
+          'realtime',
+        ],
+        // Increase warning threshold to reduce noise
+        warnAfter: 128,
+      },
+    }).concat(socketMiddleware),
 });

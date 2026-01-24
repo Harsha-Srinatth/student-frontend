@@ -14,7 +14,6 @@ export const fetchSDashboardData = createAsyncThunk(
       const response = await api.get("/student/home", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("this is the response of the dashboard data",response.data);
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || "Failed to load dashboard data");
@@ -34,7 +33,6 @@ export const fetchStudentAchievements = createAsyncThunk(
       const response = await api.get("/student/achievements", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("this is the response of the achievements data",response.data);
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || "Failed to load achievements data");
@@ -54,10 +52,33 @@ export const fetchAllApprovals = createAsyncThunk(
       const response = await api.get("/student/all-approvals", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("this is the response of the all approvals data",response.data);
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || "Failed to load all approvals");
+    }
+  }
+);
+
+/**
+ * Fetch announcements for the student
+ * Redux store acts as cache - components should check state first before calling
+ */
+export const fetchStudentAnnouncements = createAsyncThunk(
+  "dashboard/fetchStudentAnnouncements",
+  async (_, { rejectWithValue, getState }) => {
+    const state = getState();
+    const { announcements, lastFetched } = state.studentDashboard;
+    
+    // If data exists and is fresh (less than 2 minutes old), skip fetch
+    if (announcements.length > 0 && lastFetched && Date.now() - lastFetched < 2 * 60 * 1000) {
+      return { fromCache: true, data: announcements };
+    }
+    
+    try {
+      const response = await api.get("/student/announcements");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to load announcements");
     }
   }
 );
@@ -94,6 +115,7 @@ const dashboardSlice = createSlice({
     achievements: {
       academic: [],
       extracurricular: [],
+      clubs: [],
       hackathons: [],
       projects: [],
     },
@@ -105,6 +127,53 @@ const dashboardSlice = createSlice({
     approvalsLastFetched: null,
   },
   reducers: {
+    // Real-time update handlers
+    // These bypass the stale check and update data immediately via Socket.IO
+    updateCountsRealtime: (state, action) => {
+      if (action.payload) {
+        console.log('🔄 Updating counts in Redux:', {
+          previous: state.counts,
+          incoming: action.payload,
+        });
+        state.counts = {
+          ...state.counts,
+          ...action.payload,
+        };
+        console.log('✅ Updated counts:', state.counts);
+        // Update timestamp to reflect real-time data freshness
+        state.lastFetched = Date.now();
+      } else {
+        console.warn('⚠️ updateCountsRealtime called with no payload');
+      }
+    },
+    updateApprovalsRealtime: (state, action) => {
+      if (action.payload.pendingApprovals !== undefined) {
+        state.pendingApprovals = action.payload.pendingApprovals;
+      }
+      if (action.payload.rejectedApprovals !== undefined) {
+        state.rejectedApprovals = action.payload.rejectedApprovals;
+      }
+      if (action.payload.approvedApprovals !== undefined) {
+        state.approvedApprovals = action.payload.approvedApprovals;
+      }
+      // Update counts if provided
+      if (action.payload.counts) {
+        state.counts = {
+          ...state.counts,
+          ...action.payload.counts,
+        };
+      }
+      // Update timestamp to reflect real-time data freshness
+      state.approvalsLastFetched = Date.now();
+      state.lastFetched = Date.now();
+    },
+    updateAnnouncementsRealtime: (state, action) => {
+      if (action.payload) {
+        state.announcements = action.payload;
+        // Update timestamp to reflect real-time data freshness
+        state.lastFetched = Date.now();
+      }
+    },
     // Clear cache if needed (e.g., after logout or data update)
     clearDashboardCache: (state) => {
       state.student = null;
@@ -125,6 +194,7 @@ const dashboardSlice = createSlice({
       state.achievements = {
         academic: [],
         extracurricular: [],
+        clubs: [],
         hackathons: [],
         projects: [],
       };
@@ -157,12 +227,8 @@ const dashboardSlice = createSlice({
         }
         
         state.announcements = action.payload.announcements || [];
-        state.pendingApprovals = (action.payload.pendingApprovals || []).map((a) => ({
-          ...a,
-          reviewedOn: a.reviewedOn,
-          reviewedBy: a.reviewedBy,
-          message: a.message,
-        }));
+        // Backend already sends data in correct format, no need to transform
+        state.pendingApprovals = action.payload.pendingApprovals || [];
         state.rejectedApprovals = action.payload.rejectedApprovals || [];
         state.approvedApprovals = action.payload.approvedApprovals || [];
         
@@ -187,6 +253,7 @@ const dashboardSlice = createSlice({
           state.achievements = {
             academic: [],
             extracurricular: [],
+            clubs: [],
             hackathons: [],
             projects: [],
           };
@@ -210,9 +277,30 @@ const dashboardSlice = createSlice({
       .addCase(fetchAllApprovals.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      })
+      // Fetch announcements
+      .addCase(fetchStudentAnnouncements.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchStudentAnnouncements.fulfilled, (state, action) => {
+        state.loading = false;
+        if (!action.payload.fromCache) {
+          state.announcements = action.payload.data || [];
+          state.lastFetched = Date.now();
+        }
+      })
+      .addCase(fetchStudentAnnouncements.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { clearDashboardCache } = dashboardSlice.actions;
+export const { 
+  clearDashboardCache,
+  updateCountsRealtime,
+  updateApprovalsRealtime,
+  updateAnnouncementsRealtime,
+} = dashboardSlice.actions;
 export default dashboardSlice.reducer;

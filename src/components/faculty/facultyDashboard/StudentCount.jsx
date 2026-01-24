@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { mergeCounts } from '../../../utils/realtimeHelpers';
 
 const StudentCount = () => {
   // Get count from dashboard stats (already fetched by FacultyHome)
   // Fallback to students list count if dashboard stats not available
-  const dashboardStats = useSelector((state) => state.facultyDashboard.stats);
+  const facultyDashboard = useSelector((state) => state.facultyDashboard);
+  const realtimeData = useSelector((state) => state.realtime?.faculty);
   const studentsList = useSelector((state) => state.students.students);
+  
+  // Merge real-time stats with existing stats
+  const dashboardStats = useMemo(() => {
+    const baseStats = facultyDashboard.stats || {};
+    const realtimeStats = realtimeData?.stats || {};
+    return mergeCounts(baseStats, realtimeStats);
+  }, [facultyDashboard.stats, realtimeData?.stats]);
+  
   const dashboardLoading = useSelector((state) => state.facultyDashboard.loading);
   
   // Use dashboard stats first, then students list, then 0

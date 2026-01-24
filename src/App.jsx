@@ -15,6 +15,8 @@ import FacultyRegistration from './pages/auth/FacultyRegistration.jsx';
 // Login Pages
 import StudentLogin from './pages/auth/StudentLogin.jsx';
 import FacultyLogin from './pages/auth/FacultyLogin.jsx';
+import AdminLogin from './pages/auth/AdminLogin.jsx';
+import AdminRegistration from './pages/auth/AdminRegistration.jsx';
 
 // Dashboard Layout
 import MainDashboard from "./pages/MainDashboard.jsx";
@@ -47,6 +49,11 @@ import AddProfileF from './components/faculty/facultyDashboard/AddProfileF.jsx';
 import FacultyAttendance from './components/faculty/FacultyAttendance.jsx';
 import FacultyAddMidMarks from './components/faculty/FacultyAddMid.jsx';
 import FacultyDashboard from './components/faculty/LeaveReqDash.jsx';
+
+// Admin Dashboard Components
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import AnnouncementsManagement from './pages/admin/AnnouncementsManagement.jsx';
+import Analytics from './pages/admin/Analytics.jsx';
 // 🔒 Protected Route
 const ProtectedRoute = ({ children }) => {
   const token = Cookies.get('token');
@@ -70,6 +77,7 @@ const RoleProtectedRoute = ({ children, allowedRoles = [] }) => {
 const RoleBasedHome = () => {
   const userRole = Cookies.get('userRole');
   
+  if (userRole === 'admin') return <Navigate to="/admin/dashboard" replace />;
   if (userRole === 'faculty') return <Navigate to="/faculty/home" replace />;
   if (userRole === 'student') return <Navigate to="/student/home" replace />;
   
@@ -90,10 +98,12 @@ const App = () => {
       {/* Registration Routes */}
       <Route path="/register/student" element={<StudentRegistration />} />
       <Route path="/register/faculty" element={<FacultyRegistration />} />
+      <Route path="/admin/register" element={<AdminRegistration />} />
       
       {/* Login Routes */}
       <Route path="/login/student" element={<StudentLogin />} />
       <Route path="/login/faculty" element={<FacultyLogin />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
 
       {/* Profile Upload */}
       <Route path="/student/profile-img/upload" element={<AddProfile />} />
@@ -134,6 +144,11 @@ const App = () => {
         <Route path="faculty/events/competitions" element={<RoleProtectedRoute allowedRoles={['faculty']}><EventsAndCom /></RoleProtectedRoute>} />
         <Route path="faculty/settings" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultySettings /></RoleProtectedRoute>} />
         <Route path="/faculty/leave-requests" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyDashboard /></RoleProtectedRoute>} />
+        
+        {/* Admin Routes */}
+        <Route path="admin/dashboard" element={<RoleProtectedRoute allowedRoles={['admin']}><AdminDashboard /></RoleProtectedRoute>} />
+        <Route path="admin/announcements" element={<RoleProtectedRoute allowedRoles={['admin']}><AnnouncementsManagement /></RoleProtectedRoute>} />
+        <Route path="admin/analytics" element={<RoleProtectedRoute allowedRoles={['admin']}><Analytics /></RoleProtectedRoute>} />
       </Route>
       
       {/* Legacy Redirects */}

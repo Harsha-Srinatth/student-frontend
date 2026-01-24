@@ -1,16 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ClipboardCheck, FolderCheck, Award, BookOpen, TrendingUp, CheckCircle } from "lucide-react";
 import { fetchFacultyDashboardData } from "../../../features/faculty/facultyDashSlice";
 import { useNavigate } from "react-router-dom";
+import { mergeCounts } from "../../../utils/realtimeHelpers";
 
 const QuickStatsFaculty = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { stats = {}, faculty = null, loading, error } = useSelector(
-    (state) => state.facultyDashboard
-  );
+  const facultyDashboard = useSelector((state) => state.facultyDashboard);
+  const realtimeData = useSelector((state) => state.realtime?.faculty);
+  
+  // Merge real-time stats with existing stats
+  const stats = useMemo(() => {
+    const baseStats = facultyDashboard.stats || {};
+    const realtimeStats = realtimeData?.stats || {};
+    return mergeCounts(baseStats, realtimeStats);
+  }, [facultyDashboard.stats, realtimeData?.stats]);
+  
+  const { faculty = null, loading, error } = facultyDashboard;
 
   const [animatedStats, setAnimatedStats] = useState({
     totalStudents: 0,

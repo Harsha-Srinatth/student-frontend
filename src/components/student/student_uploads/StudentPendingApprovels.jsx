@@ -1,22 +1,45 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllApprovals, isDataStale } from "../../../features/student/studentDashSlice";
 import { Clock, XCircle, CheckCircle } from "lucide-react";
+import { mergeArrays } from "../../../utils/realtimeHelpers";
 
 const StudentPendingApprovels = () => {
   const dispatch = useDispatch();
-  const {
-    pendingApprovals = [],
-    rejectedApprovals = [],
-    approvedApprovals = [],
-    loading,
-    error,
-    approvalsLastFetched,
-  } = useSelector((state) => state.studentDashboard);
+  const studentDashboard = useSelector((state) => state.studentDashboard);
+  const realtimeData = useSelector((state) => state.realtime?.student);
+  
+  // Merge real-time approvals with existing approvals
+  const pendingApprovals = useMemo(() => {
+    return mergeArrays(
+      studentDashboard.pendingApprovals || [],
+      realtimeData?.pendingApprovals
+    );
+  }, [studentDashboard.pendingApprovals, realtimeData?.pendingApprovals]);
+  
+  const rejectedApprovals = useMemo(() => {
+    return mergeArrays(
+      studentDashboard.rejectedApprovals || [],
+      realtimeData?.rejectedApprovals
+    );
+  }, [studentDashboard.rejectedApprovals, realtimeData?.rejectedApprovals]);
+  
+  const approvedApprovals = useMemo(() => {
+    return mergeArrays(
+      studentDashboard.approvedApprovals || [],
+      realtimeData?.approvedApprovals
+    );
+  }, [studentDashboard.approvedApprovals, realtimeData?.approvedApprovals]);
+  
+  const { loading, error, approvalsLastFetched } = studentDashboard;
 
   const [selected, setSelected] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
+
+  // Check for real-time count changes
+  const realtimeCounts = useSelector((state) => state.realtime?.student?.counts);
+  const lastRealtimeUpdate = useSelector((state) => state.realtime?.lastUpdated?.student);
 
   useEffect(() => {
     // Redux store is the cache - only fetch if data doesn't exist or is stale (>3 min)
@@ -25,12 +48,19 @@ const StudentPendingApprovels = () => {
     
     const hasFetchedBefore = approvalsLastFetched !== null;
     const isStale = isDataStale(approvalsLastFetched, 3);
+    
+    // Also refetch if real-time update happened recently (within last 5 seconds)
+    // This ensures we get fresh data after a real-time count update
+    const shouldRefetchForRealtime = lastRealtimeUpdate && 
+      (Date.now() - lastRealtimeUpdate < 5000) && 
+      approvalsLastFetched && 
+      (lastRealtimeUpdate > approvalsLastFetched);
 
-    // Only fetch if we've never fetched before, or if data is stale
-    if (!hasFetchedBefore || isStale) {
+    // Only fetch if we've never fetched before, or if data is stale, or if real-time update occurred
+    if (!hasFetchedBefore || isStale || shouldRefetchForRealtime) {
       dispatch(fetchAllApprovals());
     }
-  }, [dispatch, approvalsLastFetched, loading]);
+  }, [dispatch, approvalsLastFetched, loading, lastRealtimeUpdate]);
 
   const tabs = [
     {
@@ -71,7 +101,7 @@ const StudentPendingApprovels = () => {
 
   // Rest of component JSX...
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
+    <div className="bg-white rounded-2xl shadow-lg p-6 w-full">
       <h2 className="text-2xl font-bold mb-6">My Approvals</h2>
 
       {/* Tabs */}
