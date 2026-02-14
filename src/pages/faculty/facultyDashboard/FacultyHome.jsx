@@ -13,13 +13,39 @@ import { fetchFacultyDashboardData } from "../../../features/faculty/facultyDash
 
 const HomeFaculty = () => {
   const dispatch = useDispatch();
-  const { faculty, loading, error } = useSelector((state) => state.facultyDashboard);
+  const { faculty, loading, error, stats } = useSelector((state) => state.facultyDashboard);
+
+  // Track if we've attempted to fetch data (prevents repeated fetches)
+  const hasFetchedRef = React.useRef(false);
+
+  // Debug: Log state changes (only in development and only when loading state changes)
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log('🏠 FacultyHome state:', {
+        loading,
+        faculty: faculty ? (faculty.fullname || faculty.name) : 'null',
+        stats: stats ? `set (totalStudents: ${stats.totalStudents})` : 'null',
+        statsTotalStudents: stats?.totalStudents
+      });
+    }
+  }, [loading]); // Only log when loading changes, not on every stats/faculty update
 
   useEffect(() => {
-    dispatch(fetchFacultyDashboardData());
-  }, [dispatch]);
+    // Only fetch once on mount if we don't have data yet
+    // Use ref to prevent re-fetching when state changes
+    if (!hasFetchedRef.current && (faculty === null || stats === null)) {
+      hasFetchedRef.current = true;
+      dispatch(fetchFacultyDashboardData());
+    }
+  }, [dispatch]); // Only depend on dispatch, not on faculty/stats
 
-  if (loading) {
+  // Show loading if actively loading OR if we don't have data yet
+  // Only check if stats is null (not fetched), not individual properties
+  // Socket updates may only update partial stats, so we shouldn't show loading
+  // if stats object exists (even if some properties are undefined)
+  const isLoading = loading || faculty === null || stats === null;
+  
+  if (isLoading) {
     return (
       <PageContainer>
         <LoadingSkeleton type="banner" />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector , useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -48,13 +48,18 @@ const FacultySettings = () => {
   const loading = useSelector((state) => state.facultyDashboard.loading || state.facultyDashboard.activitiesLoading || state.facultyDashboard.metricsLoading);
   const error = useSelector((state) => state.facultyDashboard.error);
   const metrics = useSelector((state) => state.facultyDashboard.metrics);
+  
+  // Track if we've attempted to fetch data (prevents repeated fetches)
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
     // Only fetch if faculty data not already in Redux
-    if (!faculty) {
+    // Use ref to prevent re-fetching when faculty changes
+    if (!hasFetchedRef.current && faculty === null) {
+      hasFetchedRef.current = true;
       dispatch(fetchFacultyDashboardData());
     }
-  }, [dispatch, faculty]);
+  }, [dispatch, faculty]); // Keep faculty to check if it's null, but ref prevents re-fetching
   //merits data
   useEffect(() => {
     dispatch(fetchFacultyMetrics());

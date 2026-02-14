@@ -1,7 +1,7 @@
 import { 
   Home, Upload, Award, Briefcase, ClipboardList, BookOpenCheck, 
   Megaphone, Settings, CheckCircle2, History, Users, FileCheck, 
-  GraduationCap, BarChart3 
+  GraduationCap, BarChart3, UserPlus, Building2
 } from "lucide-react";
 
 // 🎓 Student Sidebar Links
@@ -56,9 +56,27 @@ export const AdminSidebarLinks = [
   { icon: <Settings size={20} />, label: 'Settings', route: '/admin/settings' },
 ];
 
+// 🎓 HOD Sidebar Links
+export const HODSidebarLinks = [
+  { icon: <Home size={20} />, label: 'Dashboard', route: '/hod/dashboard' },
+  { icon: <UserPlus size={20} />, label: 'Assign Faculty', route: '/hod/assign-faculty' },
+  { icon: <Building2 size={20} />, label: 'Clubs Management', route: '/hod/clubs' },
+  { icon: <Megaphone size={20} />, label: 'Announcements', route: '/hod/announcements' },
+  { icon: <BarChart3 size={20} />, label: 'Analytics', route: '/hod/analytics' },
+  { icon: <Settings size={20} />, label: 'Settings', route: '/hod/settings' },
+];
+
 // 📱 Admin Bottom Bar (Mobile)
 export const AdminBottombarLinks = [
   { icon: <Home size={20} />, label: 'Home', route: '/admin/dashboard' },
   { icon: <Megaphone size={20} />, label: 'Announcements', route: '/admin/announcements' },
   { icon: <BarChart3 size={20} />, label: 'Analytics', route: '/admin/analytics' },
+];
+
+// 📱 HOD Bottom Bar (Mobile)
+export const HODBottombarLinks = [
+  { icon: <Home size={20} />, label: 'Home', route: '/hod/dashboard' },
+  { icon: <UserPlus size={20} />, label: 'Assign', route: '/hod/assign-faculty' },
+  { icon: <Building2 size={20} />, label: 'Clubs', route: '/hod/clubs' },
+  { icon: <Megaphone size={20} />, label: 'Announcements', route: '/hod/announcements' },
 ];

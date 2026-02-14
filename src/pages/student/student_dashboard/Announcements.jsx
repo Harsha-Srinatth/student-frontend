@@ -1,26 +1,31 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentAnnouncements } from "../../../features/student/studentDashSlice";
 import socketService from "../../../services/socketService";
+import AnnouncementDetailView from "../../../components/shared/AnnouncementDetailView";
+import { 
+  Bell, 
+  Calendar, 
+  Clock, 
+  AlertCircle, 
+  Info, 
+  AlertTriangle,
+  CheckCircle2,
+  Sparkles
+} from "lucide-react";
 
 const Announcements = () => {
   const dispatch = useDispatch();
   const { announcements, loading, error } = useSelector(
     (state) => state.studentDashboard
   );
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const listenersSetup = useRef(false);
 
   useEffect(() => {
-    // Ensure socket is connected
-    socketService.connect();
-    
-    // Fetch announcements via Redux
     dispatch(fetchStudentAnnouncements());
-    
-    // Set up socket listeners using socketService.on (works even if socket not connected yet)
     setupSocketListeners();
     
-    // Cleanup on unmount
     return () => {
       if (listenersSetup.current) {
         socketService.off("dashboard:announcements", handleAnnouncementUpdate);
@@ -32,7 +37,6 @@ const Announcements = () => {
 
   const handleAnnouncementUpdate = (data) => {
     console.log("Received announcement update:", data);
-    // Refetch announcements when socket update is received
     dispatch(fetchStudentAnnouncements());
   };
 
@@ -49,39 +53,86 @@ const Announcements = () => {
   const setupSocketListeners = () => {
     if (listenersSetup.current) return;
     
-    // Use socketService.on which handles connection state automatically
     socketService.on("dashboard:announcements", handleAnnouncementUpdate);
     socketService.on("socket:connected", handleSocketConnected);
     socketService.on("socket:reconnected", handleSocketReconnected);
     
     listenersSetup.current = true;
     
-    // If socket is already connected, fetch immediately
     if (socketService.getIsConnected()) {
       dispatch(fetchStudentAnnouncements());
     }
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityConfig = (priority) => {
     switch (priority) {
       case "high":
-        return "bg-red-100 text-red-700 border-red-300";
+        return {
+          bg: "bg-gradient-to-br from-red-50 to-red-100/50",
+          border: "border-l-4 border-red-500",
+          badge: "bg-red-500 text-white",
+          icon: AlertCircle,
+          iconColor: "text-red-500",
+        };
       case "medium":
-        return "bg-yellow-100 text-yellow-700 border-yellow-300";
+        return {
+          bg: "bg-gradient-to-br from-amber-50 to-amber-100/50",
+          border: "border-l-4 border-amber-500",
+          badge: "bg-amber-500 text-white",
+          icon: AlertTriangle,
+          iconColor: "text-amber-500",
+        };
       case "low":
-        return "bg-green-100 text-green-700 border-green-300";
+        return {
+          bg: "bg-gradient-to-br from-emerald-50 to-emerald-100/50",
+          border: "border-l-4 border-emerald-500",
+          badge: "bg-emerald-500 text-white",
+          icon: CheckCircle2,
+          iconColor: "text-emerald-500",
+        };
       default:
-        return "bg-gray-100 text-gray-700 border-gray-300";
+        return {
+          bg: "bg-gradient-to-br from-blue-50 to-blue-100/50",
+          border: "border-l-4 border-blue-500",
+          badge: "bg-blue-500 text-white",
+          icon: Info,
+          iconColor: "text-blue-500",
+        };
     }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) return "Today";
+    if (diffDays === 2) return "Yesterday";
+    if (diffDays <= 7) return `${diffDays - 1} days ago`;
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
   if (loading) {
     return (
-      <section className="flex flex-col gap-4 w-full bg-white rounded-2xl shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">Announcements</h3>
-        <div className="text-center py-8">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading announcements...</p>
+      <section className="w-full bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
+              <Bell className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">Announcements</h3>
+              <p className="text-sm text-gray-500">Stay updated with latest news</p>
+            </div>
+          </div>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+              <Sparkles className="w-6 h-6 text-blue-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+            </div>
+            <p className="mt-6 text-gray-600 font-medium">Loading announcements...</p>
+          </div>
         </div>
       </section>
     );
@@ -89,37 +140,137 @@ const Announcements = () => {
 
   if (error) {
     return (
-      <section className="flex flex-col gap-4 w-full bg-white rounded-2xl shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">Announcements</h3>
-        <div className="text-center py-8 text-red-600">{error}</div>
+      <section className="w-full bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
+              <Bell className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">Announcements</h3>
+              <p className="text-sm text-gray-500">Stay updated with latest news</p>
+            </div>
+          </div>
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+              <AlertCircle className="w-8 h-8 text-red-600" />
+            </div>
+            <p className="text-red-600 font-medium">{error}</p>
+          </div>
+        </div>
       </section>
     );
   }
 
   return (
-    <section className="flex flex-col gap-4 w-full bg-white rounded-2xl shadow p-6">
-      <h3 className="text-lg font-semibold mb-4">Announcements</h3>
-      {announcements.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No announcements available</div>
-      ) : (
-        <ul className="flex flex-col gap-3">
-          {announcements.map((a, idx) => (
-            <li key={a._id || idx} className="border-b pb-3 last:border-none">
-              <div className="flex items-start justify-between mb-2">
-                <p className="font-medium text-gray-900">{a.title}</p>
-                {a.priority && (
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(a.priority)}`}>
-                    {a.priority}
-                  </span>
-                )}
+    <section className="w-full bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      {/* Header */}
+      <div className="p-6 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b border-gray-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+              <Bell className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">Announcements</h3>
+              <p className="text-sm text-gray-600 mt-0.5">Stay updated with latest news and updates</p>
+            </div>
+          </div>
+          {announcements.length > 0 && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-semibold text-gray-700">
+                {announcements.length} {announcements.length === 1 ? 'announcement' : 'announcements'}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        {announcements.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="relative mb-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                <Bell className="w-12 h-12 text-gray-400" />
               </div>
-              <p className="text-sm text-gray-500 mb-2">
-                {new Date(a.createdAt).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-gray-600 whitespace-pre-wrap">{a.content}</p>
-            </li>
-          ))}
-        </ul>
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+            </div>
+            <h4 className="text-xl font-bold text-gray-900 mb-2">No Announcements Yet</h4>
+            <p className="text-gray-500 text-center max-w-sm">
+              There are no announcements at the moment. Check back later for updates!
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {announcements.map((announcement, idx) => {
+              const config = getPriorityConfig(announcement.priority);
+              const Icon = config.icon;
+              
+              return (
+                <div
+                  key={announcement._id || idx}
+                  onClick={() => setSelectedAnnouncement(announcement)}
+                  className={`group relative ${config.bg} ${config.border} rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer`}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Icon */}
+                    <div className={`flex-shrink-0 p-3 ${config.bg} rounded-lg`}>
+                      <Icon className={`w-6 h-6 ${config.iconColor}`} />
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-4 mb-3">
+                        <h4 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                          {announcement.title}
+                        </h4>
+                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${config.badge}`}>
+                          {announcement.priority || 'normal'}
+                        </span>
+                      </div>
+                      
+                      <p className="text-gray-700 mb-4 leading-relaxed whitespace-pre-wrap">
+                        {announcement.content}
+                      </p>
+                      
+                      {/* Footer */}
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-4 h-4" />
+                          <span className="font-medium">{formatDate(announcement.createdAt)}</span>
+                        </div>
+                        {announcement.targetAudience && announcement.targetAudience.length > 0 && (
+                          <>
+                            <span className="text-gray-300">•</span>
+                            <div className="flex items-center gap-1.5">
+                              <Clock className="w-4 h-4" />
+                              <span className="capitalize">{announcement.targetAudience.join(", ")}</span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Decorative gradient overlay */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Detail View Modal */}
+      {selectedAnnouncement && (
+        <AnnouncementDetailView
+          announcement={selectedAnnouncement}
+          onClose={() => setSelectedAnnouncement(null)}
+        />
       )}
     </section>
   );

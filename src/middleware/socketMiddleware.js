@@ -24,21 +24,39 @@ import {
   updateMetricsRealtime,
 } from '../features/faculty/facultyDashSlice';
 import {
-  updateAnnouncementsRealtime as updateAdminAnnouncementsRealtime,
-} from '../features/Admin/adminAnnouncementsSlice';
+  updateAnnouncementsRealtime as updateHODAnnouncementsRealtime,
+} from '../features/HOD/hodAnnouncementsSlice';
 
 /**
  * Redux middleware to handle Socket.IO events
  * Automatically dispatches Redux actions when socket events are received
  */
 export const socketMiddleware = (store) => {
-  let socketInitialized = false;
+  let listenersSetup = false;
 
   return (next) => (action) => {
-    // Initialize socket on first action
-    if (!socketInitialized) {
-      initializeSocket(store);
-      socketInitialized = true;
+    // Set up socket listeners only once, on first action
+    // SocketProvider handles the connection, we just set up the event listeners
+    // Don't try to connect here - let SocketProvider handle it
+    if (!listenersSetup) {
+      // Only set up listeners - don't connect (SocketProvider does that)
+      // Wait for socket to be connected before setting up listeners
+      // This prevents duplicate connections
+      if (socketService.getIsConnected()) {
+        initializeSocket(store);
+        listenersSetup = true;
+      } else {
+        // If not connected yet, wait for connection event
+        // Set up a one-time listener for when socket connects
+        const checkConnection = () => {
+          if (socketService.getIsConnected() && !listenersSetup) {
+            initializeSocket(store);
+            listenersSetup = true;
+            socketService.off('socket:connected', checkConnection);
+          }
+        };
+        socketService.on('socket:connected', checkConnection);
+      }
     }
 
     return next(action);
@@ -107,8 +125,8 @@ const initializeSocket = (store) => {
     // Update both realtime slice and student dashboard slice
     store.dispatch(updateStudentAnnouncements(data));
     store.dispatch(updateAnnouncementsRealtime(data));
-    // Also update admin announcements
-    store.dispatch(updateAdminAnnouncementsRealtime(data));
+    // Also update HOD announcements
+    store.dispatch(updateHODAnnouncementsRealtime(data));
   });
 
   socketService.on('dashboard:update', (data) => {

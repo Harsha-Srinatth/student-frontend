@@ -9,6 +9,9 @@ const PendingApprovalsList = ({
   variant = 'summary',
   limit = 10,
 }) => {
+  // Handle null items - convert to empty array
+  const safeItems = items === null ? [] : (Array.isArray(items) ? items : []);
+  
   const getTypeIcon = (type) => {
     switch (type) {
       case 'certificate': return '📜';
@@ -31,7 +34,7 @@ const PendingApprovalsList = ({
     }
   };
 
-  const list = variant === 'summary' ? items.slice(0, limit) : items;
+  const list = variant === 'summary' ? safeItems.slice(0, limit) : safeItems;
 
   if (loading) {
     return (
@@ -79,7 +82,7 @@ const PendingApprovalsList = ({
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
             <span className="text-sm font-medium text-gray-700">
-              {items.length} pending
+              {safeItems.length} pending
             </span>
           </div>
         </div>

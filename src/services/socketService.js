@@ -18,8 +18,8 @@ class SocketService {
    * Initialize socket connection
    */
   connect() {
+    // Early return if already connected - don't log at all to avoid spam
     if (this.socket?.connected) {
-      console.log('Socket already connected');
       return this.socket;
     }
 
@@ -97,7 +97,9 @@ class SocketService {
 
     // Connection event handlers
     this.socket.on('connect', () => {
-      console.log('✅ Socket connected:', this.socket.id);
+      // Socket ID might be undefined initially, wait a bit for it to be set
+      const socketId = this.socket.id || 'connecting...';
+      console.log('✅ Socket connected:', socketId);
       this.isConnected = true;
       this.reconnectAttempts = 0;
       
@@ -114,13 +116,17 @@ class SocketService {
         });
       });
       
-      this.emit('socket:connected');
+      // Trigger socket:connected event for local listeners
+      // Use setTimeout to ensure all listeners are attached first
+      setTimeout(() => {
+        this.triggerLocalEvent('socket:connected');
+      }, 0);
     });
 
     this.socket.on('disconnect', (reason) => {
       console.log('Socket disconnected:', reason);
       this.isConnected = false;
-      this.emit('socket:disconnected', reason);
+      this.triggerLocalEvent('socket:disconnected', reason);
     });
 
     this.socket.on('connect_error', (error) => {
@@ -133,7 +139,11 @@ class SocketService {
       console.log('Socket reconnected after', attemptNumber, 'attempts');
       this.isConnected = true;
       this.reconnectAttempts = 0;
-      this.emit('socket:reconnected', attemptNumber);
+      
+      // Trigger socket:reconnected event for local listeners
+      setTimeout(() => {
+        this.triggerLocalEvent('socket:reconnected', attemptNumber);
+      }, 0);
     });
 
     this.socket.on('reconnect_attempt', (attemptNumber) => {
@@ -163,8 +173,18 @@ class SocketService {
 
   /**
    * Subscribe to a socket event
+   * Prevents duplicate listeners by checking if callback already exists
    */
   on(event, callback) {
+    // Check if this callback is already registered for this event
+    if (this.listeners.has(event)) {
+      const existingCallbacks = this.listeners.get(event);
+      if (existingCallbacks.includes(callback)) {
+        console.log(`⚠️ Listener already registered for event: ${event}, skipping duplicate`);
+        return;
+      }
+    }
+
     // Store listener for cleanup
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
@@ -174,9 +194,20 @@ class SocketService {
     // If socket exists, attach listener immediately
     // Socket.IO will queue listeners if socket isn't connected yet
     if (this.socket) {
-      this.socket.on(event, callback);
+      // Check if listener is already attached to socket to avoid duplicates
+      const existingListeners = this.socket.listeners(event);
+      if (!existingListeners.includes(callback)) {
+        this.socket.on(event, callback);
+      }
     } else {
-      console.warn(`⚠️ Socket not initialized yet for event: ${event}. Listener will be attached when socket connects.`);
+      // Only log in development mode to reduce console noise
+      // This is expected behavior - listeners will be attached when socket connects
+      if (import.meta.env.DEV) {
+        // Only log for non-local events to reduce noise
+        if (!event.startsWith('socket:')) {
+          console.log(`📌 Queueing listener for event: ${event} (will attach when socket connects)`);
+        }
+      }
     }
   }
 
@@ -214,6 +245,23 @@ class SocketService {
     }
 
     this.socket.emit(event, data);
+  }
+
+  /**
+   * Trigger local event callbacks (for events like socket:connected, socket:reconnected)
+   * These are not sent to the server, but trigger local listeners
+   */
+  triggerLocalEvent(event, data) {
+    const callbacks = this.listeners.get(event);
+    if (callbacks) {
+      callbacks.forEach(callback => {
+        try {
+          callback(data);
+        } catch (error) {
+          console.error(`Error in ${event} callback:`, error);
+        }
+      });
+    }
   }
 
   /**

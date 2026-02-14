@@ -221,9 +221,31 @@ export default function JoinedClubs() {
               {/* Club Info */}
               <div className="p-4">
                 <h3 className="text-lg font-bold text-gray-900 mb-1">{club.clubName}</h3>
-                <p className="text-sm text-gray-600 line-clamp-2 mb-4 min-h-[2.5rem]">
+                <p className="text-sm text-gray-600 line-clamp-2 mb-3 min-h-[2.5rem]">
                   {club.description || "No description available"}
                 </p>
+
+                {/* Club Leadership Info */}
+                {(club.facultyCoordinatorDetails || club.studentHeadDetails) && (
+                  <div className="mb-3 space-y-1.5 text-xs text-gray-600">
+                    {club.facultyCoordinatorDetails && (
+                      <div className="flex items-center gap-1.5">
+                        <FiUser className="w-3 h-3 text-blue-600" />
+                        <span className="truncate">
+                          Coordinator: {club.facultyCoordinatorDetails.fullname}
+                        </span>
+                      </div>
+                    )}
+                    {club.studentHeadDetails && (
+                      <div className="flex items-center gap-1.5">
+                        <FiUsers className="w-3 h-3 text-purple-600" />
+                        <span className="truncate">
+                          Head: {club.studentHeadDetails.fullname}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Enrollment Details */}
                 <div className="space-y-2 mb-4 text-xs text-gray-600">
@@ -257,21 +279,22 @@ export default function JoinedClubs() {
       {/* Members Modal */}
       <AnimatePresence>
         {showMembersModal && selectedClubId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/50 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="relative z-10 w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl flex flex-col"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3 }}
+              className="relative z-10 w-full max-w-6xl max-h-[95vh] overflow-hidden rounded-3xl bg-white shadow-2xl flex flex-col"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-gray-200 flex-shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-blue-100 p-2">
-                    <FiUsers className="w-5 h-5 text-blue-600" />
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                    <FiUsers className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">Club Members</h3>
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Club Members</h3>
                     <p className="text-sm text-gray-600">
                       {clubs.find(c => c.clubId === selectedClubId)?.clubName || "Loading..."}
                     </p>
@@ -279,14 +302,14 @@ export default function JoinedClubs() {
                 </div>
                 <button
                   onClick={closeMembersModal}
-                  className="rounded-full bg-gray-100 p-2 text-gray-700 hover:bg-gray-200 transition-colors"
+                  className="w-10 h-10 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors flex items-center justify-center"
                 >
                   <FiX className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Modal Content - Members List */}
-              <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                 <ClubMembers clubId={selectedClubId} />
               </div>
             </motion.div>

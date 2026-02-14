@@ -2,22 +2,22 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../services/api";
 
 /**
- * Fetch admin dashboard stats
+ * Fetch HOD dashboard stats
  */
-export const fetchAdminDashboardStats = createAsyncThunk(
-  "adminDashboard/fetchStats",
+export const fetchHODDashboardStats = createAsyncThunk(
+  "hodDashboard/fetchStats",
   async (_, { rejectWithValue, getState }) => {
     try {
       const state = getState();
-      const { stats, lastFetched } = state.adminDashboard;
+      const { stats, lastFetched } = state.hodDashboard;
       
       // If data exists and is fresh (less than 5 minutes old), skip fetch
       if (stats && lastFetched && Date.now() - lastFetched < 5 * 60 * 1000) {
         return { fromCache: true, data: stats };
       }
       
-      const response = await api.get("/admin/dashboard/stats");
-      return response.data;
+      const response = await api.get("/hod/dashboard/stats");
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to load dashboard stats");
     }
@@ -28,11 +28,11 @@ export const fetchAdminDashboardStats = createAsyncThunk(
  * Fetch department performance data
  */
 export const fetchDepartmentPerformance = createAsyncThunk(
-  "adminDashboard/fetchDepartmentPerformance",
+  "hodDashboard/fetchDepartmentPerformance",
   async (department, { rejectWithValue, getState }) => {
     try {
       const state = getState();
-      const { departmentPerformance, performanceLastFetched } = state.adminDashboard;
+      const { departmentPerformance, performanceLastFetched } = state.hodDashboard;
       
       // If data exists and is fresh, skip fetch
       if (departmentPerformance && performanceLastFetched && Date.now() - performanceLastFetched < 5 * 60 * 1000) {
@@ -40,7 +40,7 @@ export const fetchDepartmentPerformance = createAsyncThunk(
       }
       
       const params = department ? { department } : {};
-      const response = await api.get("/admin/dashboard/department-performance", { params });
+      const response = await api.get("/hod/dashboard/department-performance", { params });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to load department performance");
@@ -49,16 +49,35 @@ export const fetchDepartmentPerformance = createAsyncThunk(
 );
 
 /**
- * Fetch section-wise attendance
+ * Fetch available sections (programNames) for a department
  */
-export const fetchSectionWiseAttendance = createAsyncThunk(
-  "adminDashboard/fetchSectionAttendance",
+export const fetchAvailableSections = createAsyncThunk(
+  "hodDashboard/fetchAvailableSections",
   async ({ department, semester }, { rejectWithValue }) => {
     try {
       const params = { department };
       if (semester) params.semester = semester;
       
-      const response = await api.get("/admin/dashboard/attendance/section-wise", { params });
+      const response = await api.get("/hod/dashboard/sections", { params });
+      return response.data?.data || [];
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to load sections");
+    }
+  }
+);
+
+/**
+ * Fetch section-wise attendance
+ */
+export const fetchSectionWiseAttendance = createAsyncThunk(
+  "hodDashboard/fetchSectionAttendance",
+  async ({ department, semester, section }, { rejectWithValue }) => {
+    try {
+      const params = { department };
+      if (semester) params.semester = semester;
+      if (section) params.section = section;
+      
+      const response = await api.get("/hod/dashboard/attendance/section-wise", { params });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to load section attendance");
@@ -70,13 +89,13 @@ export const fetchSectionWiseAttendance = createAsyncThunk(
  * Fetch student attendance by section
  */
 export const fetchStudentAttendanceBySection = createAsyncThunk(
-  "adminDashboard/fetchStudentAttendance",
+  "hodDashboard/fetchStudentAttendance",
   async ({ department, semester }, { rejectWithValue }) => {
     try {
       const params = { department };
       if (semester) params.semester = semester;
       
-      const response = await api.get("/admin/dashboard/attendance/students", { params });
+      const response = await api.get("/hod/dashboard/attendance/students", { params });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to load student attendance");
@@ -84,13 +103,15 @@ export const fetchStudentAttendanceBySection = createAsyncThunk(
   }
 );
 
-const adminDashboardSlice = createSlice({
-  name: "adminDashboard",
+const hodDashboardSlice = createSlice({
+  name: "hodDashboard",
   initialState: {
     stats: null,
     departmentPerformance: [],
     sectionAttendance: null,
     studentAttendance: null,
+    availableSections: [],
+    sectionsLoading: false,
     loading: false,
     performanceLoading: false,
     attendanceLoading: false,
@@ -126,18 +147,18 @@ const adminDashboardSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Dashboard stats
-      .addCase(fetchAdminDashboardStats.pending, (state) => {
+      .addCase(fetchHODDashboardStats.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAdminDashboardStats.fulfilled, (state, action) => {
+      .addCase(fetchHODDashboardStats.fulfilled, (state, action) => {
         state.loading = false;
         if (!action.payload.fromCache) {
           state.stats = action.payload.data;
           state.lastFetched = Date.now();
         }
       })
-      .addCase(fetchAdminDashboardStats.rejected, (state, action) => {
+      .addCase(fetchHODDashboardStats.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -184,6 +205,18 @@ const adminDashboardSlice = createSlice({
       .addCase(fetchStudentAttendanceBySection.rejected, (state, action) => {
         state.attendanceLoading = false;
         state.error = action.payload;
+      })
+      // Available sections
+      .addCase(fetchAvailableSections.pending, (state) => {
+        state.sectionsLoading = true;
+      })
+      .addCase(fetchAvailableSections.fulfilled, (state, action) => {
+        state.sectionsLoading = false;
+        state.availableSections = action.payload || [];
+      })
+      .addCase(fetchAvailableSections.rejected, (state, action) => {
+        state.sectionsLoading = false;
+        state.availableSections = [];
       });
   },
 });
@@ -192,7 +225,7 @@ export const {
   clearError,
   clearDashboardCache,
   updateStatsRealtime,
-} = adminDashboardSlice.actions;
+} = hodDashboardSlice.actions;
 
-export default adminDashboardSlice.reducer;
+export default hodDashboardSlice.reducer;
 

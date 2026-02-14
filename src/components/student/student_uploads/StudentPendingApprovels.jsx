@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllApprovals, isDataStale } from "../../../features/student/studentDashSlice";
-import { Clock, XCircle, CheckCircle } from "lucide-react";
+import { Clock, XCircle, CheckCircle, Calendar, FileText, Eye, X, AlertCircle } from "lucide-react";
 import { mergeArrays } from "../../../utils/realtimeHelpers";
 
 const StudentPendingApprovels = () => {
@@ -42,48 +42,84 @@ const StudentPendingApprovels = () => {
   const lastRealtimeUpdate = useSelector((state) => state.realtime?.lastUpdated?.student);
 
   useEffect(() => {
-    // Redux store is the cache - only fetch if data doesn't exist or is stale (>3 min)
-    // Don't fetch if already loading to prevent infinite loops
     if (loading) return;
     
     const hasFetchedBefore = approvalsLastFetched !== null;
     const isStale = isDataStale(approvalsLastFetched, 3);
     
-    // Also refetch if real-time update happened recently (within last 5 seconds)
-    // This ensures we get fresh data after a real-time count update
     const shouldRefetchForRealtime = lastRealtimeUpdate && 
       (Date.now() - lastRealtimeUpdate < 5000) && 
       approvalsLastFetched && 
       (lastRealtimeUpdate > approvalsLastFetched);
 
-    // Only fetch if we've never fetched before, or if data is stale, or if real-time update occurred
     if (!hasFetchedBefore || isStale || shouldRefetchForRealtime) {
       dispatch(fetchAllApprovals());
     }
   }, [dispatch, approvalsLastFetched, loading, lastRealtimeUpdate]);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const getTabConfig = (tabId) => {
+    const configs = {
+      pending: {
+        icon: Clock,
+        gradient: 'from-amber-500 to-amber-600',
+        bg: 'bg-amber-50',
+        text: 'text-amber-700',
+        border: 'border-amber-200',
+        badge: 'bg-amber-100 text-amber-700',
+        iconColor: 'text-amber-600'
+      },
+      rejected: {
+        icon: XCircle,
+        gradient: 'from-red-500 to-red-600',
+        bg: 'bg-red-50',
+        text: 'text-red-700',
+        border: 'border-red-200',
+        badge: 'bg-red-100 text-red-700',
+        iconColor: 'text-red-600'
+      },
+      approved: {
+        icon: CheckCircle,
+        gradient: 'from-emerald-500 to-emerald-600',
+        bg: 'bg-emerald-50',
+        text: 'text-emerald-700',
+        border: 'border-emerald-200',
+        badge: 'bg-emerald-100 text-emerald-700',
+        iconColor: 'text-emerald-600'
+      }
+    };
+    return configs[tabId] || configs.pending;
+  };
 
   const tabs = [
     {
       id: "pending",
       label: "Pending",
       count: pendingApprovals.length,
-      icon: <Clock className="w-4 h-4" />,
+      icon: Clock,
     },
     {
       id: "rejected",
       label: "Rejected",
       count: rejectedApprovals.length,
-      icon: <XCircle className="w-4 h-4" />,
+      icon: XCircle,
     },
     {
       id: "approved",
       label: "Approved",
       count: approvedApprovals.length,
-      icon: <CheckCircle className="w-4 h-4" />,
+      icon: CheckCircle,
     },
   ];
 
-  // Get current records based on active tab
   const getCurrentRecords = () => {
     switch (activeTab) {
       case "pending":
@@ -98,113 +134,256 @@ const StudentPendingApprovels = () => {
   };
 
   const currentRecords = getCurrentRecords();
+  const activeTabConfig = getTabConfig(activeTab);
 
-  // Rest of component JSX...
+  const LoadingSkeleton = () => (
+    <div className="space-y-4">
+      {[...Array(3)].map((_, idx) => (
+        <div key={idx} className="animate-pulse">
+          <div className="bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl border border-gray-200 h-32"></div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const EmptyState = () => {
+    const Icon = activeTabConfig.icon;
+    return (
+      <div className="text-center py-16 px-4">
+        <div className={`w-20 h-20 mx-auto mb-6 ${activeTabConfig.bg} rounded-2xl flex items-center justify-center shadow-sm`}>
+          <Icon className={`w-10 h-10 ${activeTabConfig.iconColor}`} />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-700 mb-2">No {activeTab} Approvals</h3>
+        <p className="text-gray-500 text-sm">You don't have any {activeTab} approval requests at the moment.</p>
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 w-full">
-      <h2 className="text-2xl font-bold mb-6">My Approvals</h2>
+    <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-sm border border-gray-200 p-6 sm:p-8 w-full">
+      {/* Header */}
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">My Approvals</h2>
+        <p className="text-gray-600 text-sm">Track the status of your approval requests</p>
+      </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 flex items-center gap-2 border-b-2 transition-colors ${
-              activeTab === tab.id
-                ? "border-indigo-600 text-indigo-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            {tab.icon}
-            <span>{tab.label}</span>
-            <span className="bg-gray-100 px-2 py-0.5 rounded-full text-xs">
-              {tab.count}
-            </span>
-          </button>
-        ))}
+      <div className="flex flex-wrap gap-2 mb-8 pb-4 border-b border-gray-200 overflow-x-auto scrollbar-hide">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          const tabConfig = getTabConfig(tab.id);
+          
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-5 py-2.5 font-semibold rounded-xl transition-all duration-200 whitespace-nowrap ${
+                isActive
+                  ? `bg-gradient-to-r ${tabConfig.gradient} text-white shadow-md scale-105`
+                  : "text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+              }`}
+            >
+              <Icon className={`w-4 h-4 ${isActive ? 'text-white' : tabConfig.iconColor}`} />
+              <span className="text-sm">{tab.label}</span>
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                isActive 
+                  ? 'bg-white/20 text-white' 
+                  : tabConfig.badge
+              }`}>
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Content */}
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : currentRecords.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">
-          No {activeTab} approvals found.
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {currentRecords.map((item, idx) => (
-            <div
-              key={idx}
-              className="p-4 border rounded-lg hover:shadow-md cursor-pointer"
-              onClick={() => {
-                setSelected(item);
-                setModalOpen(true);
-              }}
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium capitalize">{item.type}</p>
-                  <p className="text-sm text-gray-600">{item.description}</p>
-                </div>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs ${
-                    activeTab === "pending"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : activeTab === "approved"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {activeTab}
-                </span>
-              </div>
+      <div className="min-h-[300px]">
+        {loading ? (
+          <LoadingSkeleton />
+        ) : error ? (
+          <div className="text-center py-16 px-4">
+            <div className="w-20 h-20 mx-auto mb-6 bg-red-50 rounded-2xl flex items-center justify-center">
+              <AlertCircle className="w-10 h-10 text-red-500" />
             </div>
-          ))}
-        </div>
-      )}
+            <h3 className="text-xl font-semibold text-red-600 mb-2">Error Loading Approvals</h3>
+            <p className="text-red-500 text-sm">{error}</p>
+          </div>
+        ) : currentRecords.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {currentRecords.map((item, idx) => (
+              <div
+                key={idx}
+                className="group cursor-pointer bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-xl hover:border-gray-300 transition-all duration-300 flex flex-col h-full"
+                onClick={() => {
+                  setSelected(item);
+                  setModalOpen(true);
+                }}
+              >
+                {/* Card Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-xl ${activeTabConfig.bg} flex items-center justify-center shadow-sm`}>
+                    <FileText className={`w-6 h-6 ${activeTabConfig.iconColor}`} />
+                  </div>
+                  <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${activeTabConfig.badge} border ${activeTabConfig.border}`}>
+                    {activeTab}
+                  </span>
+                </div>
+
+                {/* Card Content */}
+                <div className="flex-1 mb-4">
+                  <h3 className="font-bold text-gray-900 text-lg mb-2 capitalize leading-tight group-hover:text-blue-600 transition-colors">
+                    {item.type || 'Approval Request'}
+                  </h3>
+                  <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
+                    {item.description || 'No description provided'}
+                  </p>
+                </div>
+
+                {/* Card Footer */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>
+                      {formatDate(item.requestedOn || item.date || item.createdAt)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 text-gray-400 group-hover:text-gray-600 transition-colors">
+                    <Eye className="w-4 h-4" />
+                    <span className="text-xs font-medium">View</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Modal */}
       {modalOpen && selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-2xl max-w-md w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Approval Details</h3>
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+          onClick={() => {
+            setModalOpen(false);
+            setSelected(null);
+          }}
+        >
+          <div 
+            className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-slideInUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className={`bg-gradient-to-r ${activeTabConfig.gradient} p-6 border-b border-white/20`}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <div className={`flex-shrink-0 w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center`}>
+                    <FileText className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-2xl font-bold text-white mb-1.5 capitalize leading-tight">
+                      {selected.type || 'Approval Details'}
+                    </h3>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-white/20 text-white`}>
+                      {(() => {
+                        const Icon = activeTabConfig.icon;
+                        return Icon ? <Icon className="w-3 h-3" /> : null;
+                      })()}
+                      {activeTab}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setModalOpen(false);
+                    setSelected(null);
+                  }}
+                  className="flex-shrink-0 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-colors backdrop-blur-sm"
+                >
+                  <X className="w-5 h-5 text-white" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+              <div className="space-y-6">
+                {/* Description */}
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                    <div className="w-1 h-4 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
+                    Description
+                  </h4>
+                  <p className="text-base text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    {selected.description || 'No description provided'}
+                  </p>
+                </div>
+
+                {/* Details Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Type</h4>
+                    <p className="text-base font-semibold text-gray-900 capitalize">
+                      {selected.type || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Date</h4>
+                    <p className="text-base font-semibold text-gray-900">
+                      {formatDate(selected.requestedOn || selected.date || selected.createdAt)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Message/Remarks */}
+                {selected.message && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                      <div className="w-1 h-4 bg-gradient-to-b from-purple-500 to-purple-600 rounded-full"></div>
+                      {activeTab === 'rejected' ? 'Rejection Reason' : activeTab === 'approved' ? 'Approval Message' : 'Message'}
+                    </h4>
+                    <div className={`${activeTabConfig.bg} rounded-xl p-4 border ${activeTabConfig.border}`}>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        {selected.message}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Status Badge */}
+                <div className={`${activeTabConfig.bg} rounded-2xl p-6 border ${activeTabConfig.border} shadow-sm`}>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-md border-2 ${activeTabConfig.border}`}>
+                      {(() => {
+                        const Icon = activeTabConfig.icon;
+                        return Icon ? <Icon className={`w-6 h-6 ${activeTabConfig.iconColor}`} /> : null;
+                      })()}
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Status</p>
+                      <p className={`text-xl font-bold ${activeTabConfig.text} capitalize`}>
+                        {activeTab}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 sm:px-8 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
               <button
                 onClick={() => {
                   setModalOpen(false);
                   setSelected(null);
                 }}
-                className="text-gray-500 hover:text-gray-700"
+                className="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-semibold text-sm shadow-sm"
               >
-                ✕
+                Close
               </button>
             </div>
-            <div className="space-y-2">
-              <p>
-                <strong>Type:</strong> {selected.type}
-              </p>
-              <p>
-                <strong>Description:</strong> {selected.description}
-              </p>
-              {selected.message && (
-                <p>
-                  <strong>Message:</strong> {selected.message}
-                </p>
-              )}
-            </div>
-            <button
-              onClick={() => {
-                setModalOpen(false);
-                setSelected(null);
-              }}
-              className="mt-4 w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-            >
-              Close
-            </button>
           </div>
         </div>
       )}

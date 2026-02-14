@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
+import { Building2, CheckCircle2, Loader2, User, Search } from "lucide-react";
 
 const steps = [
   {
@@ -10,7 +11,7 @@ const steps = [
   },
   {
     title: "Academic Info",
-    fields: ["institution", "dept", "programName", "semester", "facultyid", "dateofjoin"]
+    fields: ["institutionId", "dept", "programName", "semester", "facultyid", "dateofjoin"]
   }
 ];
 
@@ -21,7 +22,7 @@ const fieldConfig = {
   email: { label: "Email Address", type: "email", required: true },
   mobileno: { label: "Mobile Number", type: "tel", required: true },
   password: { label: "Password", type: "password", required: true },
-  institution: { label: "Institution", type: "text", required: true },
+  institutionId: { label: "Institution ID", type: "text", required: true },
   dept: { label: "Department", type: "text", required: true },
   programName: { label: "Program Name", type: "text", required: true },
   semester: { label: "Semester", type: "text", required: false },
@@ -43,6 +44,128 @@ const StudentRegistration = () => {
   const [loading, setLoading] = useState(false);
   const [responseMessage, setResponseMessage] = useState(null);
   const [direction, setDirection] = useState(0);
+  const [institutionName, setInstitutionName] = useState(null);
+  const [checkingInstitution, setCheckingInstitution] = useState(false);
+  const [collegeSearchQuery, setCollegeSearchQuery] = useState("");
+  const [collegeResults, setCollegeResults] = useState([]);
+  const [searchingCollege, setSearchingCollege] = useState(false);
+  const [showCollegeResults, setShowCollegeResults] = useState(false);
+  const [selectedCollege, setSelectedCollege] = useState(null);
+  const [facultySearchQuery, setFacultySearchQuery] = useState("");
+  const [facultyResults, setFacultyResults] = useState([]);
+  const [searchingFaculty, setSearchingFaculty] = useState(false);
+  const [showFacultyResults, setShowFacultyResults] = useState(false);
+  const [selectedFaculty, setSelectedFaculty] = useState(null);
+
+  // Search colleges when query changes
+  useEffect(() => {
+    const searchColleges = async () => {
+      const query = collegeSearchQuery?.trim();
+      if (!query || query.length < 2) {
+        setCollegeResults([]);
+        setShowCollegeResults(false);
+        if (query.length === 0) {
+          setSelectedCollege(null);
+          setInstitutionName(null);
+        }
+        return;
+      }
+
+      setSearchingCollege(true);
+      try {
+        const response = await api.get(`/colleges/search?query=${encodeURIComponent(query)}`);
+        if (response.data?.success && response.data?.data) {
+          setCollegeResults(response.data.data);
+          setShowCollegeResults(true);
+        } else {
+          setCollegeResults([]);
+          setShowCollegeResults(false);
+        }
+      } catch (error) {
+        if (error.response?.status !== 404) {
+          console.error("College search error:", error);
+        }
+        setCollegeResults([]);
+        setShowCollegeResults(false);
+      } finally {
+        setSearchingCollege(false);
+      }
+    };
+
+    const timeoutId = setTimeout(searchColleges, 500);
+    return () => clearTimeout(timeoutId);
+  }, [collegeSearchQuery]);
+
+  // Reset faculty selection when institution changes
+  useEffect(() => {
+    if (formData.institutionId) {
+      setSelectedFaculty(null);
+      setFacultySearchQuery("");
+      setFacultyResults([]);
+      setShowFacultyResults(false);
+    }
+  }, [formData.institutionId]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showCollegeResults && !event.target.closest('.college-search-container')) {
+        setShowCollegeResults(false);
+      }
+      if (showFacultyResults && !event.target.closest('.faculty-search-container')) {
+        setShowFacultyResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showCollegeResults, showFacultyResults]);
+
+  // Search faculty when query changes
+  useEffect(() => {
+    const searchFaculty = async () => {
+      const query = facultySearchQuery?.trim();
+      if (!query || query.length < 2) {
+        setFacultyResults([]);
+        setShowFacultyResults(false);
+        if (query.length === 0) {
+          setSelectedFaculty(null);
+        }
+        return;
+      }
+
+      // Only search if college ID is provided
+      if (!formData.institutionId || !formData.institutionId.trim()) {
+        setFacultyResults([]);
+        setShowFacultyResults(false);
+        return;
+      }
+
+      setSearchingFaculty(true);
+      try {
+        const collegeIdParam = `&collegeId=${encodeURIComponent(formData.institutionId)}`;
+        const response = await api.get(`/faculty/search?query=${encodeURIComponent(query)}${collegeIdParam}`);
+        if (response.data?.success && response.data?.data) {
+          setFacultyResults(response.data.data);
+          setShowFacultyResults(true);
+        } else {
+          setFacultyResults([]);
+          setShowFacultyResults(false);
+        }
+      } catch (error) {
+        if (error.response?.status !== 404) {
+          console.error("Faculty search error:", error);
+        }
+        setFacultyResults([]);
+        setShowFacultyResults(false);
+      } finally {
+        setSearchingFaculty(false);
+      }
+    };
+
+    const timeoutId = setTimeout(searchFaculty, 500);
+    return () => clearTimeout(timeoutId);
+  }, [facultySearchQuery, formData.institutionId, selectedCollege]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,13 +175,49 @@ const StudentRegistration = () => {
     if (["mobileno"].includes(name)) {
       // remove non-digits, then limit length to 10
       newValue = value.replace(/\D/g, "").slice(0, 10);
-    } else if (["fullname", "dept", "programName", "institution"].includes(name)) {
+    } else if (["fullname", "dept", "programName"].includes(name)) {
       newValue = capitalizeWords(value);
+    } else if (name === "institutionId") {
+      // For institution ID, update search query and form data
+      newValue = value.trim();
+      setCollegeSearchQuery(newValue);
+    } else if (name === "facultyid") {
+      // For faculty ID, update search query and form data
+      newValue = value.trim();
+      setFacultySearchQuery(newValue);
     }
 
     setFormData((prev) => ({ ...prev, [name]: newValue }));
 
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
+  };
+
+  const handleCollegeSelect = (college) => {
+    // Auto-fill the college ID field
+    setFormData((prev) => ({ ...prev, institutionId: college.collegeId }));
+    setSelectedCollege(college);
+    setCollegeSearchQuery(college.collegeId);
+    setInstitutionName(college.collegeName);
+    setShowCollegeResults(false);
+    // Clear faculty selection when college changes
+    setSelectedFaculty(null);
+    setFacultySearchQuery("");
+    setFormData((prev) => ({ ...prev, facultyid: "" }));
+    if (errors.institutionId) {
+      setErrors((prev) => ({ ...prev, institutionId: null }));
+    }
+  };
+
+  const handleFacultySelect = (faculty) => {
+    // Auto-fill the faculty ID field
+    setFormData((prev) => ({ ...prev, facultyid: faculty.facultyid }));
+    setSelectedFaculty(faculty);
+    setFacultySearchQuery(faculty.facultyid);
+    setShowFacultyResults(false);
+    // Clear any errors for facultyid
+    if (errors.facultyid) {
+      setErrors((prev) => ({ ...prev, facultyid: null }));
+    }
   };
 
   const validateStep = () => {
@@ -129,6 +288,12 @@ const StudentRegistration = () => {
         if (typeof cleaned[k] === "string") cleaned[k] = cleaned[k].trim();
       });
 
+      // Map institutionId to collegeId for backend compatibility
+      if (cleaned.institutionId) {
+        cleaned.collegeId = cleaned.institutionId;
+        delete cleaned.institutionId;
+      }
+
       // Force digits-only for ids and mobile
       cleaned.mobileno = (cleaned.mobileno || "").replace(/\D/g, "");
 
@@ -142,6 +307,15 @@ const StudentRegistration = () => {
       setResponseMessage({ type: "success", text: res.data?.message || "Registration successful" });
       setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""])));
       setErrors({});
+      setInstitutionName(null);
+      setCollegeSearchQuery("");
+      setCollegeResults([]);
+      setSelectedCollege(null);
+      setShowCollegeResults(false);
+      setFacultySearchQuery("");
+      setFacultyResults([]);
+      setSelectedFaculty(null);
+      setShowFacultyResults(false);
       // navigate after short delay (if desired)
       setTimeout(() => (navigate("/roleforlogin")), 1200);
     } catch (error) {
@@ -215,24 +389,140 @@ const StudentRegistration = () => {
           >
             {steps[activeStep].fields.map((name) => {
               const config = fieldConfig[name];
+              const isInstitutionId = name === "institutionId";
+              const isFacultyId = name === "facultyid";
+              
               return (
-                <div key={name} className="flex flex-col">
+                <div key={name} className={`flex flex-col ${isInstitutionId || isFacultyId ? "sm:col-span-2" : ""} ${isInstitutionId ? "college-search-container" : "faculty-search-container"}`}>
                   <label className="text-sm font-semibold text-gray-700 mb-1">
                     {config.label}
                     {config.required && <span className="text-red-500">*</span>}
                   </label>
-                  <input
-                    type={config.type}
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    placeholder={`Enter ${config.label.toLowerCase()}`}
-                    className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                      errors[name]
-                        ? "border-red-500 bg-red-50"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                  />
+                  <div className="relative">
+                    <input
+                      type={config.type}
+                      name={name}
+                      value={formData[name]}
+                      onChange={handleChange}
+                      onFocus={() => {
+                        if (isInstitutionId && collegeSearchQuery.length >= 2) {
+                          setShowCollegeResults(true);
+                        }
+                        if (isFacultyId && facultySearchQuery.length >= 2) {
+                          setShowFacultyResults(true);
+                        }
+                      }}
+                      placeholder={
+                        isInstitutionId 
+                          ? "Search by College ID or Name" 
+                          : isFacultyId 
+                          ? "Search by Faculty ID or Name (Select college first)" 
+                          : `Enter ${config.label.toLowerCase()}`
+                      }
+                      className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 w-full ${
+                        errors[name]
+                          ? "border-red-500 bg-red-50"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    />
+                    {isInstitutionId && searchingCollege && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                      </div>
+                    )}
+                    {isInstitutionId && selectedCollege && !searchingCollege && formData.institutionId === selectedCollege.collegeId && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      </div>
+                    )}
+                    {isInstitutionId && !searchingCollege && !selectedCollege && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <Search className="h-4 w-4 text-gray-400" />
+                      </div>
+                    )}
+                    {isFacultyId && searchingFaculty && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                      </div>
+                    )}
+                    {isFacultyId && selectedFaculty && !searchingFaculty && formData.facultyid === selectedFaculty.facultyid && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      </div>
+                    )}
+                    {isFacultyId && !searchingFaculty && !selectedFaculty && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <Search className="h-4 w-4 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* College Search Results Dropdown */}
+                  {isInstitutionId && showCollegeResults && collegeResults.length > 0 && (
+                    <div className="mt-1 absolute z-50 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      {collegeResults.map((college) => (
+                        <button
+                          key={college.collegeId}
+                          type="button"
+                          onClick={() => handleCollegeSelect(college)}
+                          className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Building2 className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-gray-900 truncate">{college.collegeName}</p>
+                              <p className="text-sm text-gray-600">ID: {college.collegeId}</p>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Faculty Search Results Dropdown */}
+                  {isFacultyId && showFacultyResults && facultyResults.length > 0 && (
+                    <div className="mt-1 absolute z-50 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      {facultyResults.map((faculty) => (
+                        <button
+                          key={faculty.facultyid}
+                          type="button"
+                          onClick={() => handleFacultySelect(faculty)}
+                          className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="flex items-center gap-3">
+                            <User className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-gray-900 truncate">{faculty.fullname}</p>
+                              <p className="text-sm text-gray-600">ID: {faculty.facultyid}</p>
+                              {faculty.designation && (
+                                <p className="text-xs text-gray-500">{faculty.designation}</p>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {isInstitutionId && selectedCollege && (
+                    <div className="mt-2 flex items-center space-x-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                      <Building2 className="h-4 w-4" />
+                      <span className="font-medium">{selectedCollege.collegeName}</span>
+                    </div>
+                  )}
+                  
+                  {isFacultyId && selectedFaculty && (
+                    <div className="mt-2 flex items-center space-x-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                      <User className="h-4 w-4" />
+                      <div>
+                        <span className="font-medium">{selectedFaculty.fullname}</span>
+                        {selectedFaculty.designation && (
+                          <span className="text-xs text-gray-600 ml-2">({selectedFaculty.designation})</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
                   {errors[name] && (
                     <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
                   )}

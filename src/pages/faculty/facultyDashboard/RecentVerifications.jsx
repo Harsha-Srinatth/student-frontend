@@ -10,23 +10,26 @@ const RecentVerifications = ({
   dataKey = "recentApprovals",
 }) => {
   const dispatch = useDispatch();
-  const { activities = {}, activitiesLoading, error } = useSelector(
+  const { activities = null, activitiesLoading, error } = useSelector(
     (state) => state.facultyDashboard
   );
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Always fetch on mount - Redux will handle caching
-    dispatch(fetchFacultyActivities());
-  }, [dispatch]);
+    // Only fetch if we don't have activities data yet (activities is null or empty)
+    // Redux thunk will handle caching - it won't fetch if data already exists
+    if ((!activities || Object.keys(activities).length === 0) && !activitiesLoading) {
+      dispatch(fetchFacultyActivities());
+    }
+  }, [dispatch, activities, activitiesLoading]);
 
-  const approvals = activities[dataKey] || [];
+  const approvals = activities?.[dataKey] || [];
 
   return (
     <div className="w-full h-full">
       <RecentVerificationsList
         approvals={approvals}
-        total={activities.totalApprovals || approvals.length}
+        total={activities?.totalApprovals || approvals.length}
         loading={activitiesLoading}
         error={error}
         onRetry={() => dispatch(fetchFacultyActivities())}

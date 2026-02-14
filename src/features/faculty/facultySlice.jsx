@@ -44,7 +44,7 @@ export const fetchStudentCount = createAsyncThunk(
       }
       
       // Then try to get from dashboard stats
-      if (state.facultyDashboard.stats && state.facultyDashboard.stats.totalStudents > 0) {
+      if (state.facultyDashboard.stats !== null && state.facultyDashboard.stats.totalStudents > 0) {
         return { totalCount: state.facultyDashboard.stats.totalStudents, fromCache: true };
       }
       

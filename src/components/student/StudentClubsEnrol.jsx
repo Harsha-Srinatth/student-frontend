@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiSearch, FiCheckCircle, FiUsers, FiBookOpen } from "react-icons/fi";
+import { FiSearch, FiCheckCircle, FiUsers, FiBookOpen, FiUser } from "react-icons/fi";
 import api from '../../services/api.jsx';
 import EnrollmentModal from './EnrollmentModal.jsx';
 import JoinedClubs from './JoinedClubs.jsx';
@@ -274,9 +274,31 @@ export default function StudentClubsEnrol() {
                 {/* Club Info */}
                 <div className="p-4">
                   <h3 className="text-lg font-bold text-gray-900 mb-1">{club.clubName || club.name}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                     {club.description || "Join a vibrant community to learn, lead, and grow with peers."}
                   </p>
+                  
+                  {/* Club Leadership Info */}
+                  {(club.facultyCoordinatorDetails || club.studentHeadDetails) && (
+                    <div className="mb-3 space-y-1.5 text-xs text-gray-600">
+                      {club.facultyCoordinatorDetails && (
+                        <div className="flex items-center gap-1.5">
+                          <FiUser className="w-3 h-3 text-blue-600" />
+                          <span className="truncate">
+                            Coordinator: {club.facultyCoordinatorDetails.fullname}
+                          </span>
+                        </div>
+                      )}
+                      {club.studentHeadDetails && (
+                        <div className="flex items-center gap-1.5">
+                          <FiUsers className="w-3 h-3 text-purple-600" />
+                          <span className="truncate">
+                            Head: {club.studentHeadDetails.fullname}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   {/* Action Button */}
                   <button

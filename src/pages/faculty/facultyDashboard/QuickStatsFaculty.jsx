@@ -14,6 +14,10 @@ const QuickStatsFaculty = () => {
   
   // Merge real-time stats with existing stats
   const stats = useMemo(() => {
+    // If stats is null, return null (not fetched yet)
+    if (facultyDashboard.stats === null) {
+      return null;
+    }
     const baseStats = facultyDashboard.stats || {};
     const realtimeStats = realtimeData?.stats || {};
     return mergeCounts(baseStats, realtimeStats);
@@ -100,7 +104,8 @@ const QuickStatsFaculty = () => {
     }
   ];
 
-  if (loading) {
+  // Show loading if actively loading OR if stats are not available (null means not fetched)
+  if (loading || stats === null) {
     return (
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 animate-fadeIn">
         {[...Array(6)].map((_, idx) => (

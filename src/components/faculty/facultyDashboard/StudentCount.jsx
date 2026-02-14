@@ -11,6 +11,10 @@ const StudentCount = () => {
   
   // Merge real-time stats with existing stats
   const dashboardStats = useMemo(() => {
+    // If stats is null, return null (not fetched yet)
+    if (facultyDashboard.stats === null) {
+      return null;
+    }
     const baseStats = facultyDashboard.stats || {};
     const realtimeStats = realtimeData?.stats || {};
     return mergeCounts(baseStats, realtimeStats);

@@ -10,8 +10,9 @@ import studentLeaveReducer from "../features/student/studentLeaveSlice";
 import facultyLeaveReducer from "../features/faculty/facultyLeaveReqSlice";
 import clubsReducer from "../features/shared/clubsSlice";
 import realtimeReducer from "../features/shared/realtimeSlice";
-import adminDashboardReducer from "../features/Admin/adminDashSlice";
-import adminAnnouncementsReducer from "../features/Admin/adminAnnouncementsSlice";
+import hodDashboardReducer from "../features/HOD/hodDashSlice";
+import hodAnnouncementsReducer from "../features/HOD/hodAnnouncementsSlice";
+import hodAssignmentReducer from "../features/HOD/hodAssignmentSlice";
 import { socketMiddleware } from "../middleware/socketMiddleware";
 
 export const store = configureStore({
@@ -27,8 +28,9 @@ export const store = configureStore({
     facultyLeave: facultyLeaveReducer,
     clubs: clubsReducer,
     realtime: realtimeReducer,
-    adminDashboard: adminDashboardReducer,
-    adminAnnouncements: adminAnnouncementsReducer,
+    hodDashboard: hodDashboardReducer,
+    hodAnnouncements: hodAnnouncementsReducer,
+    hodAssignment: hodAssignmentReducer,
     // you can add more slices here
   },
   middleware: (getDefaultMiddleware) =>
@@ -45,8 +47,8 @@ export const store = configureStore({
           'studentDashboard/updateCountsRealtime',
           'studentDashboard/updateApprovalsRealtime',
           'studentDashboard/updateAnnouncementsRealtime',
-          'adminAnnouncements/updateAnnouncementsRealtime',
-          'adminDashboard/updateStatsRealtime',
+          'hodAnnouncements/updateAnnouncementsRealtime',
+          'hodDashboard/updateStatsRealtime',
         ],
         // Ignore these paths in the state (Date objects, etc.)
         ignoredActionPaths: [

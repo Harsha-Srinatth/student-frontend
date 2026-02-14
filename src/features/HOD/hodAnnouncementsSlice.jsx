@@ -2,26 +2,30 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../services/api";
 
 /**
- * Fetch all announcements for admin
+ * Fetch all announcements for HOD
  */
 export const fetchAnnouncements = createAsyncThunk(
-  "adminAnnouncements/fetch",
+  "hodAnnouncements/fetch",
   async ({ targetAudience, isActive, page = 1, limit = 20, forceRefresh = false }, { rejectWithValue, getState }) => {
     try {
       const state = getState();
-      const { announcements, lastFetched } = state.adminAnnouncements;
+      const { announcements, lastFetched } = state.hodAnnouncements;
       
       // If forceRefresh is false, data exists and is fresh (less than 2 minutes old), skip fetch
       // But always fetch if announcements array is empty (e.g., after logout/login)
+      // IMPORTANT: Don't use cache if forceRefresh is true or if we need fresh data
       if (!forceRefresh && announcements.length > 0 && lastFetched && Date.now() - lastFetched < 2 * 60 * 1000) {
         return { fromCache: true, data: announcements };
       }
+      
+      // Always fetch from server if forceRefresh is true or cache is empty
+      // This ensures we get the latest data from the database
       
       const params = { page, limit };
       if (targetAudience) params.targetAudience = targetAudience;
       if (isActive !== undefined) params.isActive = isActive;
       
-      const response = await api.get("/admin/announcements", { params });
+      const response = await api.get("/hod/announcements", { params });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to load announcements");
@@ -33,10 +37,10 @@ export const fetchAnnouncements = createAsyncThunk(
  * Fetch single announcement by ID
  */
 export const fetchAnnouncementById = createAsyncThunk(
-  "adminAnnouncements/fetchById",
+  "hodAnnouncements/fetchById",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/admin/announcements/${id}`);
+      const response = await api.get(`/hod/announcements/${id}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to load announcement");
@@ -48,10 +52,35 @@ export const fetchAnnouncementById = createAsyncThunk(
  * Create new announcement
  */
 export const createAnnouncement = createAsyncThunk(
-  "adminAnnouncements/create",
+  "hodAnnouncements/create",
   async (announcementData, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.post("/admin/announcements", announcementData);
+      // If announcementData is FormData, send it directly
+      // Otherwise, convert to FormData
+      let formData = announcementData;
+      if (!(announcementData instanceof FormData)) {
+        formData = new FormData();
+        Object.keys(announcementData).forEach((key) => {
+          if (key !== 'image' && announcementData[key] !== null && announcementData[key] !== undefined) {
+            if (Array.isArray(announcementData[key])) {
+              announcementData[key].forEach((item) => {
+                formData.append(key, item);
+              });
+            } else {
+              formData.append(key, announcementData[key]);
+            }
+          }
+        });
+        if (announcementData.image instanceof File) {
+          formData.append('image', announcementData.image);
+        }
+      }
+
+      const response = await api.post("/hod/announcements", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       // Refresh announcements list after creation
       dispatch(fetchAnnouncements({}));
       return response.data;
@@ -65,10 +94,35 @@ export const createAnnouncement = createAsyncThunk(
  * Update announcement
  */
 export const updateAnnouncement = createAsyncThunk(
-  "adminAnnouncements/update",
-  async ({ id, ...updateData }, { rejectWithValue, dispatch }) => {
+  "hodAnnouncements/update",
+  async ({ id, formData: updateData }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.put(`/admin/announcements/${id}`, updateData);
+      // If updateData is FormData, send it directly
+      // Otherwise, convert to FormData
+      let formData = updateData;
+      if (!(updateData instanceof FormData)) {
+        formData = new FormData();
+        Object.keys(updateData).forEach((key) => {
+          if (key !== 'image' && updateData[key] !== null && updateData[key] !== undefined) {
+            if (Array.isArray(updateData[key])) {
+              updateData[key].forEach((item) => {
+                formData.append(key, item);
+              });
+            } else {
+              formData.append(key, updateData[key]);
+            }
+          }
+        });
+        if (updateData.image instanceof File) {
+          formData.append('image', updateData.image);
+        }
+      }
+
+      const response = await api.put(`/hod/announcements/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       // Refresh announcements list after update
       dispatch(fetchAnnouncements({}));
       return response.data;
@@ -82,10 +136,10 @@ export const updateAnnouncement = createAsyncThunk(
  * Delete announcement
  */
 export const deleteAnnouncement = createAsyncThunk(
-  "adminAnnouncements/delete",
+  "hodAnnouncements/delete",
   async (id, { rejectWithValue, dispatch }) => {
     try {
-      await api.delete(`/admin/announcements/${id}`);
+      await api.delete(`/hod/announcements/${id}`);
       // Refresh announcements list after deletion
       dispatch(fetchAnnouncements({}));
       return id;
@@ -95,8 +149,8 @@ export const deleteAnnouncement = createAsyncThunk(
   }
 );
 
-const adminAnnouncementsSlice = createSlice({
-  name: "adminAnnouncements",
+const hodAnnouncementsSlice = createSlice({
+  name: "hodAnnouncements",
   initialState: {
     announcements: [],
     currentAnnouncement: null,
@@ -156,7 +210,8 @@ const adminAnnouncementsSlice = createSlice({
       .addCase(fetchAnnouncements.fulfilled, (state, action) => {
         state.loading = false;
         if (!action.payload.fromCache) {
-          state.announcements = action.payload.data || [];
+          // Always update with fresh data from server, even if empty array
+          state.announcements = Array.isArray(action.payload.data) ? action.payload.data : [];
           state.pagination = action.payload.pagination || state.pagination;
           state.lastFetched = Date.now();
         }
@@ -225,7 +280,7 @@ export const {
   clearCurrentAnnouncement,
   clearAnnouncementsCache,
   updateAnnouncementsRealtime,
-} = adminAnnouncementsSlice.actions;
+} = hodAnnouncementsSlice.actions;
 
-export default adminAnnouncementsSlice.reducer;
+export default hodAnnouncementsSlice.reducer;
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StudentSidebarLinks, FacultySidebarLinks } from "../../context/Links";
+import { StudentSidebarLinks, FacultySidebarLinks, HODSidebarLinks, HODBottombarLinks } from "../../context/Links";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { Plus, LogOut } from "lucide-react"; // Added logout icon
@@ -11,9 +11,11 @@ const Bottombar = () => {
   const userRole = Cookies.get("userRole");
 
   const allLinks =
+    userRole === "hod" ? HODSidebarLinks :
     userRole === "faculty" ? FacultySidebarLinks : StudentSidebarLinks;
 
   const bottombarQuickLinks =
+    userRole === "hod" ? HODBottombarLinks :
     userRole === "faculty"
       ? [
           { ...allLinks.find((l) => l.label === "Dashboard") },

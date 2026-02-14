@@ -26,7 +26,7 @@ if (!API_BASE_URL) {
     // Don't set a fallback in production - fail explicitly
     API_BASE_URL = '';
   } else {
-    // Development fallback
+    // Development fallback - Backend runs on port 3000
     API_BASE_URL = 'http://localhost:3000';
     console.log('🔧 Development mode: Using default API URL:', API_BASE_URL);
   }
@@ -34,9 +34,15 @@ if (!API_BASE_URL) {
   // Validate URL format
   if (/^\d+$/.test(API_BASE_URL)) {
     // If it's just a port number, construct full URL
-    API_BASE_URL = isProduction 
-      ? '' // Invalid in production
-      : `http://localhost:${API_BASE_URL}`;
+    // But if it's 5000 and backend is on 3000, override it
+    if (API_BASE_URL === '5000' && isDevelopment) {
+      console.warn('⚠️ VITE_API_URL is set to 5000, but backend runs on 3000. Using 3000 instead.');
+      API_BASE_URL = 'http://localhost:3000';
+    } else {
+      API_BASE_URL = isProduction 
+        ? '' // Invalid in production
+        : `http://localhost:${API_BASE_URL}`;
+    }
   } else if (!API_BASE_URL.startsWith('http://') && !API_BASE_URL.startsWith('https://')) {
     // Invalid format
     if (isProduction) {
@@ -50,12 +56,13 @@ if (!API_BASE_URL) {
   // Log in development only (for security)
   if (isDevelopment) {
     console.log('🌐 API Base URL:', API_BASE_URL);
+    console.log('✅ Frontend will connect to backend at:', API_BASE_URL);
   }
 }
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true,           // if you need cookies
+  withCredentials: true,
 });
 
 api.interceptors.request.use(

@@ -12,8 +12,10 @@ const PendingApprovals = () => {
   
   // Merge real-time pending approvals with existing approvals
   const pendingApprovals = useMemo(() => {
+    const baseApprovals = facultyDashboard.pendingApprovals === null ? null : (facultyDashboard.pendingApprovals || []);
+    if (baseApprovals === null) return null; // Don't merge if we haven't fetched yet
     return mergeArrays(
-      facultyDashboard.pendingApprovals || [],
+      baseApprovals,
       realtimeData?.pendingApprovals
     );
   }, [facultyDashboard.pendingApprovals, realtimeData?.pendingApprovals]);
@@ -21,19 +23,13 @@ const PendingApprovals = () => {
   const { pendingLoading, error } = facultyDashboard;
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  // Check for real-time updates
-  const lastRealtimeUpdate = useSelector((state) => state.realtime?.lastUpdated?.faculty);
-
   useEffect(() => {
-    // Always fetch on mount - Redux will handle caching
-    // Also refetch if real-time update occurred recently
-    const shouldRefetch = !lastRealtimeUpdate || 
-      (Date.now() - lastRealtimeUpdate < 5000);
-    
-    if (shouldRefetch) {
+    // Only fetch if we don't have data yet (pendingApprovals is null)
+    // Redux thunk will handle caching - it won't fetch if data already exists
+    if (pendingApprovals === null && !pendingLoading) {
       dispatch(fetchPendingApprovals());
     }
-  }, [dispatch, lastRealtimeUpdate]);
+  }, [dispatch, pendingApprovals, pendingLoading]);
 
   const handleStudentClick = (student) => {
     setSelectedStudent(student);
@@ -56,8 +52,8 @@ const PendingApprovals = () => {
   return (
     <div className="flex flex-col gap-6 w-full transition-opacity duration-500 ease-out animate-fadeIn">
       <PendingApprovalsList
-        items={pendingApprovals}
-        loading={pendingLoading}
+        items={pendingApprovals === null ? [] : pendingApprovals}
+        loading={pendingLoading || pendingApprovals === null}
         error={error}
         onRetry={() => dispatch(fetchPendingApprovals())}
         onItemClick={handleStudentClick}

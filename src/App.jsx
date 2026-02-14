@@ -11,12 +11,12 @@ import OtpPage from "./forms/OtpPage";
 // Registration Pages
 import StudentRegistration from './pages/auth/StudentRegistration.jsx';
 import FacultyRegistration from './pages/auth/FacultyRegistration.jsx';
-
+import HODRegistration from './pages/auth/HODRegistration.jsx';
 // Login Pages
 import StudentLogin from './pages/auth/StudentLogin.jsx';
 import FacultyLogin from './pages/auth/FacultyLogin.jsx';
-import AdminLogin from './pages/auth/AdminLogin.jsx';
-import AdminRegistration from './pages/auth/AdminRegistration.jsx';
+import HODLogin from './pages/auth/HODLogin.jsx';
+
 
 // Dashboard Layout
 import MainDashboard from "./pages/MainDashboard.jsx";
@@ -50,10 +50,12 @@ import FacultyAttendance from './components/faculty/FacultyAttendance.jsx';
 import FacultyAddMidMarks from './components/faculty/FacultyAddMid.jsx';
 import FacultyDashboard from './components/faculty/LeaveReqDash.jsx';
 
-// Admin Dashboard Components
-import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
-import AnnouncementsManagement from './pages/Admin/AnnouncementsManagement.jsx';
-import Analytics from './pages/Admin/Analytics.jsx';
+// HOD Dashboard Components
+import HODDashboard from './pages/HOD/HodDashboard.jsx';
+import AnnouncementsManagement from './pages/HOD/AnnouncementsManagement.jsx';
+import Analytics from './pages/HOD/Analytics';
+import HODPortal from './components/HOD/Assign-Faculty/HodAssignment.jsx';
+import CreateNewClubs from './pages/HOD/CreateNewClubs.jsx';
 // 🔒 Protected Route
 const ProtectedRoute = ({ children }) => {
   const token = Cookies.get('token');
@@ -77,7 +79,7 @@ const RoleProtectedRoute = ({ children, allowedRoles = [] }) => {
 const RoleBasedHome = () => {
   const userRole = Cookies.get('userRole');
   
-  if (userRole === 'admin') return <Navigate to="/admin/dashboard" replace />;
+  if (userRole === 'hod') return <Navigate to="/hod/dashboard" replace />;
   if (userRole === 'faculty') return <Navigate to="/faculty/home" replace />;
   if (userRole === 'student') return <Navigate to="/student/home" replace />;
   
@@ -98,12 +100,12 @@ const App = () => {
       {/* Registration Routes */}
       <Route path="/register/student" element={<StudentRegistration />} />
       <Route path="/register/faculty" element={<FacultyRegistration />} />
-      <Route path="/admin/register" element={<AdminRegistration />} />
+      <Route path="/hod/register" element={<HODRegistration />} />
       
       {/* Login Routes */}
       <Route path="/login/student" element={<StudentLogin />} />
       <Route path="/login/faculty" element={<FacultyLogin />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/hod/login" element={<HODLogin />} />
 
       {/* Profile Upload */}
       <Route path="/student/profile-img/upload" element={<AddProfile />} />
@@ -145,10 +147,12 @@ const App = () => {
         <Route path="faculty/settings" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultySettings /></RoleProtectedRoute>} />
         <Route path="/faculty/leave-requests" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyDashboard /></RoleProtectedRoute>} />
         
-        {/* Admin Routes */}
-        <Route path="admin/dashboard" element={<RoleProtectedRoute allowedRoles={['admin']}><AdminDashboard /></RoleProtectedRoute>} />
-        <Route path="admin/announcements" element={<RoleProtectedRoute allowedRoles={['admin']}><AnnouncementsManagement /></RoleProtectedRoute>} />
-        <Route path="admin/analytics" element={<RoleProtectedRoute allowedRoles={['admin']}><Analytics /></RoleProtectedRoute>} />
+        {/* HOD Routes */}
+        <Route path="hod/dashboard" element={<RoleProtectedRoute allowedRoles={['hod']}><HODDashboard /></RoleProtectedRoute>} />
+        <Route path="hod/announcements" element={<RoleProtectedRoute allowedRoles={['hod']}><AnnouncementsManagement /></RoleProtectedRoute>} />
+        <Route path="hod/analytics" element={<RoleProtectedRoute allowedRoles={['hod']}><Analytics /></RoleProtectedRoute>} />
+        <Route path="hod/assign-faculty" element={<RoleProtectedRoute allowedRoles={['hod']}><HODPortal /></RoleProtectedRoute>} />
+        <Route path="hod/clubs" element={<RoleProtectedRoute allowedRoles={['hod']}><CreateNewClubs /></RoleProtectedRoute>} />
       </Route>
       
       {/* Legacy Redirects */}

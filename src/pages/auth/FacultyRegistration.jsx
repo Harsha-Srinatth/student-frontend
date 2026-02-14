@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
+import { Building2, CheckCircle2, Loader2 } from "lucide-react";
 
 const steps = [
   {
@@ -10,9 +11,10 @@ const steps = [
   },
   {
     title: "Professional Info",
-    fields: ["institution", "dept", "dateofjoin"]
+    fields: ["collegeId", "dept", "dateofjoin"]
   }
 ];
+
 const fieldConfig = {
   facultyid: { label: "Faculty ID", type: "text", required: true },
   fullname: { label: "Full Name", type: "text", required: true },
@@ -20,7 +22,7 @@ const fieldConfig = {
   email: { label: "Email Address", type: "email", required: true },
   mobile: { label: "Mobile Number", type: "tel", required: true },
   password: { label: "Password", type: "password", required: true },
-  institution: { label: "Institution", type: "text", required: true },
+  collegeId: { label: "College ID", type: "text", required: true },
   dept: { label: "Department", type: "text", required: true },
   dateofjoin: { label: "Date of Joining", type: "date", required: true }
 };
@@ -30,7 +32,7 @@ const capitalizeWords = (str = "") =>
   str.replace(/\b\w/g, (char) => char.toUpperCase());
 
 const FacultyRegistration = () => {
-  const  navigate = useNavigate();
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(
     Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""]))
@@ -39,6 +41,42 @@ const FacultyRegistration = () => {
   const [loading, setLoading] = useState(false);
   const [responseMessage, setResponseMessage] = useState(null);
   const [direction, setDirection] = useState(0);
+  const [collegeName, setCollegeName] = useState(null);
+  const [checkingCollege, setCheckingCollege] = useState(false);
+
+  // Check college name when collegeId changes
+  useEffect(() => {
+    const checkCollege = async () => {
+      const collegeIdValue = formData.collegeId?.trim();
+      if (!collegeIdValue || collegeIdValue.length < 2) {
+        setCollegeName(null);
+        return;
+      }
+
+      setCheckingCollege(true);
+      try {
+        const response = await api.get(`/college/${encodeURIComponent(collegeIdValue)}`);
+        if (response.data?.success && response.data?.data) {
+          setCollegeName(response.data.data.collegeName);
+        } else {
+          setCollegeName(null);
+        }
+      } catch (error) {
+        // College not found or error - that's okay, user can still register
+        // Only log if it's not a 404 (expected during typing)
+        if (error.response?.status !== 404) {
+          console.error("College lookup error:", error);
+        }
+        setCollegeName(null);
+      } finally {
+        setCheckingCollege(false);
+      }
+    };
+
+    // Debounce the check
+    const timeoutId = setTimeout(checkCollege, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData.collegeId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,8 +85,11 @@ const FacultyRegistration = () => {
     // Keep only digits for mobile, limit to 10 digits
     if (["mobile"].includes(name)) {
       newValue = (value || "").replace(/\D/g, "").slice(0, 10);
-    } else if (["fullname", "dept", "institution"].includes(name)) {
+    } else if (["fullname", "dept"].includes(name)) {
       newValue = capitalizeWords(value);
+    } else if (name === "collegeId") {
+      // College ID can be alphanumeric, keep as is but trim
+      newValue = value.trim();
     }
 
     setFormData((prev) => ({ ...prev, [name]: newValue }));
@@ -121,15 +162,13 @@ const FacultyRegistration = () => {
       cleaned.facultyid = (cleaned.facultyid || "").replace(/\D/g, "");
       cleaned.mobile = (cleaned.mobile || "").replace(/\D/g, "");
 
-      // If backend expects uppercase alphanumeric IDs, uncomment below:
-      // cleaned.facultyid = cleaned.facultyid.toUpperCase();
-
       const res = await api.post("/register/faculty", cleaned);
 
       setResponseMessage({ type: "success", text: res.data?.message || "Registration successful" });
       setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""])));
       setErrors({});
-      setTimeout(() => ( navigate("/roleforlogin")), 1200);
+      setCollegeName(null);
+      setTimeout(() => navigate("/roleforlogin"), 1200);
     } catch (error) {
       console.error("Registration error:", error);
       setResponseMessage({
@@ -199,24 +238,44 @@ const FacultyRegistration = () => {
           >
             {steps[activeStep].fields.map((name) => {
               const config = fieldConfig[name];
+              const isCollegeId = name === "collegeId";
+              
               return (
-                <div key={name} className="flex flex-col">
+                <div key={name} className={`flex flex-col ${isCollegeId ? "sm:col-span-2" : ""}`}>
                   <label className="text-sm font-semibold text-gray-700 mb-1">
                     {config.label}
                     {config.required && <span className="text-red-500">*</span>}
                   </label>
-                  <input
-                    type={config.type}
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    placeholder={`Enter ${config.label.toLowerCase()}`}
-                    className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 ${
-                      errors[name]
-                        ? "border-red-500 bg-red-50"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                  />
+                  <div className="relative">
+                    <input
+                      type={config.type}
+                      name={name}
+                      value={formData[name]}
+                      onChange={handleChange}
+                      placeholder={`Enter ${config.label.toLowerCase()}`}
+                      className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 w-full ${
+                        errors[name]
+                          ? "border-red-500 bg-red-50"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    />
+                    {isCollegeId && checkingCollege && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                      </div>
+                    )}
+                    {isCollegeId && collegeName && !checkingCollege && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      </div>
+                    )}
+                  </div>
+                  {isCollegeId && collegeName && (
+                    <div className="mt-2 flex items-center space-x-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                      <Building2 className="h-4 w-4" />
+                      <span className="font-medium">{collegeName}</span>
+                    </div>
+                  )}
                   {errors[name] && (
                     <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
                   )}
@@ -266,7 +325,7 @@ const FacultyRegistration = () => {
           Already have an account?{" "}
           <button
             type="button"
-            onClick={() => (navigate("/roleforlogin"))}
+            onClick={() => navigate("/roleforlogin")}
             className="text-green-600 hover:text-green-700 font-medium transition-colors"
           >
             Sign in here

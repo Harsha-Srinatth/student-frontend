@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import RoleSelector from "./RoleSelector";
 import StudentLogin from "./StudentLogin";
 import FacultyLogin from "./FacultyLogin";
-import AdminLogin from "./AdminLogin";
+import HODLogin from "./HODLogin";
 
 const Roleforlogin = () => {
   const [role, setRole] = useState("");
@@ -45,7 +45,7 @@ const Roleforlogin = () => {
                 ) : role === "faculty" ? (
                   <FacultyLogin />
                 ) : (
-                  <AdminLogin />
+                  <HODLogin />
                 )}
               </div>
             </div>
