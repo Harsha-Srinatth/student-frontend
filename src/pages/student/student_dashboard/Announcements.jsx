@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStudentAnnouncements } from "../../../features/student/studentDashSlice";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { fetchStudentAnnouncements, fetchSDashboardData } from "../../../features/student/studentDashSlice";
 import socketService from "../../../services/socketService";
 import AnnouncementDetailView from "../../../components/shared/AnnouncementDetailView";
 import { 
@@ -11,19 +13,32 @@ import {
   Info, 
   AlertTriangle,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Plus,
+  Users,
+  Edit,
+  Trash2
 } from "lucide-react";
+import api from "../../../services/api";
 
 const Announcements = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { announcements, loading, error } = useSelector(
+  const { announcements: announcementsRaw, loading, error, student } = useSelector(
     (state) => state.studentDashboard
   );
+  // Ensure announcements is always an array
+  const announcements = Array.isArray(announcementsRaw) ? announcementsRaw : [];
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const listenersSetup = useRef(false);
 
   useEffect(() => {
     dispatch(fetchStudentAnnouncements());
+    // Ensure student data is loaded for permission checks
+    if (!student) {
+      dispatch(fetchSDashboardData());
+    }
     setupSocketListeners();
     
     return () => {
@@ -33,7 +48,7 @@ const Announcements = () => {
         socketService.off("socket:reconnected", handleSocketReconnected);
       }
     };
-  }, [dispatch]);
+  }, [dispatch, student]);
 
   const handleAnnouncementUpdate = (data) => {
     console.log("Received announcement update:", data);
@@ -48,6 +63,51 @@ const Announcements = () => {
   const handleSocketReconnected = () => {
     console.log("Socket reconnected, fetching announcements");
     dispatch(fetchStudentAnnouncements());
+  };
+
+  // Check if user can edit/delete this announcement
+  const canModifyAnnouncement = (announcement) => {
+    if (!announcement.clubId) return false; // Only club announcements can be modified
+    
+    // Get studentid from multiple possible sources
+    const currentStudentId = student?.studentid || student?.studentId;
+    
+    if (!currentStudentId) {
+      return false;
+    }
+    
+    // Check if current user is the creator
+    const announcementCreatorId = announcement.createdBy?.adminId;
+    const isCreator = announcementCreatorId === currentStudentId;
+    
+    return isCreator;
+  };
+
+  // Handle edit
+  const handleEdit = (e, announcement) => {
+    e.stopPropagation(); // Prevent card click
+    navigate(`/student/club-announcements/edit/${announcement._id}`, { state: { announcement } });
+  };
+
+  // Handle delete
+  const handleDelete = async (e, announcementId) => {
+    e.stopPropagation(); // Prevent card click
+    
+    if (!window.confirm("Are you sure you want to delete this announcement? This action cannot be undone.")) {
+      return;
+    }
+
+    setDeletingId(announcementId);
+    try {
+      await api.delete(`/student/clubs/announcements/${announcementId}`);
+      // Refresh announcements
+      dispatch(fetchStudentAnnouncements());
+    } catch (error) {
+      console.error("Delete announcement error:", error);
+      alert(error.response?.data?.message || "Failed to delete announcement");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const setupSocketListeners = () => {
@@ -176,14 +236,25 @@ const Announcements = () => {
               <p className="text-sm text-gray-600 mt-0.5">Stay updated with latest news and updates</p>
             </div>
           </div>
-          {announcements.length > 0 && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-semibold text-gray-700">
-                {announcements.length} {announcements.length === 1 ? 'announcement' : 'announcements'}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            {announcements.length > 0 && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <span className="text-sm font-semibold text-gray-700">
+                  {announcements.length} {announcements.length === 1 ? 'announcement' : 'announcements'}
+                </span>
+              </div>
+            )}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/student/club-announcements/create')}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              Create Club Announcement
+            </motion.button>
+          </div>
         </div>
       </div>
 
@@ -217,20 +288,58 @@ const Announcements = () => {
                   className={`group relative ${config.bg} ${config.border} rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer`}
                 >
                   <div className="flex items-start gap-4">
-                    {/* Icon */}
-                    <div className={`flex-shrink-0 p-3 ${config.bg} rounded-lg`}>
-                      <Icon className={`w-6 h-6 ${config.iconColor}`} />
-                    </div>
+                    {/* Club Profile Image or Icon */}
+                    {announcement.clubImage ? (
+                      <div className="flex-shrink-0">
+                        <img
+                          src={announcement.clubImage}
+                          alt={announcement.clubName || "Club"}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-blue-500 shadow-md"
+                        />
+                      </div>
+                    ) : (
+                      <div className={`flex-shrink-0 p-3 ${config.bg} rounded-lg`}>
+                        <Icon className={`w-6 h-6 ${config.iconColor}`} />
+                      </div>
+                    )}
                     
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-4 mb-3">
-                        <h4 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                          {announcement.title}
-                        </h4>
-                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${config.badge}`}>
-                          {announcement.priority || 'normal'}
-                        </span>
+                        <div className="flex-1">
+                          <h4 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                            {announcement.title}
+                          </h4>
+                          {announcement.clubName && (
+                            <p className="text-sm text-gray-600 mt-1 font-medium">
+                              {announcement.clubName}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {canModifyAnnouncement(announcement) && (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={(e) => handleEdit(e, announcement)}
+                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Edit announcement"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={(e) => handleDelete(e, announcement._id)}
+                                disabled={deletingId === announcement._id}
+                                className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                title="Delete announcement"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                          <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${config.badge}`}>
+                            {announcement.priority || 'normal'}
+                          </span>
+                        </div>
                       </div>
                       
                       <p className="text-gray-700 mb-4 leading-relaxed whitespace-pre-wrap">
@@ -238,12 +347,30 @@ const Announcements = () => {
                       </p>
                       
                       {/* Footer */}
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-4 h-4" />
                           <span className="font-medium">{formatDate(announcement.createdAt)}</span>
                         </div>
-                        {announcement.targetAudience && announcement.targetAudience.length > 0 && (
+                        {announcement.eventDate && (
+                          <>
+                            <span className="text-gray-300">•</span>
+                            <div className="flex items-center gap-1.5">
+                              <Calendar className="w-4 h-4 text-blue-500" />
+                              <span className="font-medium">Event: {formatDate(announcement.eventDate)}</span>
+                            </div>
+                          </>
+                        )}
+                        {announcement.targetYears && announcement.targetYears.length > 0 && (
+                          <>
+                            <span className="text-gray-300">•</span>
+                            <div className="flex items-center gap-1.5">
+                              <Users className="w-4 h-4 text-purple-500" />
+                              <span className="font-medium">{announcement.targetYears.join(", ")} Year{announcement.targetYears.length > 1 ? "s" : ""}</span>
+                            </div>
+                          </>
+                        )}
+                        {announcement.targetAudience && announcement.targetAudience.length > 0 && !announcement.clubId && (
                           <>
                             <span className="text-gray-300">•</span>
                             <div className="flex items-center gap-1.5">

@@ -284,7 +284,28 @@ const facultyDashboardSlice = createSlice({
     },
     updateAnnouncementsRealtime: (state, action) => {
       if (action.payload) {
-        state.announcements = action.payload;
+        const { type, announcement, announcementId } = action.payload;
+        
+        if (type === "new" && announcement) {
+          // Check if announcement already exists (avoid duplicates)
+          const exists = state.announcements.some((a) => a._id === announcement._id);
+          if (!exists) {
+            state.announcements.unshift(announcement);
+          }
+        } else if (type === "update" && announcement) {
+          const index = state.announcements.findIndex((a) => a._id === announcement._id);
+          if (index !== -1) {
+            state.announcements[index] = { ...state.announcements[index], ...announcement };
+          } else {
+            // If not found, add it (might be a new announcement)
+            state.announcements.unshift(announcement);
+          }
+        } else if (type === "delete" && announcementId) {
+          state.announcements = state.announcements.filter((a) => a._id !== announcementId);
+        } else if (!type && Array.isArray(action.payload)) {
+          // Fallback: if payload is array, replace entire list
+          state.announcements = action.payload;
+        }
         state.announcementsLastFetched = Date.now();
       }
     },
@@ -454,7 +475,8 @@ const facultyDashboardSlice = createSlice({
         if (!action.payload.fromCache) {
           // Backend returns { success: true, data: [...] }
           // Extract data array (same as student pattern)
-          state.announcements = action.payload.data || [];
+          const announcementsData = action.payload?.data;
+          state.announcements = Array.isArray(announcementsData) ? announcementsData : [];
           state.announcementsLastFetched = Date.now();
           console.log('✅ Updated announcements from API:', state.announcements.length);
         } else if (!action.payload.silent) {

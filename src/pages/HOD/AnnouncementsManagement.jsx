@@ -5,7 +5,8 @@ import {
   createAnnouncement, 
   updateAnnouncement, 
   deleteAnnouncement,
-  clearAnnouncementsCache
+  clearAnnouncementsCache,
+  updateAnnouncementsRealtime
 } from "../../features/HOD/hodAnnouncementsSlice";
 import socketService from "../../services/socketService";
 import AnnouncementDetailView from "../../components/shared/AnnouncementDetailView";
@@ -65,6 +66,7 @@ export default function AnnouncementsManagement() {
       if (listenersSetup.current) {
         socketService.off("socket:connected", handleSocketConnected);
         socketService.off("socket:reconnected", handleSocketReconnected);
+        socketService.off("dashboard:announcements", handleAnnouncementUpdate);
       }
     };
   }, [dispatch]);
@@ -81,13 +83,27 @@ export default function AnnouncementsManagement() {
     dispatch(fetchAnnouncements({ forceRefresh: true }));
   };
 
+  const handleAnnouncementUpdate = (data) => {
+    console.log("📢 HOD: Received announcement update via socket:", data);
+    // Update Redux store immediately with realtime data
+    if (data && data.type) {
+      dispatch(updateAnnouncementsRealtime(data));
+    }
+    // Also fetch fresh data to ensure consistency (with a small delay to avoid race conditions)
+    setTimeout(() => {
+      dispatch(fetchAnnouncements({ forceRefresh: true }));
+    }, 500);
+  };
+
   const setupSocketListeners = () => {
     if (listenersSetup.current) return;
     
     socketService.on("socket:connected", handleSocketConnected);
     socketService.on("socket:reconnected", handleSocketReconnected);
+    socketService.on("dashboard:announcements", handleAnnouncementUpdate);
     
     listenersSetup.current = true;
+    console.log("✅ HOD: Socket listeners set up for announcements");
   };
 
   const handleSubmit = async (e) => {
@@ -107,10 +123,18 @@ export default function AnnouncementsManagement() {
         submitData.append("image", imageFile);
       }
 
+      let result;
       if (editingAnnouncement) {
-        await dispatch(updateAnnouncement({ id: editingAnnouncement._id, formData: submitData })).unwrap();
+        result = await dispatch(updateAnnouncement({ id: editingAnnouncement._id, formData: submitData })).unwrap();
       } else {
-        await dispatch(createAnnouncement(submitData)).unwrap();
+        result = await dispatch(createAnnouncement(submitData)).unwrap();
+        // Optimistically add the new announcement to the list immediately
+        if (result && result.data) {
+          dispatch(updateAnnouncementsRealtime({
+            type: "new",
+            announcement: result.data
+          }));
+        }
       }
       setShowModal(false);
       setEditingAnnouncement(null);
@@ -123,10 +147,14 @@ export default function AnnouncementsManagement() {
   const handleEdit = (announcement) => {
     setEditingAnnouncement(announcement);
     setFormData({
-      title: announcement.title,
-      content: announcement.content,
-      targetAudience: announcement.targetAudience,
-      priority: announcement.priority,
+      title: announcement.title || "",
+      content: announcement.content || "",
+      targetAudience: Array.isArray(announcement.targetAudience) 
+        ? announcement.targetAudience 
+        : announcement.targetAudience 
+          ? [announcement.targetAudience] 
+          : ["both"],
+      priority: announcement.priority || "medium",
       expiresAt: announcement.expiresAt 
         ? new Date(announcement.expiresAt).toISOString().split('T')[0]
         : "",
@@ -389,7 +417,11 @@ export default function AnnouncementsManagement() {
                       <div className="flex flex-wrap items-center gap-4 text-sm">
                         <div className="flex items-center gap-2 text-gray-600 bg-white/60 px-4 py-2 rounded-lg">
                           <Users className="w-4 h-4 text-purple-500" />
-                          <span className="font-semibold capitalize">{announcement.targetAudience.join(", ")}</span>
+                          <span className="font-semibold capitalize">
+                            {Array.isArray(announcement.targetAudience) 
+                              ? announcement.targetAudience.join(", ") 
+                              : announcement.targetAudience || "N/A"}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-600 bg-white/60 px-4 py-2 rounded-lg">
                           <Calendar className="w-4 h-4 text-indigo-500" />

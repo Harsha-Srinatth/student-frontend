@@ -8,7 +8,27 @@ import Cookies from "js-cookie";
  */
 export const fetchSDashboardData = createAsyncThunk(
   "dashboard/fetchDashboardData",
-  async (_, { rejectWithValue }) => {
+  async ({ forceRefresh = false } = {}, { rejectWithValue, getState }) => {
+    const state = getState();
+    const { student, counts, lastFetched } = state.studentDashboard;
+    
+    // If forceRefresh is false and data already exists in Redux (our cache), skip fetch
+    // Check if we have actual data (not just initial null state) and it's fresh (less than 5 minutes old)
+    if (!forceRefresh && student !== null && counts !== null && lastFetched && Date.now() - lastFetched < 5 * 60 * 1000) {
+      if (import.meta.env.DEV) {
+        console.log('📦 fetchSDashboardData: Returning from cache');
+      }
+      return { 
+        fromCache: true,
+        student,
+        counts,
+        announcements: state.studentDashboard.announcements || [],
+        pendingApprovals: state.studentDashboard.pendingApprovals || [],
+        rejectedApprovals: state.studentDashboard.rejectedApprovals || [],
+        approvedApprovals: state.studentDashboard.approvedApprovals || [],
+      };
+    }
+    
     const token = Cookies.get("token");
     try {
       const response = await api.get("/student/home", {
@@ -169,7 +189,28 @@ const dashboardSlice = createSlice({
     },
     updateAnnouncementsRealtime: (state, action) => {
       if (action.payload) {
-        state.announcements = action.payload;
+        const { type, announcement, announcementId } = action.payload;
+        
+        if (type === "new" && announcement) {
+          // Check if announcement already exists (avoid duplicates)
+          const exists = state.announcements.some((a) => a._id === announcement._id);
+          if (!exists) {
+            state.announcements.unshift(announcement);
+          }
+        } else if (type === "update" && announcement) {
+          const index = state.announcements.findIndex((a) => a._id === announcement._id);
+          if (index !== -1) {
+            state.announcements[index] = { ...state.announcements[index], ...announcement };
+          } else {
+            // If not found, add it (might be a new announcement)
+            state.announcements.unshift(announcement);
+          }
+        } else if (type === "delete" && announcementId) {
+          state.announcements = state.announcements.filter((a) => a._id !== announcementId);
+        } else if (!type && Array.isArray(action.payload)) {
+          // Fallback: if payload is array, replace entire list
+          state.announcements = action.payload;
+        }
         // Update timestamp to reflect real-time data freshness
         state.lastFetched = Date.now();
       }
@@ -206,21 +247,27 @@ const dashboardSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchSDashboardData.pending, (state) => {
-        state.loading = true;
+        // Only set loading if we don't have data or forceRefresh is true
+        const hasData = state.student !== null && state.counts !== null && state.lastFetched;
+        if (!hasData) {
+          state.loading = true;
+        }
         state.error = null;
       })
       .addCase(fetchSDashboardData.fulfilled, (state, action) => {
-        state.loading = false;
-        state.student = action.payload.student;
-        if (state.student) {
-          state.student.profileImage = action.payload.student?.profileImage || null;
-        }
-        
-        if (action.payload.counts) {
-          state.counts = {
-            ...state.counts,
-            ...action.payload.counts,
-            approvedCount: action.payload.counts.approvedCount ?? 0,
+        // Only update if not from cache (i.e., fresh API response)
+        if (!action.payload.fromCache) {
+          state.loading = false;
+          state.student = action.payload.student;
+          if (state.student) {
+            state.student.profileImage = action.payload.student?.profileImage || null;
+          }
+          
+          if (action.payload.counts) {
+            state.counts = {
+              ...state.counts,
+              ...action.payload.counts,
+              approvedCount: action.payload.counts.approvedCount ?? 0,
             rejectedCount: action.payload.counts.rejectedCount ?? 0,
             pendingCount: action.payload.counts.pendingCount ?? 0,
           };
@@ -234,6 +281,12 @@ const dashboardSlice = createSlice({
         
         // Update timestamp (Redux is the cache)
         state.lastFetched = Date.now();
+        } else {
+          // From cache - don't touch loading state to avoid unnecessary toggles
+          if (import.meta.env.DEV) {
+            console.log('📦 Using cached student dashboard data');
+          }
+        }
       })
       .addCase(fetchSDashboardData.rejected, (state, action) => {
         state.loading = false;
@@ -286,7 +339,9 @@ const dashboardSlice = createSlice({
       .addCase(fetchStudentAnnouncements.fulfilled, (state, action) => {
         state.loading = false;
         if (!action.payload.fromCache) {
-          state.announcements = action.payload.data || [];
+          // Ensure we always set an array, even if data is missing or malformed
+          const announcementsData = action.payload?.data;
+          state.announcements = Array.isArray(announcementsData) ? announcementsData : [];
           state.lastFetched = Date.now();
         }
       })

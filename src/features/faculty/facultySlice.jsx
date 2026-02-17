@@ -6,21 +6,27 @@ import Cookies from 'js-cookie';
 // Redux is the cache - only fetch if data doesn't exist
 export const fetchStudentsByFaculty = createAsyncThunk(
   'students/fetchByFaculty',
-  async (_, { rejectWithValue, getState }) => {
+  async ({ section, year } = {}, { rejectWithValue, getState }) => {
     try {
       const state = getState();
       const { students } = state.students;
       
-      // If students already exist in Redux (our cache), skip fetch
-      if (students && students.length > 0) {
+      // If students already exist in Redux (our cache) and no filters, skip fetch
+      // If filters are provided, always fetch fresh data
+      if (!section && !year && students && students.length > 0) {
         return { students, totalCount: students.length, fromCache: true };
       }
       
       const token = Cookies.get('token');
+      const params = {};
+      if (section && section !== 'all') params.section = section;
+      if (year && year !== 'all') params.year = year;
+      
       const response = await api.get(`/faculty/students`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        params,
       });
       return response.data;
     } catch (error) {

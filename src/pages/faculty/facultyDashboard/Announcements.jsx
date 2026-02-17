@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { fetchFacultyAnnouncements } from "../../../features/faculty/facultyDashSlice";
 import socketService from "../../../services/socketService";
 import AnnouncementDetailView from "../../../components/shared/AnnouncementDetailView";
@@ -13,15 +15,24 @@ import {
   CheckCircle2,
   Info,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  Plus,
+  Edit,
+  Trash2
 } from "lucide-react";
+import api from "../../../services/api";
 
 const FacultyAnnouncements = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { announcements, announcementsLoading, error, announcementsLastFetched } = useSelector(
+  const { announcements: announcementsRaw, announcementsLoading, error, announcementsLastFetched, faculty } = useSelector(
     (state) => state.facultyDashboard
   );
+  // Ensure announcements is always an array
+  const announcements = Array.isArray(announcementsRaw) ? announcementsRaw : [];
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [editAnnouncement, setEditAnnouncement] = useState(null);
   
   const listenersSetup = useRef(false);
   const hasFetchedRef = useRef(false);
@@ -156,6 +167,42 @@ const FacultyAnnouncements = () => {
     };
   }, [dispatch, handleAnnouncementUpdate, handleSocketConnected, handleSocketReconnected]);
 
+  // Check if user can edit/delete this announcement
+  const canModifyAnnouncement = (announcement) => {
+    if (!announcement.clubId) return false; // Only club announcements can be modified
+    if (!faculty?.facultyid) return false;
+    // Check if current user is the creator
+    return announcement.createdBy?.adminId === faculty.facultyid;
+  };
+
+  // Handle edit
+  const handleEdit = (e, announcement) => {
+    e.stopPropagation(); // Prevent card click
+    setEditAnnouncement(announcement);
+    navigate(`/faculty/club-announcements/edit/${announcement._id}`, { state: { announcement } });
+  };
+
+  // Handle delete
+  const handleDelete = async (e, announcementId) => {
+    e.stopPropagation(); // Prevent card click
+    
+    if (!window.confirm("Are you sure you want to delete this announcement? This action cannot be undone.")) {
+      return;
+    }
+
+    setDeletingId(announcementId);
+    try {
+      await api.delete(`/faculty/clubs/announcements/${announcementId}`);
+      // Refresh announcements
+      dispatch(fetchFacultyAnnouncements({ forceRefresh: true }));
+    } catch (error) {
+      console.error("Delete announcement error:", error);
+      alert(error.response?.data?.message || "Failed to delete announcement");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const setupSocketListeners = () => {
     if (listenersSetup.current) return;
     
@@ -238,23 +285,34 @@ const FacultyAnnouncements = () => {
               <p className="text-indigo-100 text-sm font-medium">Stay updated with important faculty information</p>
             </div>
           </div>
-          {announcements.length > 0 && (
-            <div className="flex items-center gap-3 px-5 py-3 bg-white/20 backdrop-blur-lg rounded-xl border border-white/30 shadow-lg">
-              <div className="relative">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <div className="absolute inset-0 w-3 h-3 bg-green-400 rounded-full animate-ping opacity-75"></div>
+          <div className="flex items-center gap-3">
+            {announcements.length > 0 && (
+              <div className="flex items-center gap-3 px-5 py-3 bg-white/20 backdrop-blur-lg rounded-xl border border-white/30 shadow-lg">
+                <div className="relative">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="absolute inset-0 w-3 h-3 bg-green-400 rounded-full animate-ping opacity-75"></div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-white" />
+                  <span className="text-white font-bold text-lg">
+                    {announcements.length}
+                  </span>
+                  <span className="text-indigo-100 text-sm">
+                    {announcements.length === 1 ? 'announcement' : 'announcements'}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-white" />
-                <span className="text-white font-bold text-lg">
-                  {announcements.length}
-                </span>
-                <span className="text-indigo-100 text-sm">
-                  {announcements.length === 1 ? 'announcement' : 'announcements'}
-                </span>
-              </div>
-            </div>
-          )}
+            )}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/faculty/club-announcements/create')}
+              className="flex items-center gap-2 px-5 py-3 bg-white/20 backdrop-blur-lg rounded-xl border border-white/30 shadow-lg hover:bg-white/30 transition-all text-white font-semibold"
+            >
+              <Plus className="w-5 h-5" />
+              Create Club Announcement
+            </motion.button>
+          </div>
         </div>
       </div>
 
@@ -307,20 +365,58 @@ const FacultyAnnouncements = () => {
                   className={`group relative ${config.bg} ${config.border} rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 ${config.glow} cursor-pointer`}
                 >
                   <div className="flex items-start gap-5">
-                    {/* Enhanced Icon */}
-                    <div className={`flex-shrink-0 p-4 ${config.bg} rounded-xl shadow-md group-hover:scale-110 transition-transform`}>
-                      <Icon className={`w-7 h-7 ${config.iconColor}`} />
-                    </div>
+                    {/* Club Profile Image or Enhanced Icon */}
+                    {announcement.clubImage ? (
+                      <div className="flex-shrink-0">
+                        <img
+                          src={announcement.clubImage}
+                          alt={announcement.clubName || "Club"}
+                          className="w-14 h-14 rounded-full object-cover border-2 border-blue-500 shadow-md"
+                        />
+                      </div>
+                    ) : (
+                      <div className={`flex-shrink-0 p-4 ${config.bg} rounded-xl shadow-md group-hover:scale-110 transition-transform`}>
+                        <Icon className={`w-7 h-7 ${config.iconColor}`} />
+                      </div>
+                    )}
                     
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-4 mb-4">
-                        <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight">
-                          {announcement.title}
-                        </h3>
-                        <span className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider shadow-md ${config.badge} flex-shrink-0`}>
-                          {announcement.priority || 'medium'}
-                        </span>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight">
+                            {announcement.title}
+                          </h3>
+                          {announcement.clubName && (
+                            <p className="text-sm text-gray-600 mt-1 font-medium">
+                              {announcement.clubName}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {canModifyAnnouncement(announcement) && (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={(e) => handleEdit(e, announcement)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Edit announcement"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={(e) => handleDelete(e, announcement._id)}
+                                disabled={deletingId === announcement._id}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                title="Delete announcement"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                          <span className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider shadow-md ${config.badge}`}>
+                            {announcement.priority || 'medium'}
+                          </span>
+                        </div>
                       </div>
                       
                       <p className="text-gray-700 mb-5 leading-relaxed whitespace-pre-wrap text-[15px]">
@@ -328,12 +424,24 @@ const FacultyAnnouncements = () => {
                       </p>
                       
                       {/* Enhanced Footer */}
-                      <div className="flex items-center gap-6 text-sm">
+                      <div className="flex items-center gap-6 text-sm flex-wrap">
                         <div className="flex items-center gap-2 text-gray-600 bg-white/60 px-3 py-1.5 rounded-lg">
                           <Calendar className="w-4 h-4 text-indigo-500" />
                           <span className="font-semibold">{formatDate(announcement.createdAt)}</span>
                         </div>
-                        {announcement.targetAudience && announcement.targetAudience.length > 0 && (
+                        {announcement.eventDate && (
+                          <div className="flex items-center gap-2 text-gray-600 bg-white/60 px-3 py-1.5 rounded-lg">
+                            <Calendar className="w-4 h-4 text-blue-500" />
+                            <span className="font-semibold">Event: {formatDate(announcement.eventDate)}</span>
+                          </div>
+                        )}
+                        {announcement.targetYears && announcement.targetYears.length > 0 && (
+                          <div className="flex items-center gap-2 text-gray-600 bg-white/60 px-3 py-1.5 rounded-lg">
+                            <Users className="w-4 h-4 text-purple-500" />
+                            <span className="font-semibold">{announcement.targetYears.join(", ")} Year{announcement.targetYears.length > 1 ? "s" : ""}</span>
+                          </div>
+                        )}
+                        {announcement.targetAudience && announcement.targetAudience.length > 0 && !announcement.clubId && (
                           <div className="flex items-center gap-2 text-gray-600 bg-white/60 px-3 py-1.5 rounded-lg">
                             <Users className="w-4 h-4 text-purple-500" />
                             <span className="font-semibold capitalize">{announcement.targetAudience.join(", ")}</span>

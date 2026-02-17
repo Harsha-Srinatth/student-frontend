@@ -1,35 +1,16 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllApprovals, isDataStale } from "../../../features/student/studentDashSlice";
 import { Clock, XCircle, CheckCircle, Calendar, FileText, Eye, X, AlertCircle } from "lucide-react";
-import { mergeArrays } from "../../../utils/realtimeHelpers";
 
 const StudentPendingApprovels = () => {
   const dispatch = useDispatch();
+  
+  // Read directly from store (source of truth - updated by socket)
   const studentDashboard = useSelector((state) => state.studentDashboard);
-  const realtimeData = useSelector((state) => state.realtime?.student);
-  
-  // Merge real-time approvals with existing approvals
-  const pendingApprovals = useMemo(() => {
-    return mergeArrays(
-      studentDashboard.pendingApprovals || [],
-      realtimeData?.pendingApprovals
-    );
-  }, [studentDashboard.pendingApprovals, realtimeData?.pendingApprovals]);
-  
-  const rejectedApprovals = useMemo(() => {
-    return mergeArrays(
-      studentDashboard.rejectedApprovals || [],
-      realtimeData?.rejectedApprovals
-    );
-  }, [studentDashboard.rejectedApprovals, realtimeData?.rejectedApprovals]);
-  
-  const approvedApprovals = useMemo(() => {
-    return mergeArrays(
-      studentDashboard.approvedApprovals || [],
-      realtimeData?.approvedApprovals
-    );
-  }, [studentDashboard.approvedApprovals, realtimeData?.approvedApprovals]);
+  const pendingApprovals = studentDashboard.pendingApprovals || [];
+  const rejectedApprovals = studentDashboard.rejectedApprovals || [];
+  const approvedApprovals = studentDashboard.approvedApprovals || [];
   
   const { loading, error, approvalsLastFetched } = studentDashboard;
 

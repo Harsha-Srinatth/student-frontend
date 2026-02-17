@@ -1,22 +1,15 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchSDashboardData, isDataStale } from "../../../features/student/studentDashSlice";
 import { XCircle, Clock, User, MessageCircle, AlertCircle } from "lucide-react";
-import { mergeArrays } from "../../../utils/realtimeHelpers";
 
 const RejectedApprovals = () => {
   const [selected, setSelected] = useState(null);
   const dispatch = useDispatch();
-  const studentDashboard = useSelector((state) => state.studentDashboard);
-  const realtimeData = useSelector((state) => state.realtime?.student);
   
-  // Merge real-time rejected approvals with existing approvals
-  const rejectedApprovals = useMemo(() => {
-    return mergeArrays(
-      studentDashboard.rejectedApprovals || [],
-      realtimeData?.rejectedApprovals
-    );
-  }, [studentDashboard.rejectedApprovals, realtimeData?.rejectedApprovals]);
+  // Read directly from store (source of truth - updated by socket)
+  const studentDashboard = useSelector((state) => state.studentDashboard);
+  const rejectedApprovals = studentDashboard.rejectedApprovals || [];
   
   const { loading, error, lastFetched } = studentDashboard;
 

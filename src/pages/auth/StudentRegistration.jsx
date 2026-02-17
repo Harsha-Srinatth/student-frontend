@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Building2, CheckCircle2, Loader2, User, Search } from "lucide-react";
+import { requestPermission } from "../../../firebase.js";
 
 const steps = [
   {
@@ -56,6 +57,23 @@ const StudentRegistration = () => {
   const [searchingFaculty, setSearchingFaculty] = useState(false);
   const [showFacultyResults, setShowFacultyResults] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState(null);
+  const [fcmToken, setFcmToken] = useState(null);
+
+  // Request FCM token on component mount
+  useEffect(() => {
+    const getFCMToken = async () => {
+      try {
+        const token = await requestPermission();
+        if (token) {
+          setFcmToken(token);
+          console.log("FCM token obtained:", token);
+        }
+      } catch (error) {
+        console.error("Error getting FCM token:", error);
+      }
+    };
+    getFCMToken();
+  }, []);
 
   // Search colleges when query changes
   useEffect(() => {
@@ -296,6 +314,11 @@ const StudentRegistration = () => {
 
       // Force digits-only for ids and mobile
       cleaned.mobileno = (cleaned.mobileno || "").replace(/\D/g, "");
+
+      // Add FCM token if available
+      if (fcmToken) {
+        cleaned.fcmToken = fcmToken;
+      }
 
       // If your backend expects uppercase alphanumeric IDs, you can convert here:
       // cleaned.studentid = cleaned.studentid.toUpperCase();

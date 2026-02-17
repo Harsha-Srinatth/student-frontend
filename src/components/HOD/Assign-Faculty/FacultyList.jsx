@@ -1,18 +1,34 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Users, Mail, Phone, BookOpen, Search, CheckCircle2, Calendar } from 'lucide-react';
-import { fetchDepartmentFaculty } from '../../../features/HOD/hodAssignmentSlice';
+import { Users, Mail, Phone, BookOpen, Search, CheckCircle2, Calendar, X, MoreVertical, Trash2 } from 'lucide-react';
+import { fetchDepartmentFaculty, removeFacultyAssignment, fetchDepartmentStudents } from '../../../features/HOD/hodAssignmentSlice';
 import { getFacultyAssignedSections, getYearLabel } from '../../../utils/sectionUtils';
 
 export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
   const dispatch = useDispatch();
-  const { faculty, facultyLoading, facultyError } = useSelector((state) => state.hodAssignment);
+  const { faculty, facultyLoading, facultyError, assigning } = useSelector((state) => state.hodAssignment);
   const { sections } = useSelector((state) => state.hodAssignment);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showRemoveMenu, setShowRemoveMenu] = useState(null);
 
   useEffect(() => {
     dispatch(fetchDepartmentFaculty());
   }, [dispatch]);
+
+  const handleRemoveAssignment = async (facultyId, section, e) => {
+    e.stopPropagation();
+    if (window.confirm(`Are you sure you want to remove this faculty from Section ${section}?`)) {
+      try {
+        await dispatch(removeFacultyAssignment({ facultyId, section })).unwrap();
+        dispatch(fetchDepartmentFaculty());
+        dispatch(fetchDepartmentStudents());
+        setShowRemoveMenu(null);
+      } catch (error) {
+        console.error('Error removing assignment:', error);
+        alert(error || 'Failed to remove assignment');
+      }
+    }
+  };
 
   // Get assigned sections for each faculty with year info
   const getFacultySectionsWithYear = (facultyMember) => {
@@ -146,7 +162,25 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
                       {member.designation && (
                         <div className="flex items-center text-sm text-gray-600">
                           <BookOpen className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-                          <span className="font-medium">{member.designation}</span>
+                          <span className="font-medium">{Array.isArray(member.designation) ? member.designation.join(', ') : member.designation}</span>
+                        </div>
+                      )}
+                      {member.subjects && member.subjects.length > 0 && (
+                        <div className="mt-2">
+                          <div className="flex items-center text-xs text-gray-500 mb-1">
+                            <BookOpen className="h-3 w-3 mr-1" />
+                            <span className="font-semibold">Subjects:</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {member.subjects.map((subject, idx) => (
+                              <span
+                                key={idx}
+                                className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200"
+                              >
+                                {subject}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -162,17 +196,25 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
                           {assignedSections.map((assignment, idx) => (
                             <div
                               key={idx}
-                              className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200"
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200 group relative"
                             >
-                              <span className="font-bold mr-1">{assignment.section}</span>
+                              <span className="font-bold">{assignment.section}</span>
                               {assignment.years && assignment.years.length > 0 && (
                                 <span className="text-blue-600">
                                   ({assignment.years.map(y => getYearLabel(y)).join(', ')})
                                 </span>
                               )}
                               {assignment.assignmentType && (
-                                <span className="ml-1 text-blue-500">• {assignment.assignmentType}</span>
+                                <span className="text-blue-500">• {assignment.assignmentType}</span>
                               )}
+                              <button
+                                onClick={(e) => handleRemoveAssignment(member.facultyid || member.id, assignment.section, e)}
+                                disabled={assigning}
+                                className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-800 disabled:opacity-50"
+                                title="Remove assignment"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
                             </div>
                           ))}
                         </div>

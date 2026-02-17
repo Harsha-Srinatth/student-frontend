@@ -1,24 +1,15 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPendingApprovals } from "../../../features/faculty/facultyDashSlice";
 import StudentDetailView from "./StudentDetailView";
 import PendingApprovalsList from "./PendingApprovalsList";
-import { mergeArrays } from "../../../utils/realtimeHelpers";
 
 const PendingApprovals = () => {
   const dispatch = useDispatch();
   const facultyDashboard = useSelector((state) => state.facultyDashboard);
-  const realtimeData = useSelector((state) => state.realtime?.faculty);
   
-  // Merge real-time pending approvals with existing approvals
-  const pendingApprovals = useMemo(() => {
-    const baseApprovals = facultyDashboard.pendingApprovals === null ? null : (facultyDashboard.pendingApprovals || []);
-    if (baseApprovals === null) return null; // Don't merge if we haven't fetched yet
-    return mergeArrays(
-      baseApprovals,
-      realtimeData?.pendingApprovals
-    );
-  }, [facultyDashboard.pendingApprovals, realtimeData?.pendingApprovals]);
+  // Read directly from store (source of truth - updated by socket)
+  const pendingApprovals = facultyDashboard.pendingApprovals;
   
   const { pendingLoading, error } = facultyDashboard;
   const [selectedStudent, setSelectedStudent] = useState(null);

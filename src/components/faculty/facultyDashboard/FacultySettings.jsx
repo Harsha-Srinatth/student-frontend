@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { FileCheck, BookOpen, Users, Shield, Settings, Mail, Phone, User, Calendar, IdCard, Building2, Briefcase,Clock } from "lucide-react";
 import { fetchFacultyDashboardData, fetchFacultyMetrics } from "../../../features/faculty/facultyDashSlice";
 import FacultyMeritsCard from "./facultyMerits";
+import NotificationSettings from "../../shared/NotificationSettings";
 
 // Faculty Details Card (passport size image, details right, all fields, improved UI)
 const FacultyDetailsCard = ({ facultyData }) => (
@@ -157,6 +158,20 @@ const FacultySettings = () => {
         <FacultyDetailsCard facultyData={facultyData} />
        {/* Faculty Metrics Card */}
         <FacultyMeritsCard metrics={metrics} />
+
+        {/* Notification Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <NotificationSettings
+            userType="faculty"
+            userId={facultyData.facultyid}
+            currentToken={faculty?.fcmToken}
+            isLoading={loading}
+          />
+        </motion.div>
 
         {/* Settings Navigation */}
         <motion.div

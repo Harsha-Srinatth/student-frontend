@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentsByFaculty } from "../../features/faculty/facultySlice";
 import { fetchCurriculum, saveMidMarks } from "../../features/shared/academicsSlice";
+import { fetchFacultyDashboardData } from "../../features/faculty/facultyDashSlice";
+import { getYearFromSemester, getYearLabel } from "../../utils/sectionUtils";
 import { 
   Search, 
   Users, 
@@ -16,17 +18,21 @@ import {
   GraduationCap,
   FileText,
   Star,
-  Target
+  Target,
+  Filter
 } from "lucide-react";
 
 export default function FacultyAddMidMarks() {
   const dispatch = useDispatch();
   const { students } = useSelector((s) => s.students);
   const { curriculum, curriculumLoading, marksSaving } = useSelector((s) => s.academics);
+  const { faculty } = useSelector((s) => s.facultyDashboard);
 
   const [studentId, setStudentId] = useState("");
   const [semester, setSemester] = useState(1);
   const [midNumber, setMidNumber] = useState(1);
+  const [selectedSection, setSelectedSection] = useState("all");
+  const [selectedYear, setSelectedYear] = useState("all");
   const [subjects, setSubjects] = useState([]);
   const [marks, setMarks] = useState({});
   const [loading, setLoading] = useState(false);
@@ -35,6 +41,37 @@ export default function FacultyAddMidMarks() {
   const [noticeType, setNoticeType] = useState("success");
   const [search, setSearch] = useState("");
   const [focusedInput, setFocusedInput] = useState("");
+
+  // Fetch faculty data to get sectionsAssigned and subjects
+  useEffect(() => {
+    if (!faculty || !faculty.sectionsAssigned) {
+      dispatch(fetchFacultyDashboardData());
+    }
+  }, [dispatch, faculty]);
+
+  // Get available sections from faculty's sectionsAssigned
+  const availableSections = useMemo(() => {
+    if (!faculty || !faculty.sectionsAssigned) return [];
+    return faculty.sectionsAssigned.map(assignment => assignment.section);
+  }, [faculty]);
+
+  // Get faculty's assigned subjects
+  const facultySubjects = useMemo(() => {
+    if (!faculty || !faculty.subjects) return [];
+    return faculty.subjects.map(s => s.toLowerCase().trim());
+  }, [faculty]);
+
+  // Get available years from students
+  const availableYears = useMemo(() => {
+    if (!students || students.length === 0) return [];
+    const years = new Set();
+    students.forEach(student => {
+      if (student.semester) {
+        years.add(getYearFromSemester(student.semester));
+      }
+    });
+    return Array.from(years).sort();
+  }, [students]);
 
   // Students are already sorted by studentid from the backend
   const sortedStudents = students || [];
@@ -46,21 +83,33 @@ export default function FacultyAddMidMarks() {
     }
   }, [sortedStudents, studentId]);
 
-  // Load faculty students - only if not already in Redux
+  // Load faculty students - fetch when section or year changes
   useEffect(() => {
-    if (!students || students.length === 0) {
-      dispatch(fetchStudentsByFaculty());
-    }
-  }, [dispatch, students]);
+    dispatch(fetchStudentsByFaculty({ 
+      section: selectedSection !== "all" ? selectedSection : undefined,
+      year: selectedYear !== "all" ? selectedYear : undefined
+    }));
+  }, [dispatch, selectedSection, selectedYear]);
 
-  // Fetch curriculum
+  // Fetch curriculum and filter by faculty's assigned subjects
   useEffect(() => {
     let active = true;
     (async () => {
       setLoading(true);
       try {
         const subs = await dispatch(fetchCurriculum(semester)).unwrap();
-        if (active) setSubjects(subs);
+        if (active) {
+          // Filter subjects by faculty's assigned subjects if available
+          if (facultySubjects.length > 0) {
+            const filtered = subs.filter(subject => {
+              const subjectName = (subject.name || '').toLowerCase().trim();
+              return facultySubjects.some(fs => subjectName.includes(fs));
+            });
+            setSubjects(filtered);
+          } else {
+            setSubjects(subs);
+          }
+        }
       } catch {
         if (active) setSubjects([]);
       } finally {
@@ -70,7 +119,7 @@ export default function FacultyAddMidMarks() {
     return () => {
       active = false;
     };
-  }, [studentId, semester]);
+  }, [studentId, semester, facultySubjects, dispatch]);
 
   // Reset marks on change
   useEffect(() => {
@@ -264,7 +313,65 @@ export default function FacultyAddMidMarks() {
             </div>
 
             {/* Controls Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {/* Section Filter */}
+              {availableSections.length > 0 && (
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <BookOpen className="w-4 h-4 text-indigo-600" />
+                    Section
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedSection}
+                      onChange={(e) => setSelectedSection(e.target.value)}
+                      className="w-full px-4 py-3.5 bg-white/80 border border-white/40 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-200/50 focus:border-indigo-300/50 transition-all duration-300 appearance-none cursor-pointer backdrop-blur-sm"
+                    >
+                      <option value="all">All Sections</option>
+                      {availableSections.map((section) => (
+                        <option key={section} value={section}>
+                          {section}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Year Filter */}
+              {availableYears.length > 0 && (
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <Filter className="w-4 h-4 text-indigo-600" />
+                    Year
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(e.target.value)}
+                      className="w-full px-4 py-3.5 bg-white/80 border border-white/40 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-200/50 focus:border-indigo-300/50 transition-all duration-300 appearance-none cursor-pointer backdrop-blur-sm"
+                    >
+                      <option value="all">All Years</option>
+                      {availableYears.map((year) => (
+                        <option key={year} value={year}>
+                          {getYearLabel(year)}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Student Selection */}
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">

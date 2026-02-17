@@ -1,6 +1,14 @@
 import { io } from 'socket.io-client';
 import Cookies from 'js-cookie';
 
+// Store navigation function - will be set by App component
+let navigateFunction = null;
+
+// Export function to set navigate function from App component
+export const setSocketNavigate = (navigate) => {
+  navigateFunction = navigate;
+};
+
 /**
  * Socket.IO Service
  * Manages a single socket connection for the entire application
@@ -131,6 +139,52 @@ class SocketService {
 
     this.socket.on('connect_error', (error) => {
       console.error('Socket connection error:', error);
+      
+      // Check if error is due to authentication failure (token expired or invalid)
+      const errorMessage = error.message || error.toString();
+      if (errorMessage.includes('Authentication') || 
+          errorMessage.includes('jwt expired') || 
+          errorMessage.includes('TokenExpiredError') ||
+          errorMessage.includes('Authentication failed')) {
+        
+        // Get user role before clearing cookies
+        const userRole = Cookies.get('userRole');
+        
+        // Clear all authentication cookies
+        Cookies.remove('token');
+        Cookies.remove('userRole');
+        
+        // Disconnect socket
+        this.disconnect();
+        
+        // Determine the appropriate login page based on user role
+        let loginPath = '/landing/page'; // Default fallback
+        
+        if (userRole === 'student') {
+          loginPath = '/login/student';
+        } else if (userRole === 'faculty') {
+          loginPath = '/login/faculty';
+        } else if (userRole === 'hod') {
+          loginPath = '/hod/login';
+        } else if (userRole === 'admin') {
+          loginPath = '/admin/login';
+        }
+        
+        // Redirect to login page if navigate function is available
+        if (navigateFunction) {
+          console.warn('🔒 Socket authentication failed. Token expired. Redirecting to login page...');
+          navigateFunction(loginPath);
+        } else {
+          // Fallback: use window.location if navigate is not available
+          console.warn('🔒 Socket authentication failed. Token expired. Redirecting to login page...');
+          window.location.href = loginPath;
+        }
+        
+        // Don't attempt reconnection for auth errors
+        return;
+      }
+      
+      // For other errors, allow reconnection attempts
       this.reconnectAttempts++;
       this.emit('socket:error', error);
     });

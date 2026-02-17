@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Building2, CheckCircle2, Loader2 } from "lucide-react";
+import { requestPermission } from "../../../firebase.js";
 
 export default function HODRegistration() {
   const navigate = useNavigate();
@@ -21,6 +22,23 @@ export default function HODRegistration() {
   const [success, setSuccess] = useState(false);
   const [collegeName, setCollegeName] = useState(null);
   const [checkingCollege, setCheckingCollege] = useState(false);
+  const [fcmToken, setFcmToken] = useState(null);
+
+  // Request FCM token on component mount
+  useEffect(() => {
+    const getFCMToken = async () => {
+      try {
+        const token = await requestPermission();
+        if (token) {
+          setFcmToken(token);
+          console.log("FCM token obtained:", token);
+        }
+      } catch (error) {
+        console.error("Error getting FCM token:", error);
+      }
+    };
+    getFCMToken();
+  }, []);
 
   // Check college name when collegeId changes
   useEffect(() => {
@@ -88,7 +106,13 @@ export default function HODRegistration() {
         setLoading(false);
         return;
       }
-      const response = await api.post("/hod/register", dataToSend);
+      
+      // Add FCM token if available
+      if (fcmToken) {
+        dataToSend.fcmToken = fcmToken;
+      }
+      
+      const response = await api.post("/register/hod", dataToSend);
 
       setSuccess(true);
       setTimeout(() => {

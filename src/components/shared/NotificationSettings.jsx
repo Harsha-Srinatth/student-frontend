@@ -17,27 +17,55 @@ const NotificationSettings = ({ userType, userId, currentToken: initialToken, is
   const previousTokenRef = useRef(initialToken);
   const dataLoadedRef = useRef(false);
   
-  // Initialize state - be conservative: only set enabled if we have a token
-  // If token is undefined (not loaded), keep current state or default to disabled
+  // Initialize state - use localStorage to persist state across reloads
+  // This prevents the toggle from resetting to disabled on reload
   const getInitialState = () => {
-    // If we have a token, use it
+    // First, check if we have a token from props (Redux might have loaded)
     if (initialToken && initialToken.trim() !== "") {
+      // Save to localStorage for persistence
+      localStorage.setItem(`fcmToken_${userType}_${userId}`, initialToken);
       return {
         token: initialToken,
-        enabled: true
+        enabled: true,
+        waitingForData: false
       };
     }
-    // If token is explicitly null (loaded and no token), disabled
-    // If token is undefined (not loaded yet), we'll wait for it
+    
+    // If token is explicitly null (loaded and confirmed no token), disabled
+    if (initialToken === null) {
+      localStorage.removeItem(`fcmToken_${userType}_${userId}`);
+      return {
+        token: null,
+        enabled: false,
+        waitingForData: false
+      };
+    }
+    
+    // If token is undefined (not loaded yet), check localStorage for previous state
+    // This prevents reset on reload
+    const storedToken = localStorage.getItem(`fcmToken_${userType}_${userId}`);
+    if (storedToken && storedToken.trim() !== "") {
+      // We have a stored token, but Redux hasn't loaded yet
+      // Keep it enabled until Redux confirms
+      return {
+        token: storedToken,
+        enabled: true,
+        waitingForData: true // Still waiting for Redux to confirm
+      };
+    }
+    
+    // No stored token and no prop - start disabled
     return {
       token: null,
-      enabled: false
+      enabled: false,
+      waitingForData: true // Waiting for Redux to load
     };
   };
   
   const initialState = getInitialState();
   const [fcmToken, setFcmToken] = useState(initialState.token);
   const [isEnabled, setIsEnabled] = useState(initialState.enabled);
+  const [waitingForData, setWaitingForData] = useState(initialState.waitingForData);
   const [loading, setLoading] = useState(false);
   const [requestingPermission, setRequestingPermission] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -46,59 +74,88 @@ const NotificationSettings = ({ userType, userId, currentToken: initialToken, is
   useEffect(() => {
     if (!isLoading && initialToken !== undefined) {
       dataLoadedRef.current = true;
+      setWaitingForData(false);
     }
   }, [isLoading, initialToken]);
 
   // Sync with prop changes (when Redux data loads)
-  // Only update when we receive a definitive token value from Redux
+  // This is the main effect that handles state updates when Redux loads
   useEffect(() => {
     // On first mount, initialize the ref
     if (!hasInitializedRef.current) {
       hasInitializedRef.current = true;
       previousTokenRef.current = initialToken;
-      // If we have a token on initial mount, use it
+      
+      // If we have a token on initial mount, use it immediately
       if (initialToken && initialToken.trim() !== "") {
         const hasToken = !!initialToken && initialToken.trim() !== "";
         setFcmToken(initialToken);
         setIsEnabled(hasToken);
+        setWaitingForData(false);
         dataLoadedRef.current = true;
+        console.log("🔔 [NotificationSettings] Initialized with token:", { 
+          hasToken, 
+          tokenLength: initialToken.length 
+        });
+      } else if (initialToken === null) {
+        // Explicitly null means no token (data loaded, no token)
+        setFcmToken(null);
+        setIsEnabled(false);
+        setWaitingForData(false);
+        dataLoadedRef.current = true;
+        console.log("🔔 [NotificationSettings] Initialized with null token (no token)");
+      } else {
+        // undefined means data not loaded yet - keep waiting
+        console.log("🔔 [NotificationSettings] Initialized, waiting for data... (token is undefined)");
+        // Keep waitingForData as true (set in initial state)
       }
       return;
     }
 
-    // After initial mount, only update if:
-    // 1. Data has loaded (isLoading is false) AND we have a definitive value (not undefined)
-    // 2. OR the token value actually changed from a known state
+    // After initial mount, check if token changed
     const tokenChanged = previousTokenRef.current !== initialToken;
-    const hasDefinitiveValue = initialToken !== undefined || dataLoadedRef.current;
     
-    if (tokenChanged && hasDefinitiveValue) {
+    // If token is still undefined, we're still waiting for data - don't update
+    if (initialToken === undefined) {
+      return; // Still waiting for Redux to load
+    }
+
+    // We have a definitive value now (either a token string or null)
+    // Always update when we transition from undefined to a definitive value
+    if (tokenChanged) {
       const hasToken = !!initialToken && initialToken.trim() !== "";
-      const previousHasToken = !!previousTokenRef.current && previousTokenRef.current.trim() !== "";
+      const previousWasUndefined = previousTokenRef.current === undefined;
       
-      // Only update if:
-      // 1. We're going from undefined/unknown to a known state (Redux loaded)
-      // 2. We're going from no token to having a token (Redux loaded with token)
-      // 3. We're going from having a token to no token (user disabled or token removed)
-      // 4. The token value actually changed
-      const shouldUpdate = 
-        (previousTokenRef.current === undefined && initialToken !== undefined) || // Redux just loaded
-        (hasToken !== previousHasToken) || // Enabled state changed
-        (initialToken && initialToken !== previousTokenRef.current); // Token value changed
-      
-      if (shouldUpdate) {
-        console.log("🔔 [NotificationSettings] Token prop changed:", { 
+      // Always update when:
+      // 1. We're going from undefined to a known state (Redux loaded) - CRITICAL FIX
+      // 2. The token value actually changed
+      if (previousWasUndefined || initialToken !== previousTokenRef.current) {
+        console.log("🔔 [NotificationSettings] Token prop changed (updating state):", { 
           hasToken, 
           tokenLength: initialToken?.length || 0,
-          previousToken: previousTokenRef.current ? `${previousTokenRef.current.substring(0, 20)}...` : previousTokenRef.current,
-          newToken: initialToken ? `${initialToken.substring(0, 20)}...` : initialToken,
+          previousToken: previousTokenRef.current !== undefined 
+            ? (previousTokenRef.current ? `${previousTokenRef.current.substring(0, 20)}...` : 'null')
+            : 'undefined',
+          newToken: initialToken ? `${initialToken.substring(0, 20)}...` : 'null',
           isLoading,
-          dataLoaded: dataLoadedRef.current
+          dataLoaded: dataLoadedRef.current,
+          previousWasUndefined,
+          isReduxJustLoaded: previousWasUndefined
         });
         
-        setFcmToken(hasToken ? initialToken : null);
+        const newToken = hasToken ? initialToken : null;
+        setFcmToken(newToken);
         setIsEnabled(hasToken);
+        setWaitingForData(false);
         previousTokenRef.current = initialToken;
+        
+        // Update localStorage to persist state
+        if (hasToken) {
+          localStorage.setItem(`fcmToken_${userType}_${userId}`, initialToken);
+        } else {
+          localStorage.removeItem(`fcmToken_${userType}_${userId}`);
+        }
+        
         if (!isLoading) {
           dataLoadedRef.current = true;
         }
@@ -107,9 +164,24 @@ const NotificationSettings = ({ userType, userId, currentToken: initialToken, is
   }, [initialToken, isLoading]);
 
   // Keep enabled state in sync with token
+  // Only update if we have a definitive token value (not waiting for data)
   useEffect(() => {
-    setIsEnabled(!!fcmToken && fcmToken.trim() !== "");
-  }, [fcmToken]);
+    // Don't update if we're still waiting for data from Redux
+    if (waitingForData && !dataLoadedRef.current) {
+      return; // Still waiting, don't change state
+    }
+    
+    // Once data is loaded, sync enabled state with token
+    const shouldBeEnabled = !!fcmToken && fcmToken.trim() !== "";
+    if (isEnabled !== shouldBeEnabled) {
+      console.log("🔔 [NotificationSettings] Syncing enabled state with token:", {
+        fcmToken: fcmToken ? `${fcmToken.substring(0, 20)}...` : null,
+        shouldBeEnabled,
+        currentIsEnabled: isEnabled
+      });
+      setIsEnabled(shouldBeEnabled);
+    }
+  }, [fcmToken, waitingForData, isEnabled]);
 
   const handleToggleNotifications = async () => {
     if (isEnabled) {
@@ -150,6 +222,12 @@ const NotificationSettings = ({ userType, userId, currentToken: initialToken, is
       if (response.data) {
         setFcmToken(token);
         setIsEnabled(true);
+        setWaitingForData(false);
+        // Update the ref so we don't reset on next render
+        previousTokenRef.current = token;
+        dataLoadedRef.current = true;
+        // Save to localStorage for persistence across reloads
+        localStorage.setItem(`fcmToken_${userType}_${userId}`, token);
         setMessage({
           type: "success",
           text: "Push notifications enabled successfully! You'll receive notifications from College360x.",
@@ -180,6 +258,12 @@ const NotificationSettings = ({ userType, userId, currentToken: initialToken, is
       if (response.data) {
         setFcmToken(null);
         setIsEnabled(false);
+        setWaitingForData(false);
+        // Update the ref so we don't reset on next render
+        previousTokenRef.current = null;
+        dataLoadedRef.current = true;
+        // Remove from localStorage when disabled
+        localStorage.removeItem(`fcmToken_${userType}_${userId}`);
         setMessage({
           type: "success",
           text: "Push notifications disabled successfully.",

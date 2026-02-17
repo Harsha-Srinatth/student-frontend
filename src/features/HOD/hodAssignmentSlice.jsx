@@ -103,6 +103,23 @@ export const fetchFacultySections = createAsyncThunk(
   }
 );
 
+/**
+ * Remove faculty assignment from a section
+ */
+export const removeFacultyAssignment = createAsyncThunk(
+  'hodAssignment/removeFacultyAssignment',
+  async ({ facultyId, section }, { rejectWithValue }) => {
+    try {
+      const response = await api.delete('/hod/assign', {
+        data: { facultyId, section }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to remove faculty assignment');
+    }
+  }
+);
+
 const hodAssignmentSlice = createSlice({
   name: 'hodAssignment',
   initialState: {
@@ -142,23 +159,23 @@ const hodAssignmentSlice = createSlice({
     setHODInfo: (state, action) => {
       state.hodInfo = action.payload;
     },
-    // Group students by section
+    // Group students by section (programName)
     groupStudentsBySection: (state) => {
       const grouped = {};
       
       state.students.forEach(student => {
-        // Use section field if available, otherwise fallback to semester
-        const sectionKey = student.section || student.semester || 'UNASSIGNED';
+        // Use programName as section identifier
+        const sectionKey = student.programName || student.section || 'UNASSIGNED';
         if (!grouped[sectionKey]) {
           grouped[sectionKey] = [];
         }
         grouped[sectionKey].push(student);
       });
       
-      // Display just the section value, not with department prefix
+      // Display programName as section
       state.sections = Object.entries(grouped).map(([section, students]) => ({
-        name: section, // Show just section value (e.g., "1", "A")
-        section: section, // Actual section value for assignment
+        name: section, // programName is the section (e.g., "CSBS", "IT-A", "CSE-A")
+        section: section, // Actual programName value for assignment
         studentCount: students.length,
         students
       }));
@@ -207,11 +224,11 @@ const hodAssignmentSlice = createSlice({
             : (action.payload.data || action.payload || []);
           state.students = Array.isArray(data) ? data : [];
           
-          // Auto-group students by section
+          // Auto-group students by section (programName)
           const grouped = {};
           state.students.forEach(student => {
-            // Use section field if available, otherwise fallback to semester
-            const sectionKey = student.section || student.semester || 'UNASSIGNED';
+            // Use programName as section identifier
+            const sectionKey = student.programName || student.section || 'UNASSIGNED';
             if (!grouped[sectionKey]) {
               grouped[sectionKey] = [];
             }
@@ -224,9 +241,9 @@ const hodAssignmentSlice = createSlice({
                                 (state.students.length > 0 ? state.students[0].department_id?.toUpperCase().substring(0, 3) : '');
           
           state.sections = Object.entries(grouped).map(([section, students]) => ({
-            // Display name with department prefix for clarity, but section value is the actual section
-            name: departmentCode ? `${departmentCode}-${section}` : section,
-            section: section, // This is the actual section value used for assignment (e.g., "1", "A", etc.)
+            // Display name with department prefix for clarity, but section value is the actual programName
+            name: section, // programName is the section (e.g., "CSBS", "IT-A", "CSE-A")
+            section: section, // This is the actual programName used for assignment
             studentCount: students.length,
             students
           }));
@@ -278,6 +295,19 @@ const hodAssignmentSlice = createSlice({
       .addCase(fetchFacultySections.rejected, (state, action) => {
         state.facultySectionsLoading = false;
         state.facultySectionsError = action.payload;
+      })
+      // Remove assignment
+      .addCase(removeFacultyAssignment.pending, (state) => {
+        state.assigning = true;
+        state.assignError = null;
+      })
+      .addCase(removeFacultyAssignment.fulfilled, (state, action) => {
+        state.assigning = false;
+        state.assignError = null;
+      })
+      .addCase(removeFacultyAssignment.rejected, (state, action) => {
+        state.assigning = false;
+        state.assignError = action.payload;
       });
   }
 });

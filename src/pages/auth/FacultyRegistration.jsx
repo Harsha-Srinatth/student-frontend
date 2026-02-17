@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Building2, CheckCircle2, Loader2 } from "lucide-react";
+import { requestPermission } from "../../../firebase.js";
 
 const steps = [
   {
@@ -11,7 +12,7 @@ const steps = [
   },
   {
     title: "Professional Info",
-    fields: ["collegeId", "dept", "dateofjoin"]
+    fields: ["collegeId", "dept", "dateofjoin", "subjects"]
   }
 ];
 
@@ -35,7 +36,7 @@ const FacultyRegistration = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(
-    Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""]))
+    Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, key === "subjects" ? [] : ""]))
   );
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -43,6 +44,24 @@ const FacultyRegistration = () => {
   const [direction, setDirection] = useState(0);
   const [collegeName, setCollegeName] = useState(null);
   const [checkingCollege, setCheckingCollege] = useState(false);
+  const [subjectInput, setSubjectInput] = useState("");
+  const [fcmToken, setFcmToken] = useState(null);
+
+  // Request FCM token on component mount
+  useEffect(() => {
+    const getFCMToken = async () => {
+      try {
+        const token = await requestPermission();
+        if (token) {
+          setFcmToken(token);
+          console.log("FCM token obtained:", token);
+        }
+      } catch (error) {
+        console.error("Error getting FCM token:", error);
+      }
+    };
+    getFCMToken();
+  }, []);
 
   // Check college name when collegeId changes
   useEffect(() => {
@@ -127,6 +146,14 @@ const FacultyRegistration = () => {
         }
         return;
       }
+
+      if (name === "subjects") {
+        const subjects = Array.isArray(value) ? value : [];
+        if (config.required && subjects.length === 0) {
+          newErrors[name] = "At least one subject is required";
+        }
+        return;
+      }
     });
 
     setErrors(newErrors);
@@ -162,12 +189,18 @@ const FacultyRegistration = () => {
       cleaned.facultyid = (cleaned.facultyid || "").replace(/\D/g, "");
       cleaned.mobile = (cleaned.mobile || "").replace(/\D/g, "");
 
+      // Add FCM token if available
+      if (fcmToken) {
+        cleaned.fcmToken = fcmToken;
+      }
+
       const res = await api.post("/register/faculty", cleaned);
 
       setResponseMessage({ type: "success", text: res.data?.message || "Registration successful" });
-      setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""])));
+      setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, key === "subjects" ? [] : ""])));
       setErrors({});
       setCollegeName(null);
+      setSubjectInput("");
       setTimeout(() => navigate("/roleforlogin"), 1200);
     } catch (error) {
       console.error("Registration error:", error);
@@ -239,6 +272,76 @@ const FacultyRegistration = () => {
             {steps[activeStep].fields.map((name) => {
               const config = fieldConfig[name];
               const isCollegeId = name === "collegeId";
+              const isSubjects = name === "subjects";
+              
+              if (isSubjects) {
+                return (
+                  <div key={name} className="sm:col-span-2 flex flex-col">
+                    <label className="text-sm font-semibold text-gray-700 mb-1">
+                      Subjects You Can Teach
+                      {config.required && <span className="text-red-500">*</span>}
+                    </label>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={subjectInput}
+                          onChange={(e) => setSubjectInput(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === "Enter" && subjectInput.trim()) {
+                              e.preventDefault();
+                              const newSubjects = [...(formData.subjects || []), subjectInput.trim()];
+                              setFormData({ ...formData, subjects: newSubjects });
+                              setSubjectInput("");
+                            }
+                          }}
+                          placeholder="Enter subject name and press Enter"
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (subjectInput.trim()) {
+                              const newSubjects = [...(formData.subjects || []), subjectInput.trim()];
+                              setFormData({ ...formData, subjects: newSubjects });
+                              setSubjectInput("");
+                            }
+                          }}
+                          className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      {formData.subjects && formData.subjects.length > 0 && (
+                        <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          {formData.subjects.map((subject, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-lg text-sm font-medium"
+                            >
+                              {subject}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newSubjects = formData.subjects.filter((_, i) => i !== idx);
+                                  setFormData({ ...formData, subjects: newSubjects });
+                                }}
+                                className="ml-2 text-green-600 hover:text-green-800"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500">Add all subjects you can teach. Press Enter or click Add to add each subject.</p>
+                    </div>
+                    {errors[name] && (
+                      <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
+                    )}
+                  </div>
+                );
+              }
               
               return (
                 <div key={name} className={`flex flex-col ${isCollegeId ? "sm:col-span-2" : ""}`}>

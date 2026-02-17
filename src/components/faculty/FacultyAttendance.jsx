@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
 import { fetchStudentsByFaculty } from "../../features/faculty/facultySlice";
 import { submitAttendance } from "../../features/shared/academicsSlice";
+import { fetchFacultyDashboardData } from "../../features/faculty/facultyDashSlice";
 import { toast } from "react-hot-toast";
 import { 
   Search, 
@@ -14,24 +15,55 @@ import {
   XCircle,
   Send,
   Filter,
-  Download
+  Download,
+  BookOpen
 } from "lucide-react";
+import { getYearFromSemester, getYearLabel } from "../../utils/sectionUtils";
 
 const FacultyAttendance = () => {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [period, setPeriod] = useState(1);
+  const [selectedSection, setSelectedSection] = useState("all");
+  const [selectedYear, setSelectedYear] = useState("all");
   const dispatch = useDispatch();
   const { students, studentsLoading } = useSelector((s) => s.students);
+  const { faculty } = useSelector((s) => s.facultyDashboard);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
 
+  // Fetch faculty data to get sectionsAssigned
   useEffect(() => {
-    // Only fetch if students not already in Redux or data is stale
-    if (!students || students.length === 0) {
-      dispatch(fetchStudentsByFaculty());
+    if (!faculty || !faculty.sectionsAssigned) {
+      dispatch(fetchFacultyDashboardData());
     }
-  }, [dispatch, students]);
+  }, [dispatch, faculty]);
+
+  // Get available sections from faculty's sectionsAssigned
+  const availableSections = useMemo(() => {
+    if (!faculty || !faculty.sectionsAssigned) return [];
+    return faculty.sectionsAssigned.map(assignment => assignment.section);
+  }, [faculty]);
+
+  // Get available years from students
+  const availableYears = useMemo(() => {
+    if (!students || students.length === 0) return [];
+    const years = new Set();
+    students.forEach(student => {
+      if (student.semester) {
+        years.add(getYearFromSemester(student.semester));
+      }
+    });
+    return Array.from(years).sort();
+  }, [students]);
+
+  // Fetch students when section or year changes
+  useEffect(() => {
+    dispatch(fetchStudentsByFaculty({ 
+      section: selectedSection !== "all" ? selectedSection : undefined,
+      year: selectedYear !== "all" ? selectedYear : undefined
+    }));
+  }, [dispatch, selectedSection, selectedYear]);
 
   useEffect(() => {
     // Students are already sorted by studentid from the backend
@@ -151,6 +183,44 @@ const FacultyAttendance = () => {
                   ))}
                 </select>
               </div>
+
+              {/* Section Filter */}
+              {availableSections.length > 0 && (
+                <div className="relative group">
+                  <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                  <select
+                    value={selectedSection}
+                    onChange={(e) => setSelectedSection(e.target.value)}
+                    className="h-12 pl-10 pr-8 rounded-xl border-0 bg-white shadow-lg shadow-slate-200/50 focus:shadow-xl focus:shadow-blue-200/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-slate-700 font-medium appearance-none cursor-pointer"
+                  >
+                    <option value="all">All Sections</option>
+                    {availableSections.map((section) => (
+                      <option key={section} value={section}>
+                        {section}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Year Filter */}
+              {availableYears.length > 0 && (
+                <div className="relative group">
+                  <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className="h-12 pl-10 pr-8 rounded-xl border-0 bg-white shadow-lg shadow-slate-200/50 focus:shadow-xl focus:shadow-blue-200/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-slate-700 font-medium appearance-none cursor-pointer"
+                  >
+                    <option value="all">All Years</option>
+                    {availableYears.map((year) => (
+                      <option key={year} value={year}>
+                        {getYearLabel(year)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               
               <div className="flex gap-2">
                 <button

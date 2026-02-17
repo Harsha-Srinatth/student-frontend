@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { fetchSDashboardData } from "../../../features/student/studentDashSlice";
+import NotificationSettings from "../../shared/NotificationSettings";
 
 const shimmerCls = "animate-pulse bg-gray-200";
 
@@ -188,6 +189,20 @@ const StudentSettings = ({ student: studentProp }) => {
               ))}
             </div>
           </div>
+        </motion.div>
+
+        {/* Notification Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <NotificationSettings
+            userType="student"
+            userId={studentData.studentid}
+            currentToken={reduxStudent?.fcmToken}
+            isLoading={reduxLoading}
+          />
         </motion.div>
 
         {/* Settings Navigation */}

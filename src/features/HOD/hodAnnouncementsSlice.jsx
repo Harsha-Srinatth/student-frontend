@@ -81,8 +81,8 @@ export const createAnnouncement = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       });
-      // Refresh announcements list after creation
-      dispatch(fetchAnnouncements({}));
+      // Refresh announcements list after creation with forceRefresh
+      dispatch(fetchAnnouncements({ forceRefresh: true }));
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to create announcement");
@@ -123,8 +123,8 @@ export const updateAnnouncement = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       });
-      // Refresh announcements list after update
-      dispatch(fetchAnnouncements({}));
+      // Refresh announcements list after update with forceRefresh
+      dispatch(fetchAnnouncements({ forceRefresh: true }));
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to update announcement");
@@ -140,8 +140,8 @@ export const deleteAnnouncement = createAsyncThunk(
   async (id, { rejectWithValue, dispatch }) => {
     try {
       await api.delete(`/hod/announcements/${id}`);
-      // Refresh announcements list after deletion
-      dispatch(fetchAnnouncements({}));
+      // Refresh announcements list after deletion with forceRefresh
+      dispatch(fetchAnnouncements({ forceRefresh: true }));
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to delete announcement");

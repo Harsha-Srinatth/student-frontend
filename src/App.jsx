@@ -1,6 +1,10 @@
 // App.jsx
+import { useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { setNavigate } from './services/api';
+import { setSocketNavigate } from './services/socketService';
+import { setupForegroundMessageHandler } from '../firebase.js';
 
 // Public Pages
 import Landing from './pages/auth/Landing.jsx';
@@ -35,12 +39,14 @@ import AddProfile from './components/student/student_uploads/AddProfile.jsx';
 import StudentResults from './components/student/StudentResults.jsx';
 import StudentClubsEnrol from './components/student/StudentClubsEnrol.jsx';
 import LeaveRequestDashboard from './components/student/LeaveRequestDash.jsx';
+import CreateClubAnnouncementStudent from './pages/student/student_dashboard/CreateClubAnnouncement.jsx';
 
 // Faculty Dashboard Components
 import FacultyHome from "./pages/faculty/facultyDashboard/FacultyHome.jsx";
 import PendingApprovals from "./pages/faculty/facultyDashboard/PendingApprovals.jsx";
 import RecentVerifications from "./pages/faculty/facultyDashboard/RecentVerifications.jsx";
 import FacultyAnnouncements from "./pages/faculty/facultyDashboard/Announcements.jsx";
+import CreateClubAnnouncement from "./pages/faculty/facultyDashboard/CreateClubAnnouncement.jsx";
 import StudentList from './components/faculty/facultyDashboard/StudentList.jsx';
 import ApprovedByYou from './pages/faculty/facultyDashboard/ApprovedByYou.jsx';
 import FacultySettings from './components/faculty/facultyDashboard/FacultySettings.jsx';
@@ -88,6 +94,23 @@ const RoleBasedHome = () => {
 
 const App = () => {
   const navigate = useNavigate();
+  
+  // Set navigate function in API and Socket services for token expiration redirects
+  useEffect(() => {
+    setNavigate(navigate);
+    setSocketNavigate(navigate);
+  }, [navigate]);
+
+  // Initialize foreground message handler for push notifications
+  useEffect(() => {
+    // Check if user has notification permission and set up foreground handler
+    if ("Notification" in window && Notification.permission === "granted") {
+      console.log("🔔 [APP] Notification permission granted, setting up foreground handler");
+      setupForegroundMessageHandler();
+    } else {
+      console.log("🔔 [APP] Notification permission not granted, skipping foreground handler setup");
+    }
+  }, []);
 
   return (
     <Routes>
@@ -129,6 +152,8 @@ const App = () => {
         <Route path="student/upload" element={<RoleProtectedRoute allowedRoles={['student']}><UploadDocument /></RoleProtectedRoute>} />
         <Route path="student/generate/digital/port-folio" element={<RoleProtectedRoute allowedRoles={['student']}><StudentDigitalPortfolio /></RoleProtectedRoute>} />
         <Route path="student/announcements" element={<RoleProtectedRoute allowedRoles={['student']}><Announcements /></RoleProtectedRoute>} />
+        <Route path="student/club-announcements/create" element={<RoleProtectedRoute allowedRoles={['student']}><CreateClubAnnouncementStudent /></RoleProtectedRoute>} />
+        <Route path="student/club-announcements/edit/:id" element={<RoleProtectedRoute allowedRoles={['student']}><CreateClubAnnouncementStudent /></RoleProtectedRoute>} />
         <Route path="student/pending/approvels" element={<RoleProtectedRoute allowedRoles={['student']}><StudentPendingApprovels /></RoleProtectedRoute>} />
         <Route path="student/settings" element={<RoleProtectedRoute allowedRoles={['student']}><StudentSettings /></RoleProtectedRoute>} />
         <Route path="student/profile/update" element={<RoleProtectedRoute allowedRoles={['student']}><UpdateStudentProfile /></RoleProtectedRoute>} />
@@ -143,6 +168,8 @@ const App = () => {
         <Route path="faculty/verifications" element={<RoleProtectedRoute allowedRoles={['faculty']}><RecentVerifications fullHeight /></RoleProtectedRoute>} />
         <Route path="faculty/add/marks" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyAddMidMarks /></RoleProtectedRoute>} />
         <Route path="faculty/announcements" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyAnnouncements /></RoleProtectedRoute>} />
+        <Route path="faculty/club-announcements/create" element={<RoleProtectedRoute allowedRoles={['faculty']}><CreateClubAnnouncement /></RoleProtectedRoute>} />
+        <Route path="faculty/club-announcements/edit/:id" element={<RoleProtectedRoute allowedRoles={['faculty']}><CreateClubAnnouncement /></RoleProtectedRoute>} />
         <Route path="faculty/events/competitions" element={<RoleProtectedRoute allowedRoles={['faculty']}><EventsAndCom /></RoleProtectedRoute>} />
         <Route path="faculty/settings" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultySettings /></RoleProtectedRoute>} />
         <Route path="/faculty/leave-requests" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyDashboard /></RoleProtectedRoute>} />
