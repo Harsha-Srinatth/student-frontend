@@ -128,7 +128,7 @@ const StudentAchievements = () => {
       <div
         key={achievement.id || idx}
         onClick={onClick}
-        className="group cursor-pointer bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-xl hover:border-gray-300 transition-all duration-300 flex flex-col h-full"
+        className="group cursor-pointer bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-5 hover:shadow-lg hover:border-gray-300 transition-all duration-300 flex flex-col"
       >
         {/* Header Section */}
         <div className="flex items-start gap-4 mb-4">
@@ -254,12 +254,12 @@ const StudentAchievements = () => {
   });
 
   return (
-    <section className="w-full bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-sm border border-gray-200 p-6 sm:p-8">
+    <section className="w-full bg-gradient-to-br from-gray-50 to-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 sm:mb-8 gap-3">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">My Achievements</h2>
-          <p className="text-gray-600 text-sm">Track and showcase your verified accomplishments</p>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1">My Achievements</h2>
+          <p className="text-gray-600 text-xs sm:text-sm">Track and showcase your verified accomplishments</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button 
@@ -283,7 +283,7 @@ const StudentAchievements = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 mb-8 pb-4 border-b border-gray-200 overflow-x-auto scrollbar-hide">
+      <div className="flex gap-2 mb-5 sm:mb-8 pb-3 sm:pb-4 border-b border-gray-200 overflow-x-auto">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -313,21 +313,21 @@ const StudentAchievements = () => {
       </div>
 
       {/* Content */}
-      <div className="min-h-[400px] w-full">
+      <div className="min-h-[200px] w-full">
         {loading ? (
           <LoadingSkeleton />
         ) : error ? (
-          <div className="text-center py-16 px-4">
-            <div className="w-20 h-20 mx-auto mb-6 bg-red-50 rounded-2xl flex items-center justify-center">
-              <Award className="w-10 h-10 text-red-500" />
+          <div className="text-center py-12 px-4">
+            <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-2xl flex items-center justify-center">
+              <Award className="w-8 h-8 text-red-500" />
             </div>
-            <h3 className="text-xl font-semibold text-red-600 mb-2">Error Loading Achievements</h3>
+            <h3 className="text-lg font-semibold text-red-600 mb-2">Error Loading Achievements</h3>
             <p className="text-red-500 text-sm">{error}</p>
           </div>
         ) : sortedAchievements.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div className="max-h-[65vh] overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
             {sortedAchievements.map((achievement, idx) => (
               <AchievementCard
                 key={achievement.id || idx}

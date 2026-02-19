@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Building2, CheckCircle2, Loader2 } from "lucide-react";
+import PasswordInput from "../../components/shared/PasswordInput";
 import { requestPermission } from "../../../firebase.js";
 
 const steps = [
@@ -350,27 +351,41 @@ const FacultyRegistration = () => {
                     {config.required && <span className="text-red-500">*</span>}
                   </label>
                   <div className="relative">
-                    <input
-                      type={config.type}
-                      name={name}
-                      value={formData[name]}
-                      onChange={handleChange}
-                      placeholder={`Enter ${config.label.toLowerCase()}`}
-                      className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 w-full ${
-                        errors[name]
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300 hover:border-gray-400"
-                      }`}
-                    />
-                    {isCollegeId && checkingCollege && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                      </div>
-                    )}
-                    {isCollegeId && collegeName && !checkingCollege && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      </div>
+                    {config.type === "password" ? (
+                      <PasswordInput
+                        name={name}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        placeholder={`Enter ${config.label.toLowerCase()}`}
+                        className={`px-4 py-2 pr-10 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 w-full ${
+                          errors[name] ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
+                        }`}
+                      />
+                    ) : (
+                      <>
+                        <input
+                          type={config.type}
+                          name={name}
+                          value={formData[name]}
+                          onChange={handleChange}
+                          placeholder={`Enter ${config.label.toLowerCase()}`}
+                          className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 w-full ${
+                            errors[name]
+                              ? "border-red-500 bg-red-50"
+                              : "border-gray-300 hover:border-gray-400"
+                          }`}
+                        />
+                        {isCollegeId && checkingCollege && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                          </div>
+                        )}
+                        {isCollegeId && collegeName && !checkingCollege && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                   {isCollegeId && collegeName && (

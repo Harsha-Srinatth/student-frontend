@@ -141,15 +141,15 @@ const StudentPendingApprovels = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-sm border border-gray-200 p-6 sm:p-8 w-full">
+    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8 w-full">
       {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">My Approvals</h2>
-        <p className="text-gray-600 text-sm">Track the status of your approval requests</p>
+      <div className="mb-5 sm:mb-8">
+        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">My Approvals</h2>
+        <p className="text-gray-600 text-xs sm:text-sm">Track the status of your approval requests</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 mb-8 pb-4 border-b border-gray-200 overflow-x-auto scrollbar-hide">
+      <div className="flex gap-2 mb-5 sm:mb-8 pb-3 sm:pb-4 border-b border-gray-200 overflow-x-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -180,25 +180,25 @@ const StudentPendingApprovels = () => {
       </div>
 
       {/* Content */}
-      <div className="min-h-[300px]">
+      <div className="min-h-[200px]">
         {loading ? (
           <LoadingSkeleton />
         ) : error ? (
-          <div className="text-center py-16 px-4">
-            <div className="w-20 h-20 mx-auto mb-6 bg-red-50 rounded-2xl flex items-center justify-center">
-              <AlertCircle className="w-10 h-10 text-red-500" />
+          <div className="text-center py-12 px-4">
+            <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-2xl flex items-center justify-center">
+              <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
-            <h3 className="text-xl font-semibold text-red-600 mb-2">Error Loading Approvals</h3>
+            <h3 className="text-lg font-semibold text-red-600 mb-2">Error Loading Approvals</h3>
             <p className="text-red-500 text-sm">{error}</p>
           </div>
         ) : currentRecords.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="max-h-[65vh] overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
             {currentRecords.map((item, idx) => (
               <div
                 key={idx}
-                className="group cursor-pointer bg-white rounded-2xl border border-gray-200 p-5 hover:shadow-xl hover:border-gray-300 transition-all duration-300 flex flex-col h-full"
+                className="group cursor-pointer bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-5 hover:shadow-lg hover:border-gray-300 transition-all duration-300 flex flex-col"
                 onClick={() => {
                   setSelected(item);
                   setModalOpen(true);
@@ -253,7 +253,7 @@ const StudentPendingApprovels = () => {
           }}
         >
           <div 
-            className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-slideInUp"
+            className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}

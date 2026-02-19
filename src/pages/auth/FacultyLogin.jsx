@@ -1,8 +1,9 @@
 // src/pages/FacultyLogin.jsx
 import React, { useState } from "react";
-import api from "../../services/api"; // axios instance
+import api from "../../services/api";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import PasswordInput from "../../components/shared/PasswordInput";
 //  docker-compose down
 //  docker-compose up -d --build
 export default function FacultyLogin() {
@@ -86,10 +87,9 @@ export default function FacultyLogin() {
 
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     placeholder="Enter your password"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required

@@ -78,10 +78,10 @@ const RejectedApprovals = () => {
   }
 
   return (
-    <section className="bg-white rounded-2xl shadow p-6 animate-fadeIn">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Rejected Approvals</h3>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+    <section className="bg-white rounded-xl sm:rounded-2xl shadow p-4 sm:p-6">
+      <div className="flex items-center justify-between mb-4 gap-2">
+        <h3 className="text-base sm:text-lg font-semibold truncate">Rejected Approvals</h3>
+        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-500 flex-shrink-0">
           <XCircle className="w-4 h-4" />
           <span>{rejectedApprovals.length} rejected</span>
         </div>
@@ -96,20 +96,20 @@ const RejectedApprovals = () => {
           <p className="text-gray-600">All your submissions have been approved or are pending review.</p>
         </div>
       ) : (
-        <ul className="space-y-3 max-h-80 overflow-y-auto">
+        <ul className="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
           {rejectedApprovals.map((item, idx) => (
             <li 
               key={idx} 
-              className="p-4 border border-red-200 rounded-xl hover:border-red-300 hover:shadow-md transition-all duration-200 cursor-pointer group bg-red-50/30"
+              className="p-3 sm:p-4 border border-red-200 rounded-lg sm:rounded-xl hover:border-red-300 hover:shadow-md transition-all duration-200 cursor-pointer group bg-red-50/30"
               onClick={() => setSelected(item)}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1 bg-red-100 rounded">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="p-1 bg-red-100 rounded flex-shrink-0">
                       <XCircle className="w-4 h-4 text-red-600" />
                     </div>
-                    <p className="font-medium text-gray-800 capitalize">
+                    <p className="font-medium text-gray-800 capitalize text-sm truncate">
                       {item.type} - {item.description}
                     </p>
                   </div>
@@ -152,8 +152,8 @@ const RejectedApprovals = () => {
 
       {/* Detail Modal */}
       {selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 animate-fadeIn">
-          <div className="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md mx-4 animate-slideInRight">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-3 sm:p-4">
+          <div className="bg-white p-5 sm:p-6 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold text-gray-900">Rejection Details</h3>
               <button

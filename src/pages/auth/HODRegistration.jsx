@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Building2, CheckCircle2, Loader2 } from "lucide-react";
+import PasswordInput from "../../components/shared/PasswordInput";
 import { requestPermission } from "../../../firebase.js";
 
 export default function HODRegistration() {
@@ -277,11 +278,10 @@ export default function HODRegistration() {
 
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">Password *</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     name="password"
                     placeholder="Enter password (min 8 characters)"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -291,11 +291,10 @@ export default function HODRegistration() {
 
                 <div className="space-y-2 md:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700">Confirm Password *</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     name="confirmPassword"
                     placeholder="Confirm your password"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required

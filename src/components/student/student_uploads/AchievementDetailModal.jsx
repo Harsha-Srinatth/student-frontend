@@ -85,32 +85,32 @@ const AchievementDetailModal = ({ isOpen, onClose, achievement, type, studentPro
 
   return (
     <div 
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 sm:p-4"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-slideInUp flex flex-col"
+        className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl max-h-[92vh] sm:max-h-[88vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className={`bg-gradient-to-r ${typeConfig.gradient} p-6 border-b border-white/20`}>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-4 flex-1 min-w-0">
-              <div className="flex-shrink-0 w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <TypeIcon className="w-7 h-7 text-white" />
+        <div className={`bg-gradient-to-r ${typeConfig.gradient} p-4 sm:p-6 border-b border-white/20`}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <div className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <TypeIcon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-2xl font-bold text-white mb-1.5 leading-tight">
+                <h2 className="text-lg sm:text-2xl font-bold text-white mb-1 leading-tight line-clamp-2">
                   {achievement.title || achievement.name || 'Achievement Details'}
                 </h2>
-                <p className="text-white/90 text-sm font-medium">
+                <p className="text-white/90 text-xs sm:text-sm font-medium truncate">
                   {achievement.issuer || achievement.organizer || achievement.role || type}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-colors backdrop-blur-sm"
+              className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-colors backdrop-blur-sm"
             >
               <X className="w-5 h-5 text-white" />
             </button>
@@ -118,7 +118,7 @@ const AchievementDetailModal = ({ isOpen, onClose, achievement, type, studentPro
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {/* Image Section - Compact */}
           {(achievement.imageUrl || achievement.certificateUrl || achievement.image) && (
             <div className="mb-6">
@@ -126,7 +126,7 @@ const AchievementDetailModal = ({ isOpen, onClose, achievement, type, studentPro
                 <img
                   src={achievement.imageUrl || achievement.certificateUrl || achievement.image}
                   alt={achievement.title || achievement.name}
-                  className="w-full h-auto max-h-96 object-contain"
+                  className="w-full h-auto max-h-52 sm:max-h-96 object-contain"
                   onError={(e) => {
                     e.target.style.display = 'none';
                   }}
@@ -136,7 +136,7 @@ const AchievementDetailModal = ({ isOpen, onClose, achievement, type, studentPro
           )}
 
           {/* Details Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-5 sm:mb-6">
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -248,11 +248,11 @@ const AchievementDetailModal = ({ isOpen, onClose, achievement, type, studentPro
 
           {/* Verification Status */}
           {(achievement.status || reviewerName) && (
-            <div className={`bg-gradient-to-r ${statusConfig.bg} rounded-2xl p-6 border ${statusConfig.border} shadow-sm`}>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-md border-2 ${statusConfig.border}`}>
-                    <StatusIcon className={`w-7 h-7 ${statusConfig.iconColor}`} />
+            <div className={`bg-gradient-to-r ${statusConfig.bg} rounded-xl sm:rounded-2xl p-4 sm:p-6 border ${statusConfig.border} shadow-sm`}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-xl bg-white flex items-center justify-center shadow-md border-2 ${statusConfig.border}`}>
+                    <StatusIcon className={`w-5 h-5 sm:w-7 sm:h-7 ${statusConfig.iconColor}`} />
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Status</p>
@@ -306,7 +306,7 @@ const AchievementDetailModal = ({ isOpen, onClose, achievement, type, studentPro
         </div>
 
         {/* Footer */}
-        <div className="px-6 sm:px-8 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-4">
+        <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-3">
           <button
             onClick={handleDownload}
             className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold text-sm shadow-sm"

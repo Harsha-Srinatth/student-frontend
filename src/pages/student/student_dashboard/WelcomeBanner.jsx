@@ -9,47 +9,36 @@ const WelcomeBanner = () => {
   );
 
   useEffect(() => {
-    // fetchSDashboardData will use cache if data is fresh (< 5 min old)
     dispatch(fetchSDashboardData());
   }, [dispatch]);
 
   const bannerGradient =
     "bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600";
 
-  const loadingGradient =
-    "bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500";
-
   if (loading) {
     return (
-      <section
-        className={`${loadingGradient} p-6 text-white rounded-2xl shadow-lg transition-all`}
-      >
-        <h2 className="text-2xl font-bold">Loading your dashboard...</h2>
+      <section className={`${bannerGradient} px-4 py-5 sm:p-6 text-white rounded-2xl shadow-lg`}>
+        <div className="h-7 w-48 bg-white/20 rounded animate-pulse" />
+        <div className="h-4 w-64 bg-white/10 rounded mt-3 animate-pulse" />
       </section>
     );
   }
 
   if (error) {
     return (
-      <section
-        className={`${loadingGradient} p-6 text-white rounded-2xl shadow-lg transition-all`}
-      >
-        <h2 className="text-2xl font-bold text-red-200">
-          Error: {error}
-        </h2>
+      <section className={`${bannerGradient} px-4 py-5 sm:p-6 text-white rounded-2xl shadow-lg`}>
+        <h2 className="text-lg sm:text-2xl font-bold text-red-200 break-words">Error: {error}</h2>
       </section>
     );
   }
 
   return (
-    <section
-      className={`${bannerGradient} p-6 text-white rounded-2xl shadow-lg transition-all`}
-    >
-      <h2 className="text-2xl font-bold">
+    <section className={`${bannerGradient} px-4 py-5 sm:p-6 text-white rounded-2xl shadow-lg`}>
+      <h2 className="text-lg sm:text-2xl font-bold break-words">
         Welcome back, {student?.fullname || "Student"} 👋
       </h2>
-      <p className="mt-2">
-        Here’s a quick overview of your student activity records.
+      <p className="mt-1.5 sm:mt-2 text-sm sm:text-base text-white/90">
+        Here's a quick overview of your student activity records.
       </p>
     </section>
   );

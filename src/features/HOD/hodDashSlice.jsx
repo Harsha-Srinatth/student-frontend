@@ -12,7 +12,7 @@ export const fetchHODDashboardStats = createAsyncThunk(
       const { stats, lastFetched } = state.hodDashboard;
       
       // If data exists and is fresh (less than 5 minutes old), skip fetch
-      if (stats && lastFetched && Date.now() - lastFetched < 5 * 60 * 1000) {
+      if (stats && lastFetched && Date.now() - lastFetched < 1 * 60 * 1000) {
         return { fromCache: true, data: stats };
       }
       
@@ -86,6 +86,21 @@ export const fetchSectionWiseAttendance = createAsyncThunk(
 );
 
 /**
+ * Fetch all departments comparison (college-wide)
+ */
+export const fetchAllDepartments = createAsyncThunk(
+  "hodDashboard/fetchAllDepartments",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/hod/dashboard/all-departments");
+      return response.data?.data || [];
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to load departments");
+    }
+  }
+);
+
+/**
  * Fetch student attendance by section
  */
 export const fetchStudentAttendanceBySection = createAsyncThunk(
@@ -108,6 +123,8 @@ const hodDashboardSlice = createSlice({
   initialState: {
     stats: null,
     departmentPerformance: [],
+    allDepartments: [],
+    allDepartmentsLoading: false,
     sectionAttendance: null,
     studentAttendance: null,
     availableSections: [],
@@ -205,6 +222,15 @@ const hodDashboardSlice = createSlice({
       .addCase(fetchStudentAttendanceBySection.rejected, (state, action) => {
         state.attendanceLoading = false;
         state.error = action.payload;
+      })
+      // All departments
+      .addCase(fetchAllDepartments.pending, (state) => { state.allDepartmentsLoading = true; })
+      .addCase(fetchAllDepartments.fulfilled, (state, action) => {
+        state.allDepartmentsLoading = false;
+        state.allDepartments = action.payload || [];
+      })
+      .addCase(fetchAllDepartments.rejected, (state) => {
+        state.allDepartmentsLoading = false;
       })
       // Available sections
       .addCase(fetchAvailableSections.pending, (state) => {

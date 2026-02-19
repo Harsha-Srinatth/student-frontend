@@ -1,7 +1,7 @@
 import { 
   Home, Upload, Award, Briefcase, ClipboardList, BookOpenCheck, 
   Megaphone, Settings, CheckCircle2, History, Users, FileCheck, 
-  GraduationCap, BarChart3, UserPlus, Building2
+  GraduationCap, BarChart3, UserPlus, Building2, MessageCircle
 } from "lucide-react";
 
 // 🎓 Student Sidebar Links
@@ -10,7 +10,7 @@ export const StudentSidebarLinks = [
   { icon: <Upload size={20} />, label: 'Upload Files', route: '/student/upload' },
   { icon: <Award size={20} />, label: 'Achievements', route: '/student/achievements/all/docs' },
   { icon: <Briefcase size={20} />, label: 'Portfolio', route: '/student/generate/digital/port-folio' },
-  { icon: <ClipboardList size={20} />, label: 'Pending Tasks', route: '/student/pending/approvels' },
+  { icon: <MessageCircle size={20} />, label: 'Ask Doubt', route: '/student/ask/doubt' },
   { icon: <BarChart3 size={20} />, label: 'Results', route: '/student/results' },
   { icon: <Users size={20} />, label: 'Club Enrolment', route: '/student/clubs/enrol' },
   { icon: <Megaphone size={20} />, label: 'Announcements', route: '/student/announcements' },

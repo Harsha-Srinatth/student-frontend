@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Building2, CheckCircle2, Loader2, User, Search } from "lucide-react";
+import PasswordInput from "../../components/shared/PasswordInput";
 import { requestPermission } from "../../../firebase.js";
 
 const steps = [
@@ -422,61 +423,75 @@ const StudentRegistration = () => {
                     {config.required && <span className="text-red-500">*</span>}
                   </label>
                   <div className="relative">
-                    <input
-                      type={config.type}
-                      name={name}
-                      value={formData[name]}
-                      onChange={handleChange}
-                      onFocus={() => {
-                        if (isInstitutionId && collegeSearchQuery.length >= 2) {
-                          setShowCollegeResults(true);
-                        }
-                        if (isFacultyId && facultySearchQuery.length >= 2) {
-                          setShowFacultyResults(true);
-                        }
-                      }}
-                      placeholder={
-                        isInstitutionId 
-                          ? "Search by College ID or Name" 
-                          : isFacultyId 
-                          ? "Search by Faculty ID or Name (Select college first)" 
-                          : `Enter ${config.label.toLowerCase()}`
-                      }
-                      className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 w-full ${
-                        errors[name]
-                          ? "border-red-500 bg-red-50"
-                          : "border-gray-300 hover:border-gray-400"
-                      }`}
-                    />
-                    {isInstitutionId && searchingCollege && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                      </div>
-                    )}
-                    {isInstitutionId && selectedCollege && !searchingCollege && formData.institutionId === selectedCollege.collegeId && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      </div>
-                    )}
-                    {isInstitutionId && !searchingCollege && !selectedCollege && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <Search className="h-4 w-4 text-gray-400" />
-                      </div>
-                    )}
-                    {isFacultyId && searchingFaculty && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-                      </div>
-                    )}
-                    {isFacultyId && selectedFaculty && !searchingFaculty && formData.facultyid === selectedFaculty.facultyid && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      </div>
-                    )}
-                    {isFacultyId && !searchingFaculty && !selectedFaculty && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <Search className="h-4 w-4 text-gray-400" />
-                      </div>
+                    {config.type === "password" ? (
+                      <PasswordInput
+                        name={name}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        placeholder={`Enter ${config.label.toLowerCase()}`}
+                        className={`px-4 py-2 pr-10 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 w-full ${
+                          errors[name] ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
+                        }`}
+                      />
+                    ) : (
+                      <>
+                        <input
+                          type={config.type}
+                          name={name}
+                          value={formData[name]}
+                          onChange={handleChange}
+                          onFocus={() => {
+                            if (isInstitutionId && collegeSearchQuery.length >= 2) {
+                              setShowCollegeResults(true);
+                            }
+                            if (isFacultyId && facultySearchQuery.length >= 2) {
+                              setShowFacultyResults(true);
+                            }
+                          }}
+                          placeholder={
+                            isInstitutionId 
+                              ? "Search by College ID or Name" 
+                              : isFacultyId 
+                              ? "Search by Faculty ID or Name (Select college first)" 
+                              : `Enter ${config.label.toLowerCase()}`
+                          }
+                          className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 w-full ${
+                            errors[name]
+                              ? "border-red-500 bg-red-50"
+                              : "border-gray-300 hover:border-gray-400"
+                          }`}
+                        />
+                        {isInstitutionId && searchingCollege && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                          </div>
+                        )}
+                        {isInstitutionId && selectedCollege && !searchingCollege && formData.institutionId === selectedCollege.collegeId && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          </div>
+                        )}
+                        {isInstitutionId && !searchingCollege && !selectedCollege && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <Search className="h-4 w-4 text-gray-400" />
+                          </div>
+                        )}
+                        {isFacultyId && searchingFaculty && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                          </div>
+                        )}
+                        {isFacultyId && selectedFaculty && !searchingFaculty && formData.facultyid === selectedFaculty.facultyid && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          </div>
+                        )}
+                        {isFacultyId && !searchingFaculty && !selectedFaculty && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <Search className="h-4 w-4 text-gray-400" />
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                   

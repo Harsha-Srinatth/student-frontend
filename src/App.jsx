@@ -40,6 +40,8 @@ import StudentResults from './components/student/StudentResults.jsx';
 import StudentClubsEnrol from './components/student/StudentClubsEnrol.jsx';
 import LeaveRequestDashboard from './components/student/LeaveRequestDash.jsx';
 import CreateClubAnnouncementStudent from './pages/student/student_dashboard/CreateClubAnnouncement.jsx';
+import AskDoubt from './pages/student/student_dashboard/AskDoubt.jsx';
+import DoubtDetail from './pages/student/student_dashboard/DoubtDetail.jsx';
 
 // Faculty Dashboard Components
 import FacultyHome from "./pages/faculty/facultyDashboard/FacultyHome.jsx";
@@ -62,6 +64,7 @@ import AnnouncementsManagement from './pages/HOD/AnnouncementsManagement.jsx';
 import Analytics from './pages/HOD/Analytics';
 import HODPortal from './components/HOD/Assign-Faculty/HodAssignment.jsx';
 import CreateNewClubs from './pages/HOD/CreateNewClubs.jsx';
+import HodSettings from './pages/HOD/HodSettings.jsx';
 // 🔒 Protected Route
 const ProtectedRoute = ({ children }) => {
   const token = Cookies.get('token');
@@ -155,6 +158,8 @@ const App = () => {
         <Route path="student/club-announcements/create" element={<RoleProtectedRoute allowedRoles={['student']}><CreateClubAnnouncementStudent /></RoleProtectedRoute>} />
         <Route path="student/club-announcements/edit/:id" element={<RoleProtectedRoute allowedRoles={['student']}><CreateClubAnnouncementStudent /></RoleProtectedRoute>} />
         <Route path="student/pending/approvels" element={<RoleProtectedRoute allowedRoles={['student']}><StudentPendingApprovels /></RoleProtectedRoute>} />
+        <Route path="student/ask/doubt" element={<RoleProtectedRoute allowedRoles={['student']}><AskDoubt /></RoleProtectedRoute>} />
+        <Route path="student/ask/doubt/:doubtId" element={<RoleProtectedRoute allowedRoles={['student']}><DoubtDetail /></RoleProtectedRoute>} />
         <Route path="student/settings" element={<RoleProtectedRoute allowedRoles={['student']}><StudentSettings /></RoleProtectedRoute>} />
         <Route path="student/profile/update" element={<RoleProtectedRoute allowedRoles={['student']}><UpdateStudentProfile /></RoleProtectedRoute>} />
         <Route path="/student/leaveRequests" element={<RoleProtectedRoute allowedRoles={['student']}><LeaveRequestDashboard /></RoleProtectedRoute>} />
@@ -180,6 +185,7 @@ const App = () => {
         <Route path="hod/analytics" element={<RoleProtectedRoute allowedRoles={['hod']}><Analytics /></RoleProtectedRoute>} />
         <Route path="hod/assign-faculty" element={<RoleProtectedRoute allowedRoles={['hod']}><HODPortal /></RoleProtectedRoute>} />
         <Route path="hod/clubs" element={<RoleProtectedRoute allowedRoles={['hod']}><CreateNewClubs /></RoleProtectedRoute>} />
+        <Route path="hod/settings" element={<RoleProtectedRoute allowedRoles={['hod']}><HodSettings /></RoleProtectedRoute>} />
       </Route>
       
       {/* Legacy Redirects */}
