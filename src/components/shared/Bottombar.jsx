@@ -21,13 +21,13 @@ const Bottombar = () => {
           { ...allLinks.find((l) => l.label === "Dashboard") },
           { ...allLinks.find((l) => l.label === "Activity Approvals") },
           { ...allLinks.find((l) => l.label === "Verification History") },
-        ]
+        ].filter(link => link && link.route) // Filter out undefined/null links
       : [
           { ...allLinks.find((l) => l.label === "Dashboard") },
           { ...allLinks.find((l) => l.label === "Upload Files") },
           { ...allLinks.find((l) => l.label === "Pending Tasks") },
           { ...allLinks.find((l) => l.label === "Achievements") },
-        ];
+        ].filter(link => link && link.route); // Filter out undefined/null links
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -47,11 +47,12 @@ const Bottombar = () => {
         rounded-t-xl shadow-xl border-t border-gray-700 z-50"
       >
         <div className="h-16 flex justify-around items-center relative">
-          {bottombarQuickLinks.map((link) => {
+          {bottombarQuickLinks.map((link, index) => {
+            if (!link || !link.route) return null; // Skip invalid links
             const isActive = pathname === link.route;
             return (
               <Link
-                key={link.label}
+                key={link.route || `${link.label}-${index}`} // Use route as key, fallback to label+index
                 to={link.route}
                 className={`flex items-center justify-center p-2 rounded-lg transition-all duration-300 ease-in-out ${
                   isActive
@@ -89,22 +90,25 @@ const Bottombar = () => {
               overflow-y-auto border-t border-gray-700"
             onClick={(e) => e.stopPropagation()}
           >
-            {allLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.route}
-                onClick={() => setIsOpen(false)}
-                className="flex flex-col items-center justify-center p-3 rounded-lg 
-                  hover:bg-gray-800 transition-all duration-200"
-              >
-                <div className="text-gray-300 group-hover:text-white">
-                  {link.icon}
-                </div>
-                <span className="text-xs mt-1 text-gray-400 group-hover:text-gray-200 text-center">
-                  {link.label}
-                </span>
-              </Link>
-            ))}
+            {allLinks.map((link, index) => {
+              if (!link || !link.route) return null; // Skip invalid links
+              return (
+                <Link
+                  key={link.route || `${link.label}-${index}`} // Use route as key, fallback to label+index
+                  to={link.route}
+                  onClick={() => setIsOpen(false)}
+                  className="flex flex-col items-center justify-center p-3 rounded-lg 
+                    hover:bg-gray-800 transition-all duration-200"
+                >
+                  <div className="text-gray-300 group-hover:text-white">
+                    {link.icon}
+                  </div>
+                  <span className="text-xs mt-1 text-gray-400 group-hover:text-gray-200 text-center">
+                    {link.label}
+                  </span>
+                </Link>
+              );
+            })}
 
             {/* 🔹 Logout Button */}
             <button

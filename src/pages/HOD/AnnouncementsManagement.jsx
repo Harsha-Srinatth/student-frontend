@@ -260,12 +260,18 @@ export default function AnnouncementsManagement() {
     }
   };
 
-  const filteredAnnouncements = announcements.filter((announcement) => {
-    const matchesSearch = announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         announcement.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesPriority = filterPriority === "all" || announcement.priority === filterPriority;
-    return matchesSearch && matchesPriority;
-  });
+  // Filter and deduplicate announcements by _id to fix React key warning
+  const filteredAnnouncements = announcements
+    .filter((announcement, index, self) => 
+      // Remove duplicates by keeping only the first occurrence of each _id
+      index === self.findIndex(a => a._id === announcement._id)
+    )
+    .filter((announcement) => {
+      const matchesSearch = announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           announcement.content.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesPriority = filterPriority === "all" || announcement.priority === filterPriority;
+      return matchesSearch && matchesPriority;
+    });
 
   if (loading && announcements.length === 0) {
     return (

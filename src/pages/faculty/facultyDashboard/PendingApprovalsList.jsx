@@ -101,9 +101,15 @@ const PendingApprovalsList = ({
           </div>
         ) : (
           <div className="space-y-4">
-            {list.map((student, index) => (
+            {list.map((student, index) => {
+              // Create a unique key combining studentid with index to prevent duplicates
+              const uniqueKey = student.studentid 
+                ? `${student.studentid}-${index}` 
+                : `student-${index}`;
+              
+              return (
               <div
-                key={student.studentid || index}
+                key={uniqueKey}
                 onClick={() => onItemClick && onItemClick(student)}
                 className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer group animate-slideInRight"
                 style={{ animationDelay: `${index * 100}ms` }}
@@ -158,7 +164,8 @@ const PendingApprovalsList = ({
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

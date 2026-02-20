@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bell, BellOff, CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import { requestPermission, setupForegroundMessageHandler } from "../../../firebase.js";
+import { 
+  requestPermission, 
+  setupForegroundMessageHandler, 
+  getDeviceId, 
+  getDeviceName,
+  setupTokenRefreshListener 
+} from "../../../firebase.js";
 import api from "../../services/api";
 
 /**
@@ -69,6 +75,56 @@ const NotificationSettings = ({ userType, userId, currentToken: initialToken, is
   const [loading, setLoading] = useState(false);
   const [requestingPermission, setRequestingPermission] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const deviceIdRef = useRef(null);
+  const tokenRefreshListenerRef = useRef(null);
+
+  // Initialize device ID on mount
+  useEffect(() => {
+    deviceIdRef.current = getDeviceId();
+    console.log('🔔 [NotificationSettings] Device ID:', deviceIdRef.current);
+  }, []);
+
+  // Set up token refresh listener
+  useEffect(() => {
+    if (isEnabled && fcmToken) {
+      // Set up token refresh listener
+      const handleTokenRefresh = async (newToken, oldToken) => {
+        console.log('🔄 [NotificationSettings] Token refreshed, updating backend...');
+        try {
+          const endpoint = getUpdateEndpoint(userType);
+          const response = await api.put(endpoint, {
+            fcmTokenData: {
+              token: newToken,
+              deviceId: deviceIdRef.current,
+              deviceName: getDeviceName(),
+              action: 'update' // Update existing device
+            }
+          });
+          
+          // Get the updated token from response
+          const responseToken = response.data?.student?.fcmToken || response.data?.faculty?.fcmToken || response.data?.hod?.fcmToken || newToken;
+          
+          setFcmToken(responseToken);
+          previousTokenRef.current = responseToken;
+          localStorage.setItem(`fcmToken_${userType}_${userId}`, responseToken);
+          console.log('✅ [NotificationSettings] Token updated in backend:', { 
+            deviceId: deviceIdRef.current,
+            tokenLength: responseToken.length 
+          });
+        } catch (error) {
+          console.error('❌ [NotificationSettings] Error updating token:', error);
+        }
+      };
+
+      setupTokenRefreshListener(handleTokenRefresh);
+      tokenRefreshListenerRef.current = handleTokenRefresh;
+    }
+
+    return () => {
+      // Cleanup if needed
+      tokenRefreshListenerRef.current = null;
+    };
+  }, [isEnabled, fcmToken, userType, userId]);
 
   // Track when data has finished loading
   useEffect(() => {
@@ -214,20 +270,40 @@ const NotificationSettings = ({ userType, userId, currentToken: initialToken, is
       console.log("🔔 [NotificationSettings] Setting up foreground message handler");
       setupForegroundMessageHandler();
 
-      // Save token to backend
+      // Save token to backend with device info
       setLoading(true);
       const endpoint = getUpdateEndpoint(userType);
-      const response = await api.put(endpoint, { fcmToken: token });
+      const deviceId = deviceIdRef.current || getDeviceId();
+      const deviceName = getDeviceName();
+      
+      const response = await api.put(endpoint, {
+        fcmTokenData: {
+          token,
+          deviceId,
+          deviceName,
+          action: 'add' // Add or update device
+        }
+      });
 
       if (response.data) {
-        setFcmToken(token);
+        // Get the token from response (backend returns the updated token for the specific device)
+        const responseToken = response.data?.student?.fcmToken || 
+                             response.data?.faculty?.fcmToken || 
+                             response.data?.hod?.fcmToken || 
+                             token;
+        
+        setFcmToken(responseToken);
         setIsEnabled(true);
         setWaitingForData(false);
         // Update the ref so we don't reset on next render
-        previousTokenRef.current = token;
+        previousTokenRef.current = responseToken;
         dataLoadedRef.current = true;
         // Save to localStorage for persistence across reloads
-        localStorage.setItem(`fcmToken_${userType}_${userId}`, token);
+        localStorage.setItem(`fcmToken_${userType}_${userId}`, responseToken);
+        console.log('✅ [NotificationSettings] Token saved:', { 
+          deviceId: deviceIdRef.current,
+          tokenLength: responseToken.length 
+        });
         setMessage({
           type: "success",
           text: "Push notifications enabled successfully! You'll receive notifications from College360x.",
@@ -253,21 +329,47 @@ const NotificationSettings = ({ userType, userId, currentToken: initialToken, is
 
     try {
       const endpoint = getUpdateEndpoint(userType);
-      const response = await api.put(endpoint, { fcmToken: null });
+      const deviceId = deviceIdRef.current;
+      
+      // Remove only this device's token (not all devices)
+      const response = await api.put(endpoint, {
+        fcmTokenData: {
+          deviceId,
+          action: 'remove' // Remove this specific device
+        }
+      });
 
       if (response.data) {
-        setFcmToken(null);
-        setIsEnabled(false);
+        // Get the token from response (will be null if device was removed or no other devices)
+        const responseToken = response.data?.student?.fcmToken || 
+                             response.data?.faculty?.fcmToken || 
+                             response.data?.hod?.fcmToken || 
+                             null;
+        
+        const hasToken = responseToken !== null && responseToken.trim() !== "";
+        
+        setFcmToken(responseToken);
+        setIsEnabled(hasToken);
         setWaitingForData(false);
         // Update the ref so we don't reset on next render
-        previousTokenRef.current = null;
+        previousTokenRef.current = responseToken;
         dataLoadedRef.current = true;
-        // Remove from localStorage when disabled
-        localStorage.removeItem(`fcmToken_${userType}_${userId}`);
-        setMessage({
-          type: "success",
-          text: "Push notifications disabled successfully.",
-        });
+        
+        if (hasToken) {
+          // Device was removed but user still has other devices
+          localStorage.setItem(`fcmToken_${userType}_${userId}`, responseToken);
+          setMessage({
+            type: "success",
+            text: "Notifications disabled for this device. Other devices are still active.",
+          });
+        } else {
+          // All devices removed or this was the last device
+          localStorage.removeItem(`fcmToken_${userType}_${userId}`);
+          setMessage({
+            type: "success",
+            text: "Push notifications disabled successfully.",
+          });
+        }
       }
     } catch (error) {
       console.error("Error disabling notifications:", error);

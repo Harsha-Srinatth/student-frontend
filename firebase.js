@@ -26,16 +26,37 @@ try {
     navigator.serviceWorker
       .register("/firebase-messaging-sw.js")
       .then((registration) => {
-        console.log("Service Worker registered successfully:", registration.scope);
+        console.log("✅ [FIREBASE] Service Worker registered successfully:", registration.scope);
+        console.log("✅ [FIREBASE] Service Worker state:", registration.active?.state || "not active");
+        
+        // Check if service worker is active
+        if (registration.active) {
+          console.log("✅ [FIREBASE] Service Worker is active and ready");
+        } else {
+          console.warn("⚠️ [FIREBASE] Service Worker registered but not yet active");
+        }
       })
       .catch((error) => {
-        console.error("Service Worker registration failed:", error);
+        console.error("❌ [FIREBASE] Service Worker registration failed:", error);
+        console.error("❌ [FIREBASE] Error details:", {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
       });
+  } else {
+    console.warn("⚠️ [FIREBASE] Service Workers not supported in this browser");
   }
 
   messaging = getMessaging(app);
+  console.log("✅ [FIREBASE] Messaging instance created");
 } catch (err) {
-  console.error("Firebase messaging initialization error:", err);
+  console.error("❌ [FIREBASE] Firebase messaging initialization error:", err);
+  console.error("❌ [FIREBASE] Error details:", {
+    message: err.message,
+    stack: err.stack,
+    name: err.name
+  });
 }
 
 export const requestPermission = async () => {
@@ -130,13 +151,19 @@ export const setupForegroundMessageHandler = () => {
 
   try {
     console.log("🔔 [FOREGROUND] Setting up foreground message handler...");
+    console.log("🔔 [FOREGROUND] Messaging instance:", messaging ? "✅ Available" : "❌ Not available");
+    console.log("🔔 [FOREGROUND] Notification permission:", Notification.permission);
     
     onMessage(messaging, (payload) => {
-      console.log("🔔 [FOREGROUND] Received foreground message:", payload);
+      console.log("🔔 [FOREGROUND] ✅ Received foreground message:", payload);
+      console.log("🔔 [FOREGROUND] Payload notification:", payload.notification);
+      console.log("🔔 [FOREGROUND] Payload data:", payload.data);
       console.log("🔔 [FOREGROUND] Notification permission:", Notification.permission);
       
       const notificationTitle = payload.notification?.title || payload.data?.title || "College360x";
       const notificationBody = payload.notification?.body || payload.data?.body || "You have a new notification";
+      
+      console.log("🔔 [FOREGROUND] Creating notification:", { title: notificationTitle, body: notificationBody });
       
       // Use full URL for icon to ensure it works
       const baseUrl = window.location.origin;
@@ -146,14 +173,16 @@ export const setupForegroundMessageHandler = () => {
       // Show browser notification
       if ("Notification" in window && Notification.permission === "granted") {
         try {
+          console.log("🔔 [FOREGROUND] Attempting to create notification...");
           const notification = new Notification(notificationTitle, {
             body: notificationBody,
             icon: notificationIcon,
             badge: `${baseUrl}/weblogo.jpg`,
             image: notificationImage,
-            tag: payload.data?.type || "notification",
-            requireInteraction: false,
+            tag: payload.data?.type || payload.data?.announcementId || "notification",
+            requireInteraction: false, // Set to true if you want notifications to stay until clicked
             data: payload.data || {},
+            silent: false, // Make sure sound plays
           });
 
           console.log("✅ [FOREGROUND] Browser notification displayed:", { title: notificationTitle, body: notificationBody });
@@ -170,18 +199,27 @@ export const setupForegroundMessageHandler = () => {
             notification.close();
           };
 
-          // Auto-close after 5 seconds
+          // Auto-close after 10 seconds (increased from 5 for better visibility)
           setTimeout(() => {
             notification.close();
-          }, 5000);
+          }, 10000);
         } catch (notifError) {
           console.error("❌ [FOREGROUND] Error creating notification:", notifError);
+          console.error("❌ [FOREGROUND] Error details:", {
+            message: notifError.message,
+            stack: notifError.stack,
+            name: notifError.name
+          });
         }
       } else {
         console.warn("⚠️ [FOREGROUND] Cannot show notification - permission:", Notification.permission);
+        console.warn("⚠️ [FOREGROUND] Notification API available:", "Notification" in window);
         // Fallback: Show alert if notifications not available
         if (Notification.permission !== "denied") {
+          console.log("🔔 [FOREGROUND] Showing fallback alert");
           alert(`${notificationTitle}\n${notificationBody}`);
+        } else {
+          console.warn("⚠️ [FOREGROUND] Notifications denied by user");
         }
       }
     });
@@ -190,7 +228,97 @@ export const setupForegroundMessageHandler = () => {
     console.log("✅ [FOREGROUND] Foreground message handler set up successfully");
   } catch (error) {
     console.error("❌ [FOREGROUND] Error setting up foreground message handler:", error);
+    console.error("❌ [FOREGROUND] Error details:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
   }
+};
+
+/**
+ * Get or generate device ID (stored in localStorage)
+ * @returns {string} Device ID
+ */
+export const getDeviceId = () => {
+  let deviceId = localStorage.getItem('fcm_deviceId');
+  if (!deviceId) {
+    // Generate a unique device ID
+    deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('fcm_deviceId', deviceId);
+    console.log('🔔 [FCM] Generated new device ID:', deviceId);
+  }
+  return deviceId;
+};
+
+/**
+ * Get device name from user agent
+ * @returns {string} Device name
+ */
+export const getDeviceName = () => {
+  const ua = navigator.userAgent;
+  if (ua.includes('Mobile') || ua.includes('Android') || ua.includes('iPhone')) {
+    if (ua.includes('Android')) {
+      const match = ua.match(/Android\s+([^;)]+)/);
+      return match ? `Android ${match[1]}` : 'Android Mobile';
+    }
+    if (ua.includes('iPhone')) {
+      const match = ua.match(/iPhone OS\s+([_\d]+)/);
+      return match ? `iPhone iOS ${match[1].replace(/_/g, '.')}` : 'iPhone';
+    }
+    return 'Mobile Device';
+  }
+  if (ua.includes('Windows')) return 'Windows PC';
+  if (ua.includes('Mac')) return 'Mac';
+  if (ua.includes('Linux')) return 'Linux PC';
+  return 'Unknown Device';
+};
+
+/**
+ * Set up token refresh listener
+ * @param {Function} onTokenRefresh - Callback when token refreshes
+ */
+export const setupTokenRefreshListener = (onTokenRefresh) => {
+  if (!messaging) {
+    console.warn('⚠️ [FCM] Messaging not initialized, cannot set up token refresh listener');
+    return;
+  }
+
+  // Firebase v9+ doesn't have onTokenRefresh, but tokens can change
+  // We'll check token periodically and on visibility change
+  let lastToken = null;
+  
+  const checkTokenRefresh = async () => {
+    try {
+      const currentToken = await getToken(messaging, {
+        vapidKey: "BISjcErh1YpP-tpBpSt1iEe6boDQ19KH0zXzE2MEVluC2n-l9ixjxIpIkzQi1dwZmFkGxI-oLVGQh3Xlg3i6QUc"
+      });
+      
+      if (currentToken && currentToken !== lastToken && lastToken !== null) {
+        console.log('🔄 [FCM] Token refreshed:', { old: lastToken?.substring(0, 20), new: currentToken.substring(0, 20) });
+        if (onTokenRefresh) {
+          onTokenRefresh(currentToken, lastToken);
+        }
+      }
+      
+      lastToken = currentToken;
+    } catch (error) {
+      console.error('❌ [FCM] Error checking token refresh:', error);
+    }
+  };
+
+  // Check on visibility change (when user returns to tab)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      checkTokenRefresh();
+    }
+  });
+
+  // Check periodically (every 5 minutes)
+  setInterval(checkTokenRefresh, 5 * 60 * 1000);
+
+  // Initial check
+  checkTokenRefresh();
 };
 
 // Export messaging instance for use in other components

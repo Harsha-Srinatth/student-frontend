@@ -106,12 +106,23 @@ const App = () => {
 
   // Initialize foreground message handler for push notifications
   useEffect(() => {
-    // Check if user has notification permission and set up foreground handler
-    if ("Notification" in window && Notification.permission === "granted") {
-      console.log("🔔 [APP] Notification permission granted, setting up foreground handler");
-      setupForegroundMessageHandler();
-    } else {
-      console.log("🔔 [APP] Notification permission not granted, skipping foreground handler setup");
+    console.log("🔔 [APP] Initializing notification system...");
+    console.log("🔔 [APP] Notification API available:", "Notification" in window);
+    console.log("🔔 [APP] Notification permission:", Notification.permission);
+    console.log("🔔 [APP] Service Worker support:", "serviceWorker" in navigator);
+    
+    // Always set up foreground handler (it will check permission internally)
+    // This ensures notifications work when permission is granted later
+    console.log("🔔 [APP] Setting up foreground message handler...");
+    setupForegroundMessageHandler();
+    
+    // Check service worker status
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.ready.then((registration) => {
+        console.log("✅ [APP] Service Worker ready:", registration.scope);
+      }).catch((error) => {
+        console.error("❌ [APP] Service Worker not ready:", error);
+      });
     }
   }, []);
 

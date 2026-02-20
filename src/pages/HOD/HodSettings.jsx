@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -7,8 +7,10 @@ import {
   UserPlus, Settings, Mail, Phone, IdCard, Shield,
 } from "lucide-react";
 import { fetchHODDashboardStats } from "../../features/HOD/hodDashSlice";
+import { setHODInfo } from "../../features/HOD/hodAssignmentSlice";
 import NotificationSettings from "../../components/shared/NotificationSettings";
 import Cookies from "js-cookie";
+import api from "../../services/api";
 
 const shimmerCls = "animate-pulse bg-gray-200 rounded";
 
@@ -16,15 +18,37 @@ export default function HodSettings() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { stats, loading } = useSelector((s) => s.hodDashboard);
+  const { hodInfo } = useSelector((s) => s.hodAssignment);
+  const [hodInfoLoading, setHodInfoLoading] = useState(false);
 
   useEffect(() => {
     if (!stats) dispatch(fetchHODDashboardStats());
   }, [dispatch, stats]);
 
-  // HOD info from cookies (set at login) + dashboard stats
-  const hodId = Cookies.get("hodId") || "—";
-  const department = Cookies.get("department") || "—";
-  const collegeId = Cookies.get("collegeId") || "—";
+  // Fetch HOD info if not already in Redux
+  useEffect(() => {
+    const fetchHODInfo = async () => {
+      if (!hodInfo) {
+        setHodInfoLoading(true);
+        try {
+          const response = await api.get("/hod/info");
+          if (response.data?.success && response.data?.data?.hod) {
+            dispatch(setHODInfo(response.data.data.hod));
+          }
+        } catch (error) {
+          console.error("Error fetching HOD info:", error);
+        } finally {
+          setHodInfoLoading(false);
+        }
+      }
+    };
+    fetchHODInfo();
+  }, [dispatch, hodInfo]);
+
+  // HOD info from cookies (set at login) + dashboard stats + Redux
+  const hodId = hodInfo?.hodId || Cookies.get("hodId") || "—";
+  const department = hodInfo?.department?.name || hodInfo?.department || Cookies.get("department") || "—";
+  const collegeId = hodInfo?.collegeId || Cookies.get("collegeId") || "—";
 
   const quickLinks = [
     { icon: <Megaphone className="w-7 h-7 text-purple-600" />, title: "Announcements", desc: "Create & manage announcements", path: "/hod/announcements" },
@@ -120,7 +144,12 @@ export default function HodSettings() {
       {/* Notification Settings */}
       <div>
         <h2 className="text-base font-bold text-gray-700 mb-3">Notifications</h2>
-        <NotificationSettings />
+        <NotificationSettings
+          userType="hod"
+          userId={hodId}
+          currentToken={hodInfo?.fcmToken}
+          isLoading={hodInfoLoading}
+        />
       </div>
     </div>
   );
