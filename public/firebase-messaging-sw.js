@@ -35,9 +35,9 @@ messaging.onBackgroundMessage((payload) => {
   
   const notificationOptions = {
     body: notificationBody,
-    icon: '/weblogo.jpg', // Use your app's logo
-    badge: '/weblogo.jpg',
-    image: payload.notification?.image || payload.data?.image || '/weblogo.jpg',
+    icon: '/college-web-logo.jpeg', // Use main app logo
+    badge: '/college-web-logo.jpeg',
+    image: payload.notification?.image || payload.data?.image || '/college-web-logo.jpeg',
     data: {
       ...payload.data,
       click_action: payload.data?.click_action || payload.fcmOptions?.link || '/',
@@ -67,8 +67,8 @@ messaging.onBackgroundMessage((payload) => {
       // Try to show a basic notification as fallback
       return self.registration.showNotification(notificationTitle, {
         body: notificationBody,
-        icon: '/weblogo.jpg',
-        badge: '/weblogo.jpg',
+        icon: '/college-web-logo.jpeg',
+        badge: '/college-web-logo.jpeg',
         tag: 'fallback-notification',
       }).catch((fallbackError) => {
         console.error('[firebase-messaging-sw.js] ❌ Fallback notification also failed:', fallbackError);

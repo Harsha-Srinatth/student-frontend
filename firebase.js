@@ -167,8 +167,8 @@ export const setupForegroundMessageHandler = () => {
       
       // Use full URL for icon to ensure it works
       const baseUrl = window.location.origin;
-      const notificationIcon = payload.notification?.icon || `${baseUrl}/weblogo.jpg`;
-      const notificationImage = payload.notification?.image || `${baseUrl}/weblogo.jpg`;
+      const notificationIcon = payload.notification?.icon || `${baseUrl}/college-web-logo.jpeg`;
+      const notificationImage = payload.notification?.image || `${baseUrl}/college-web-logo.jpeg`;
       
       // Show browser notification
       if ("Notification" in window && Notification.permission === "granted") {
@@ -177,7 +177,7 @@ export const setupForegroundMessageHandler = () => {
           const notification = new Notification(notificationTitle, {
             body: notificationBody,
             icon: notificationIcon,
-            badge: `${baseUrl}/weblogo.jpg`,
+            badge: `${baseUrl}/college-web-logo.jpeg`,
             image: notificationImage,
             tag: payload.data?.type || payload.data?.announcementId || "notification",
             requireInteraction: false, // Set to true if you want notifications to stay until clicked

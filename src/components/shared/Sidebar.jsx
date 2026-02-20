@@ -56,8 +56,8 @@ const Sidebar = () => {
           rounded-full flex items-center justify-center 
           text-white font-bold shadow-md hover:scale-105 transition overflow-hidden">
           <img
-            src="/logo2.jpg"
-            alt="App Logo"
+            src="/college-web-logo.jpeg"
+            alt="College360x Logo"
             className="w-full h-full object-cover"
            />
          </div>
