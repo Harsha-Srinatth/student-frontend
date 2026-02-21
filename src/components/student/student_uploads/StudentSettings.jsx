@@ -201,7 +201,9 @@ const StudentSettings = ({ student: studentProp }) => {
             userType="student"
             userId={studentData.studentid}
             currentToken={reduxStudent?.fcmToken}
+            fcmDevices={reduxStudent?.fcmDevices}
             isLoading={reduxLoading}
+            onNotificationChange={() => dispatch(fetchSDashboardData({ forceRefresh: true }))}
           />
         </motion.div>
 

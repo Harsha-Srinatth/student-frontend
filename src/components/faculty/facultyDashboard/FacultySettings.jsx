@@ -169,7 +169,9 @@ const FacultySettings = () => {
             userType="faculty"
             userId={facultyData.facultyid}
             currentToken={faculty?.fcmToken}
+            fcmDevices={faculty?.fcmDevices}
             isLoading={loading}
+            onNotificationChange={() => dispatch(fetchFacultyDashboardData({ forceRefresh: true }))}
           />
         </motion.div>
 
