@@ -4,6 +4,7 @@ import api from "../../services/api";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/shared/PasswordInput";
+import { registerFCMTokenIfGranted } from "../../services/fcmRegistration";
 
 export default function StudentLogin() {
   const navigate = useNavigate();
@@ -26,10 +27,14 @@ export default function StudentLogin() {
       const user = response.data.user;
       console.log("responce for student login",response.data.user);
   
-      // Save token and role
+      // Save token, role, and userId (for FCM token registration on this device)
       Cookies.set("token", token, { expires: 7, secure: true });
       Cookies.set("userRole", "student", { expires: 7, secure: true });
-  
+      Cookies.set("userId", user.studentid, { expires: 7, secure: true });
+
+      // Register this device's FCM token if permission already granted (no prompt)
+      registerFCMTokenIfGranted();
+
       // ✅ Redirect based on profile picture status
       if (!user.hasProfilePic) {
         navigate("/student/profile-img/upload");

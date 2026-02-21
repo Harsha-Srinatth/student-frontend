@@ -4,6 +4,7 @@ import api from "../../services/api";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/shared/PasswordInput";
+import { registerFCMTokenIfGranted } from "../../services/fcmRegistration";
 //  docker-compose down
 //  docker-compose up -d --build
 export default function FacultyLogin() {
@@ -26,9 +27,13 @@ export default function FacultyLogin() {
       const token = response.data.token;
       const user = response.data.user;
 
-      // Save token and user role in cookies (expires in 7 days)
+      // Save token, role, and userId (for FCM token registration on this device)
       Cookies.set("token", token, { expires: 7, secure: true });
       Cookies.set("userRole", "faculty", { expires: 7, secure: true });
+      Cookies.set("userId", user.facultyid, { expires: 7, secure: true });
+
+      // Register this device's FCM token if permission already granted (no prompt)
+      registerFCMTokenIfGranted();
 
       // Redirect to role-based home
       if (!user.hasProfilePic) {

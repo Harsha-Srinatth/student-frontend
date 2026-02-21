@@ -237,6 +237,31 @@ export const setupForegroundMessageHandler = () => {
 };
 
 /**
+ * Get FCM token if notification permission is already granted (no prompt).
+ * Use this to sync token to backend after login or when dashboard loads.
+ * @returns {Promise<string|null>} FCM token or null
+ */
+export const getTokenIfPermissionGranted = async () => {
+  if (!messaging) return null;
+  if (Notification.permission !== "granted") return null;
+  try {
+    let registration = null;
+    if ("serviceWorker" in navigator) {
+      registration = await navigator.serviceWorker.ready;
+    }
+    if (!registration) return null;
+    const token = await getToken(messaging, {
+      vapidKey: "BISjcErh1YpP-tpBpSt1iEe6boDQ19KH0zXzE2MEVluC2n-l9ixjxIpIkzQi1dwZmFkGxI-oLVGQh3Xlg3i6QUc",
+      serviceWorkerRegistration: registration
+    });
+    return token || null;
+  } catch (err) {
+    console.warn("[FIREBASE] getTokenIfPermissionGranted failed:", err?.message);
+    return null;
+  }
+};
+
+/**
  * Get or generate device ID (stored in localStorage)
  * @returns {string} Device ID
  */

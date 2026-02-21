@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 // import Header from '../components/MainHeader';
 import MobileHeader from '../components/shared/MobileHeader';
 import Sidebar from '../components/shared/Sidebar';
 import Bottombar from '../components/shared/Bottombar.jsx';
 import SocketProvider from '../components/shared/SocketProvider';
+import { registerFCMTokenIfGranted } from '../services/fcmRegistration';
 
 const MainDashboard = () => {
+  // Sync FCM token for this device when dashboard loads (e.g. new device after login)
+  useEffect(() => {
+    registerFCMTokenIfGranted();
+  }, []);
+
   return (
     <SocketProvider>
       <div className="flex h-screen w-full bg-white text-black">
