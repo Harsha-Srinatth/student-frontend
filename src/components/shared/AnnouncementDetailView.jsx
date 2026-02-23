@@ -11,7 +11,17 @@ import {
 
 const getRegistrationLink = (announcement) => {
   if (!announcement) return null;
-  const link = announcement.participationOrRegistrationLink ?? announcement.participation_or_registration_link;
+  // Support multiple possible field names from API (camelCase, snake_case, or alternate names)
+  const link =
+    announcement.participationOrRegistrationLink ??
+    announcement.participation_or_registration_link ??
+    announcement.participationLink ??
+    announcement.participation_link ??
+    announcement.registrationLink ??
+    announcement.registration_link ??
+    announcement.eventLink ??
+    announcement.event_link ??
+    announcement.link;
   return link && String(link).trim() ? link : null;
 };
 
