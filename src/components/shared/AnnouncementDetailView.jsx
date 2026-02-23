@@ -4,51 +4,26 @@ import {
   Calendar, 
   Users, 
   Clock, 
-  AlertCircle, 
-  AlertTriangle,
-  CheckCircle2,
   Info,
-  Image as ImageIcon
+  Image as ImageIcon,
+  ExternalLink
 } from "lucide-react";
+
+const getRegistrationLink = (announcement) => {
+  if (!announcement) return null;
+  const link = announcement.participationOrRegistrationLink ?? announcement.participation_or_registration_link;
+  return link && String(link).trim() ? link : null;
+};
 
 const AnnouncementDetailView = ({ announcement, onClose }) => {
   if (!announcement) return null;
+  const registrationLink = getRegistrationLink(announcement);
 
-  const getPriorityConfig = (priority) => {
-    switch (priority) {
-      case "high":
-        return {
-          bg: "bg-gradient-to-br from-red-50 to-red-100/50",
-          border: "border-red-500",
-          badge: "bg-gradient-to-r from-red-500 to-red-600 text-white",
-          icon: AlertCircle,
-          iconColor: "text-red-500",
-        };
-      case "medium":
-        return {
-          bg: "bg-gradient-to-br from-amber-50 to-amber-100/50",
-          border: "border-amber-500",
-          badge: "bg-gradient-to-r from-amber-500 to-amber-600 text-white",
-          icon: AlertTriangle,
-          iconColor: "text-amber-500",
-        };
-      case "low":
-        return {
-          bg: "bg-gradient-to-br from-emerald-50 to-emerald-100/50",
-          border: "border-emerald-500",
-          badge: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white",
-          icon: CheckCircle2,
-          iconColor: "text-emerald-500",
-        };
-      default:
-        return {
-          bg: "bg-gradient-to-br from-blue-50 to-blue-100/50",
-          border: "border-blue-500",
-          badge: "bg-gradient-to-r from-blue-500 to-indigo-600 text-white",
-          icon: Info,
-          iconColor: "text-blue-500",
-        };
-    }
+  const defaultConfig = {
+    bg: "bg-gradient-to-br from-blue-50 to-blue-100/50",
+    border: "border-blue-500",
+    icon: Info,
+    iconColor: "text-blue-500",
   };
 
   const formatDate = (dateString) => {
@@ -63,7 +38,7 @@ const AnnouncementDetailView = ({ announcement, onClose }) => {
     });
   };
 
-  const config = getPriorityConfig(announcement.priority || "medium");
+  const config = defaultConfig;
   const Icon = config.icon;
 
   return (
@@ -79,9 +54,6 @@ const AnnouncementDetailView = ({ announcement, onClose }) => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2 flex-wrap">
                   <h2 className="text-3xl font-bold text-gray-900">{announcement.title}</h2>
-                  <span className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider shadow-md ${config.badge} flex-shrink-0`}>
-                    {announcement.priority || "medium"}
-                  </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
@@ -147,6 +119,22 @@ const AnnouncementDetailView = ({ announcement, onClose }) => {
               {announcement.content}
             </div>
           </div>
+
+          {/* Register / Participate link (club events) */}
+          {registrationLink && (
+            <div className="pt-2">
+              <a
+                href={/^https?:\/\//i.test(registrationLink) ? registrationLink : `https://${registrationLink}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-cyan-500 text-white font-semibold hover:bg-cyan-600 transition-colors shadow-md"
+              >
+                <ExternalLink className="w-5 h-5" />
+                Register / Participate
+              </a>
+              <p className="text-sm text-gray-500 mt-2">Opens in a new tab</p>
+            </div>
+          )}
 
           {/* Footer Info */}
           {announcement.createdBy && (

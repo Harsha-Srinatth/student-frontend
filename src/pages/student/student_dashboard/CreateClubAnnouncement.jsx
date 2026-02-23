@@ -34,7 +34,7 @@ const CreateClubAnnouncement = () => {
     description: "",
     selectedYears: [],
     image: null,
-    priority: "medium",
+    participationOrRegistrationLink: "",
   });
   
   const [imagePreview, setImagePreview] = useState(null);
@@ -71,7 +71,7 @@ const CreateClubAnnouncement = () => {
               description: announcement.content || "",
               selectedYears: announcement.targetYears || [],
               image: null, // Don't preload image file
-              priority: announcement.priority || "medium",
+              participationOrRegistrationLink: announcement.participationOrRegistrationLink || "",
             });
             
             // Set image preview if exists
@@ -91,7 +91,7 @@ const CreateClubAnnouncement = () => {
                   description: ann.content || "",
                   selectedYears: ann.targetYears || [],
                   image: null,
-                  priority: ann.priority || "medium",
+                  participationOrRegistrationLink: ann.participationOrRegistrationLink || "",
                 });
                 if (ann.image?.url) {
                   setImagePreview(ann.image.url);
@@ -210,7 +210,9 @@ const CreateClubAnnouncement = () => {
       postData.append("title", formData.eventName);
       postData.append("content", formData.description || "");
       postData.append("eventDate", formData.eventDate);
-      postData.append("priority", formData.priority);
+      if (formData.participationOrRegistrationLink?.trim()) {
+        postData.append("participationOrRegistrationLink", formData.participationOrRegistrationLink.trim());
+      }
       formData.selectedYears.forEach((year) => {
         postData.append("targetYears", year);
       });
@@ -423,21 +425,22 @@ const CreateClubAnnouncement = () => {
             />
           </div>
 
-          {/* Priority */}
+          {/* Participation / Registration Link */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Priority
+              Participation / Registration Link
             </label>
-            <select
-              name="priority"
-              value={formData.priority}
+            <input
+              type="url"
+              name="participationOrRegistrationLink"
+              value={formData.participationOrRegistrationLink}
               onChange={handleInputChange}
+              placeholder="https://..."
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Optional link for students to register or participate in the event
+            </p>
           </div>
 
           {/* Year Selection */}

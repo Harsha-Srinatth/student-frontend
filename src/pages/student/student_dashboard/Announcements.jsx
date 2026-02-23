@@ -11,13 +11,12 @@ import {
   Clock, 
   AlertCircle, 
   Info, 
-  AlertTriangle,
-  CheckCircle2,
   Sparkles,
   Plus,
   Users,
   Edit,
-  Trash2
+  Trash2,
+  ExternalLink
 } from "lucide-react";
 import api from "../../../services/api";
 
@@ -63,6 +62,11 @@ const Announcements = () => {
   const handleSocketReconnected = () => {
     console.log("Socket reconnected, fetching announcements");
     dispatch(fetchStudentAnnouncements());
+  };
+
+  const getRegistrationLink = (announcement) => {
+    const link = announcement.participationOrRegistrationLink ?? announcement.participation_or_registration_link;
+    return link && String(link).trim() ? link : null;
   };
 
   // Check if user can edit/delete this announcement
@@ -124,41 +128,11 @@ const Announcements = () => {
     }
   };
 
-  const getPriorityConfig = (priority) => {
-    switch (priority) {
-      case "high":
-        return {
-          bg: "bg-gradient-to-br from-red-50 to-red-100/50",
-          border: "border-l-4 border-red-500",
-          badge: "bg-red-500 text-white",
-          icon: AlertCircle,
-          iconColor: "text-red-500",
-        };
-      case "medium":
-        return {
-          bg: "bg-gradient-to-br from-amber-50 to-amber-100/50",
-          border: "border-l-4 border-amber-500",
-          badge: "bg-amber-500 text-white",
-          icon: AlertTriangle,
-          iconColor: "text-amber-500",
-        };
-      case "low":
-        return {
-          bg: "bg-gradient-to-br from-emerald-50 to-emerald-100/50",
-          border: "border-l-4 border-emerald-500",
-          badge: "bg-emerald-500 text-white",
-          icon: CheckCircle2,
-          iconColor: "text-emerald-500",
-        };
-      default:
-        return {
-          bg: "bg-gradient-to-br from-blue-50 to-blue-100/50",
-          border: "border-l-4 border-blue-500",
-          badge: "bg-blue-500 text-white",
-          icon: Info,
-          iconColor: "text-blue-500",
-        };
-    }
+  const defaultCardConfig = {
+    bg: "bg-gradient-to-br from-blue-50 to-blue-100/50",
+    border: "border-l-4 border-blue-500",
+    icon: Info,
+    iconColor: "text-blue-500",
   };
 
   const formatDate = (dateString) => {
@@ -278,8 +252,9 @@ const Announcements = () => {
         ) : (
           <div className="space-y-4">
             {announcements.map((announcement, idx) => {
-              const config = getPriorityConfig(announcement.priority);
+              const config = defaultCardConfig;
               const Icon = config.icon;
+              const registrationLink = getRegistrationLink(announcement);
               
               return (
                 <div
@@ -316,7 +291,7 @@ const Announcements = () => {
                             </p>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
                           {canModifyAnnouncement(announcement) && (
                             <div className="flex items-center gap-1">
                               <button
@@ -336,9 +311,19 @@ const Announcements = () => {
                               </button>
                             </div>
                           )}
-                          <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${config.badge}`}>
-                            {announcement.priority || 'normal'}
-                          </span>
+                          {registrationLink && (
+                            <a
+                              href={/^https?:\/\//i.test(registrationLink) ? registrationLink : `https://${registrationLink}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-cyan-500 text-white hover:bg-cyan-600 transition-colors shadow-sm"
+                              title="Open registration or participation link"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              Register / Participate
+                            </a>
+                          )}
                         </div>
                       </div>
                       
@@ -368,6 +353,21 @@ const Announcements = () => {
                               <Users className="w-4 h-4 text-purple-500" />
                               <span className="font-medium">{announcement.targetYears.join(", ")} Year{announcement.targetYears.length > 1 ? "s" : ""}</span>
                             </div>
+                          </>
+                        )}
+                        {registrationLink && (
+                          <>
+                            <span className="text-gray-300">•</span>
+                            <a
+                              href={/^https?:\/\//i.test(registrationLink) ? registrationLink : `https://${registrationLink}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1.5 font-medium text-cyan-600 hover:text-cyan-700 hover:underline"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              Register / Participate
+                            </a>
                           </>
                         )}
                         {announcement.targetAudience && announcement.targetAudience.length > 0 && !announcement.clubId && (

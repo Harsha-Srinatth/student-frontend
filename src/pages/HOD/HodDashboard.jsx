@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fetchHODDashboardStats, fetchAllDepartments } from "../../features/HOD/hodDashSlice";
+import { fetchDepartmentFaculty, fetchDepartmentStudents, selectAssignmentStats } from "../../features/HOD/hodAssignmentSlice";
 import {
   Users, GraduationCap, Megaphone, Building2, Award,
-  TrendingUp, BarChart3, Briefcase, ChevronRight, Trophy,
+  BarChart3, Briefcase, ChevronRight, Trophy, CheckCircle2,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
@@ -14,11 +15,14 @@ const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899"
 export default function HODDashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { stats, loading, error, allDepartments, allDepartmentsLoading } = useSelector((s) => s.hodDashboard);
+  const { stats, loading, error, allDepartments } = useSelector((s) => s.hodDashboard);
+  const assignmentStats = useSelector(selectAssignmentStats);
 
   useEffect(() => {
     dispatch(fetchHODDashboardStats());
     dispatch(fetchAllDepartments());
+    dispatch(fetchDepartmentFaculty());
+    dispatch(fetchDepartmentStudents());
   }, [dispatch]);
 
   if (loading && !stats) {
@@ -47,10 +51,11 @@ export default function HODDashboard() {
 
   const ov = stats?.overview || {};
   const statCards = [
-    { title: "Total Students", value: ov.totalStudents || 0, icon: Users, color: "blue" },
-    { title: "Total Faculty", value: ov.totalFaculty || 0, icon: GraduationCap, color: "emerald" },
+    { title: "Total Students", value: assignmentStats.totalStudents, icon: Users, color: "blue" },
+    { title: "Total Faculty", value: assignmentStats.totalFaculty, icon: GraduationCap, color: "emerald" },
     { title: "Announcements", value: ov.activeAnnouncements || 0, icon: Megaphone, color: "purple" },
-    { title: "Sections", value: ov.totalSections || 0, icon: Building2, color: "orange" },
+    { title: "Sections", value: assignmentStats.totalSections, icon: Building2, color: "orange" },
+    { title: "Assigned Faculty", value: assignmentStats.assignedFacultyCount, icon: CheckCircle2, color: "cyan" },
     { title: "Clubs", value: ov.totalClubs || 0, icon: Briefcase, color: "pink" },
   ];
 
@@ -59,6 +64,7 @@ export default function HODDashboard() {
     emerald: { bg: "bg-emerald-50", icon: "bg-emerald-500", text: "text-emerald-700" },
     purple: { bg: "bg-purple-50", icon: "bg-purple-500", text: "text-purple-700" },
     orange: { bg: "bg-orange-50", icon: "bg-orange-500", text: "text-orange-700" },
+    cyan: { bg: "bg-cyan-50", icon: "bg-cyan-500", text: "text-cyan-700" },
     pink: { bg: "bg-pink-50", icon: "bg-pink-500", text: "text-pink-700" },
   };
 
@@ -80,7 +86,7 @@ export default function HODDashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         {statCards.map((s, i) => {
           const c = colorMap[s.color];
           const Icon = s.icon;
@@ -271,10 +277,17 @@ export default function HODDashboard() {
             {stats.recentAnnouncements.map((a, idx) => (
               <div key={idx} className="p-3 rounded-lg border-l-4 border-purple-400 bg-gray-50/50 hover:bg-gray-50">
                 <p className="font-semibold text-gray-900 text-sm">{a.title}</p>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    a.priority === "high" ? "bg-red-100 text-red-700" : a.priority === "medium" ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700"
-                  }`}>{a.priority}</span>
+                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                  {a.clubId && a.participationOrRegistrationLink && (
+                    <a
+                      href={a.participationOrRegistrationLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700 hover:bg-cyan-200"
+                    >
+                      Registration / Participation link
+                    </a>
+                  )}
                   <span className="text-[11px] text-gray-400">{new Date(a.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>

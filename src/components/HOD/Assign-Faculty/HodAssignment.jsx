@@ -4,7 +4,7 @@ import { Building2, ArrowRight, CheckCircle2, AlertCircle, Users, BookOpen } fro
 import FacultyList from './FacultyList';
 import StudentList from './StudentDepartmentList';
 import AssignmentModal from './AssignmentModel';
-import { fetchDepartmentFaculty, fetchDepartmentStudents, setHODInfo } from '../../../features/HOD/hodAssignmentSlice';
+import { fetchDepartmentFaculty, fetchDepartmentStudents, setHODInfo, selectAssignmentStats } from '../../../features/HOD/hodAssignmentSlice';
 import { getYearLabel } from '../../../utils/sectionUtils';
 import api from '../../../services/api';
 
@@ -19,6 +19,7 @@ export default function HODPortal() {
     facultyError,
     studentsError
   } = useSelector((state) => state.hodAssignment);
+  const stats = useSelector(selectAssignmentStats);
   
   const [selectedFaculty, setSelectedFaculty] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
@@ -77,11 +78,7 @@ export default function HODPortal() {
     );
   }
 
-  // Calculate stats
-  const totalFaculty = faculty.length;
-  const totalSections = sections.length;
-  const totalStudents = sections.reduce((sum, section) => sum + (section.studentCount || 0), 0);
-  const assignedFacultyCount = faculty.filter(f => (f.sectionsAssigned || []).length > 0).length;
+  const { totalFaculty, totalSections, totalStudents, assignedFacultyCount } = stats;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100">

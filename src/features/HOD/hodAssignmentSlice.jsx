@@ -320,5 +320,24 @@ export const {
   invalidateCache
 } = hodAssignmentSlice.actions;
 
+/**
+ * Selector: assignment stats derived from faculty and sections.
+ * Use in HOD Assignment page and Dashboard to avoid computing twice.
+ */
+export const selectAssignmentStats = (state) => {
+  const faculty = state.hodAssignment?.faculty ?? [];
+  const sections = state.hodAssignment?.sections ?? [];
+  const totalFaculty = faculty.length;
+  const totalSections = sections.length;
+  const totalStudents = sections.reduce((sum, s) => sum + (s.studentCount || 0), 0);
+  const assignedFacultyCount = faculty.filter((f) => (f.sectionsAssigned || []).length > 0).length;
+  return {
+    totalFaculty,
+    totalSections,
+    totalStudents,
+    assignedFacultyCount,
+  };
+};
+
 export default hodAssignmentSlice.reducer;
 
