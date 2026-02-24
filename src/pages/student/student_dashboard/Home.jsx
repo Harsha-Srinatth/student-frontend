@@ -31,6 +31,7 @@ const StudentHome = () => {
         greeting="Welcome back"
         description="Here's a quick overview of your student activity records."
         emoji="👋"
+        announcementsRoute="/student/announcements"
       />
 
             {/* Top Row - Quick Stats and Attendance */}

@@ -68,6 +68,7 @@ const HomeFaculty = () => {
         greeting="Welcome"
         description="Here's an overview of approvals and student activity tracking."
         emoji="👩‍🏫"
+        announcementsRoute="/faculty/announcements"
       />
 
       {/* Student Count Card with Link */}

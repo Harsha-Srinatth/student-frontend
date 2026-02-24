@@ -1,11 +1,10 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchSDashboardData } from "../../../features/student/studentDashSlice";
 import { CheckCircle, XCircle, Clock, User, MessageCircle, ArrowRight } from "lucide-react";
 
 const RecentActivities = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const studentDashboard = useSelector((state) => state.studentDashboard);
@@ -14,9 +13,7 @@ const RecentActivities = () => {
   const approvedApprovals = studentDashboard.approvedApprovals || [];
   const { loading, error } = studentDashboard;
 
-  useEffect(() => {
-    dispatch(fetchSDashboardData());
-  }, [dispatch]);
+  // Data is loaded by parent (Home) – no duplicate fetch to avoid extra re-renders
 
   const allActivities = [...approvedApprovals, ...pendingApprovals, ...rejectedApprovals].sort(
     (a, b) => new Date(b.requestedOn) - new Date(a.requestedOn)

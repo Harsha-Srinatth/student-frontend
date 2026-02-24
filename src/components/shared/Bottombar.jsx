@@ -24,6 +24,7 @@ const Bottombar = () => {
         ].filter(link => link && link.route) // Filter out undefined/null links
       : [
           { ...allLinks.find((l) => l.label === "Dashboard") },
+          { ...allLinks.find((l) => l.label === "Skill Exchange") },
           { ...allLinks.find((l) => l.label === "Upload Files") },
           { ...allLinks.find((l) => l.label === "Pending Tasks") },
           { ...allLinks.find((l) => l.label === "Achievements") },

@@ -9,6 +9,7 @@ import {
   BarChart3, Briefcase, ChevronRight, Trophy, CheckCircle2,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import WelcomeBanner from "../../components/shared/WelcomeBanner";
 
 const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#06B6D4", "#F97316"];
 
@@ -73,17 +74,20 @@ export default function HODDashboard() {
     name: d.department || "N/A",
     students: d.totalStudents,
     faculty: d.totalFaculty,
-    attendance: d.avgAttendance,
     score: d.performanceScore,
   }));
 
   return (
     <div className="w-full p-3 sm:p-5 lg:p-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">HOD Dashboard</h1>
-        <p className="text-gray-500 text-sm mt-1">Overview of your department management</p>
-      </div>
+      <WelcomeBanner
+        name={stats?.hodName || "HOD"}
+        loading={false}
+        greeting="Welcome"
+        description="Overview of your department management."
+        emoji="👔"
+        gradient="bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600"
+        announcementsRoute="/hod/announcements"
+      />
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
@@ -144,7 +148,6 @@ export default function HODDashboard() {
                   <th className="pb-2 font-medium">Department</th>
                   <th className="pb-2 font-medium text-center">Students</th>
                   <th className="pb-2 font-medium text-center">Faculty</th>
-                  <th className="pb-2 font-medium text-center">Attendance</th>
                   <th className="pb-2 font-medium text-center">Certs</th>
                   <th className="pb-2 font-medium text-center">Projects</th>
                   <th className="pb-2 font-medium text-center hidden sm:table-cell">Score</th>
@@ -159,11 +162,6 @@ export default function HODDashboard() {
                     </td>
                     <td className="py-2.5 text-center text-gray-700">{d.totalStudents}</td>
                     <td className="py-2.5 text-center text-gray-700">{d.totalFaculty}</td>
-                    <td className="py-2.5 text-center">
-                      <span className={`font-medium ${d.avgAttendance >= 75 ? "text-green-600" : d.avgAttendance >= 50 ? "text-yellow-600" : "text-red-600"}`}>
-                        {d.avgAttendance}%
-                      </span>
-                    </td>
                     <td className="py-2.5 text-center text-gray-700">{d.totalCertifications}</td>
                     <td className="py-2.5 text-center text-gray-700">{d.totalProjects}</td>
                     <td className="py-2.5 text-center hidden sm:table-cell">

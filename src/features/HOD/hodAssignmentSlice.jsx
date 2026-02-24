@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSelector } from 'reselect';
 import api from '../../services/api';
 
 /**
@@ -322,22 +323,27 @@ export const {
 
 /**
  * Selector: assignment stats derived from faculty and sections.
- * Use in HOD Assignment page and Dashboard to avoid computing twice.
+ * Memoized so the same object reference is returned when inputs haven't changed,
+ * avoiding unnecessary rerenders (e.g. in HodDashboard).
  */
-export const selectAssignmentStats = (state) => {
-  const faculty = state.hodAssignment?.faculty ?? [];
-  const sections = state.hodAssignment?.sections ?? [];
-  const totalFaculty = faculty.length;
-  const totalSections = sections.length;
-  const totalStudents = sections.reduce((sum, s) => sum + (s.studentCount || 0), 0);
-  const assignedFacultyCount = faculty.filter((f) => (f.sectionsAssigned || []).length > 0).length;
-  return {
-    totalFaculty,
-    totalSections,
-    totalStudents,
-    assignedFacultyCount,
-  };
-};
+const selectFaculty = (state) => state.hodAssignment?.faculty ?? [];
+const selectSections = (state) => state.hodAssignment?.sections ?? [];
+
+export const selectAssignmentStats = createSelector(
+  [selectFaculty, selectSections],
+  (faculty, sections) => {
+    const totalFaculty = faculty.length;
+    const totalSections = sections.length;
+    const totalStudents = sections.reduce((sum, s) => sum + (s.studentCount || 0), 0);
+    const assignedFacultyCount = faculty.filter((f) => (f.sectionsAssigned || []).length > 0).length;
+    return {
+      totalFaculty,
+      totalSections,
+      totalStudents,
+      assignedFacultyCount,
+    };
+  }
+);
 
 export default hodAssignmentSlice.reducer;
 

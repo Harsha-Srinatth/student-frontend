@@ -46,7 +46,7 @@ const Sidebar = () => {
   }));
 
   return (
-    <div className="h-full flex flex-col w-64 
+    <div className="h-full min-h-0 flex flex-col w-64 
       bg-gradient-to-b from-gray-900 via-indigo-950 to-black 
       text-gray-100 border-r border-gray-800 shadow-2xl">
       
@@ -86,8 +86,8 @@ const Sidebar = () => {
         </span>
       </div>
 
-      {/* 🔹 Navigation Links */}
-      <nav className="flex-1 px-3 mt-6">
+      {/* 🔹 Navigation Links - scrollable so logout stays visible at bottom */}
+      <nav className="flex-1 min-h-0 overflow-y-auto px-3 mt-6">
         <ul className="space-y-2">
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.route;
@@ -165,8 +165,8 @@ const Sidebar = () => {
         </ul>
       </nav>
 
-      {/* 🔹 Logout */}
-      <div className="px-4 py-6 border-t border-gray-800">
+      {/* 🔹 Logout - always visible at bottom */}
+      <div className="flex-shrink-0 px-4 py-6 border-t border-gray-800">
         <button
           onClick={handleLogout}
           className="flex items-center justify-center w-full gap-2 px-3 py-2 

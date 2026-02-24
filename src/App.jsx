@@ -42,6 +42,7 @@ import LeaveRequestDashboard from './components/student/LeaveRequestDash.jsx';
 import CreateClubAnnouncementStudent from './pages/student/student_dashboard/CreateClubAnnouncement.jsx';
 import AskDoubt from './pages/student/student_dashboard/AskDoubt.jsx';
 import DoubtDetail from './pages/student/student_dashboard/DoubtDetail.jsx';
+import SkillExchange from './pages/student/student_dashboard/SkillExchange.jsx';
 
 // Faculty Dashboard Components
 import FacultyHome from "./pages/faculty/facultyDashboard/FacultyHome.jsx";
@@ -57,6 +58,7 @@ import AddProfileF from './components/faculty/facultyDashboard/AddProfileF.jsx';
 import FacultyAttendance from './components/faculty/FacultyAttendance.jsx';
 import FacultyAddMidMarks from './components/faculty/FacultyAddMid.jsx';
 import FacultyDashboard from './components/faculty/LeaveReqDash.jsx';
+import FacultyCourseApprovals from './pages/faculty/facultyDashboard/FacultyCourseApprovals.jsx';
 
 // HOD Dashboard Components
 import HODDashboard from './pages/HOD/HodDashboard.jsx';
@@ -171,6 +173,7 @@ const App = () => {
         <Route path="student/pending/approvels" element={<RoleProtectedRoute allowedRoles={['student']}><StudentPendingApprovels /></RoleProtectedRoute>} />
         <Route path="student/ask/doubt" element={<RoleProtectedRoute allowedRoles={['student']}><AskDoubt /></RoleProtectedRoute>} />
         <Route path="student/ask/doubt/:doubtId" element={<RoleProtectedRoute allowedRoles={['student']}><DoubtDetail /></RoleProtectedRoute>} />
+        <Route path="student/skill-exchange" element={<RoleProtectedRoute allowedRoles={['student']}><SkillExchange /></RoleProtectedRoute>} />
         <Route path="student/settings" element={<RoleProtectedRoute allowedRoles={['student']}><StudentSettings /></RoleProtectedRoute>} />
         <Route path="student/profile/update" element={<RoleProtectedRoute allowedRoles={['student']}><UpdateStudentProfile /></RoleProtectedRoute>} />
         <Route path="/student/leaveRequests" element={<RoleProtectedRoute allowedRoles={['student']}><LeaveRequestDashboard /></RoleProtectedRoute>} />
@@ -182,6 +185,7 @@ const App = () => {
         <Route path="faculty/add/attendance" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyAttendance /></RoleProtectedRoute>} />
         <Route path="faculty/Approvels/docs/students" element={<RoleProtectedRoute allowedRoles={['faculty']}><ApprovedByYou /></RoleProtectedRoute>} />
         <Route path="faculty/verifications" element={<RoleProtectedRoute allowedRoles={['faculty']}><RecentVerifications fullHeight /></RoleProtectedRoute>} />
+        <Route path="faculty/course-approvals" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyCourseApprovals /></RoleProtectedRoute>} />
         <Route path="faculty/add/marks" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyAddMidMarks /></RoleProtectedRoute>} />
         <Route path="faculty/announcements" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyAnnouncements /></RoleProtectedRoute>} />
         <Route path="faculty/club-announcements/create" element={<RoleProtectedRoute allowedRoles={['faculty']}><CreateClubAnnouncement /></RoleProtectedRoute>} />

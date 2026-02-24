@@ -35,7 +35,8 @@
     "react-window": "^2.0.2",
     "recharts": "^3.2.1",
     "socket.io-client": "^4.8.3",
-    "unsplash-js": "^7.0.19"
+    "unsplash-js": "^7.0.19",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",

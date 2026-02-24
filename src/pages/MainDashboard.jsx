@@ -17,12 +17,12 @@ const MainDashboard = () => {
     <SocketProvider>
       <div className="flex h-screen w-full bg-white text-black">
         {/* Sidebar - fixed width like Instagram (64px on large screens) */}
-        <aside className="hidden lg:block lg:w-64 h-full bg-gray-100">
+        <aside className="hidden lg:block lg:w-64 h-full min-h-0 overflow-hidden bg-gray-100 flex-shrink-0">
           <Sidebar /> 
         </aside>
         
-        {/* Main Content Container */}
-        <div className="flex flex-1 flex-col min-h-screen">
+        {/* Main Content Container - min-h-0 so it fits in h-screen and doesn't push footer */}
+        <div className="flex flex-1 flex-col min-h-0">
           
           {/* Mobile Header - only visible on mobile/tablet */}
           <div className="lg:hidden bg-white">

@@ -6,8 +6,10 @@ import { getFacultyAssignedSections, getYearLabel } from '../../../utils/section
 
 export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
   const dispatch = useDispatch();
-  const { faculty, facultyLoading, facultyError, assigning } = useSelector((state) => state.hodAssignment);
-  const { sections } = useSelector((state) => state.hodAssignment);
+  const hodState = useSelector((state) => state.hodAssignment);
+  const faculty = Array.isArray(hodState?.faculty) ? hodState.faculty : [];
+  const sections = Array.isArray(hodState?.sections) ? hodState.sections : [];
+  const { facultyLoading, facultyError, assigning } = hodState || {};
   const [searchQuery, setSearchQuery] = useState('');
   const [showRemoveMenu, setShowRemoveMenu] = useState(null);
 
@@ -37,8 +39,9 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
     const assignedSections = facultyMember.sectionsAssigned || [];
     
     // Match with actual sections to get year info
+    const safeSections = Array.isArray(sections) ? sections : [];
     return assignedSections.map(assignment => {
-      const sectionData = sections.find(s => s.section === assignment.section);
+      const sectionData = safeSections.find(s => s.section === assignment.section);
       if (sectionData && sectionData.students && sectionData.students.length > 0) {
         const years = new Set();
         sectionData.students.forEach(student => {
@@ -55,11 +58,14 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
     });
   };
 
-  const filteredFaculty = faculty.filter(f =>
-    f.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    f.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (f.designation && f.designation.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const searchLower = (searchQuery || '').toLowerCase();
+  const filteredFaculty = faculty.filter(f => {
+    if (!f || typeof f !== 'object') return false;
+    const name = (f.name || f.fullname || '').toString().toLowerCase();
+    const email = (f.email || '').toString().toLowerCase();
+    const designation = (Array.isArray(f.designation) ? f.designation.join(' ') : (f.designation || '')).toString().toLowerCase();
+    return name.includes(searchLower) || email.includes(searchLower) || designation.includes(searchLower);
+  });
 
   if (facultyLoading) {
     return (
@@ -119,14 +125,16 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
             </p>
           </div>
         ) : (
-          filteredFaculty.map((member) => {
-            const isSelected = selectedFacultyId === (member.id || member.facultyid);
+          filteredFaculty.map((member, index) => {
+            if (!member || typeof member !== 'object') return null;
+            const memberId = member.id ?? member.facultyid ?? `faculty-${index}`;
+            const isSelected = selectedFacultyId === memberId;
             const assignedSections = getFacultySectionsWithYear(member);
             const hasAssignments = assignedSections.length > 0;
 
             return (
               <div
-                key={member.id || member.facultyid}
+                key={memberId}
                 onClick={() => onSelectFaculty(member)}
                 className={`px-6 py-4 hover:bg-blue-50 transition-all cursor-pointer ${
                   isSelected
@@ -165,7 +173,7 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
                           <span className="font-medium">{Array.isArray(member.designation) ? member.designation.join(', ') : member.designation}</span>
                         </div>
                       )}
-                      {member.subjects && member.subjects.length > 0 && (
+                      {Array.isArray(member.subjects) && member.subjects.length > 0 && (
                         <div className="mt-2">
                           <div className="flex items-center text-xs text-gray-500 mb-1">
                             <BookOpen className="h-3 w-3 mr-1" />
@@ -208,7 +216,7 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
                                 <span className="text-blue-500">• {assignment.assignmentType}</span>
                               )}
                               <button
-                                onClick={(e) => handleRemoveAssignment(member.facultyid || member.id, assignment.section, e)}
+                                onClick={(e) => handleRemoveAssignment(member.facultyid ?? member.id, assignment.section, e)}
                                 disabled={assigning}
                                 className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-800 disabled:opacity-50"
                                 title="Remove assignment"
