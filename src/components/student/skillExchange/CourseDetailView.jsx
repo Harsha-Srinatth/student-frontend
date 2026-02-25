@@ -165,29 +165,38 @@ export default function CourseDetailView({ course: initialCourse, currentStudent
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col h-[calc(100vh-6rem)] sm:h-[calc(100vh-5rem)]">
       {/* Top bar */}
-      <div className="flex-shrink-0 px-2 sm:px-4 py-3 border-b border-gray-200 bg-white">
-        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-2">
+      <div className="flex-shrink-0 px-3 sm:px-4 py-3 border-b border-gray-200 bg-white">
+        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 mb-2 transition-colors text-sm sm:text-base">
           <ArrowLeft size={18} />
           Back
         </button>
-        {!isCreator && (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 flex items-center gap-2">
+        {!isCreator && (course.creatorName || course.creatorContact) && (
+          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 sm:p-4 flex flex-wrap items-center gap-2">
             <Phone size={18} className="text-indigo-600 flex-shrink-0" />
-            <span className="text-sm text-indigo-900">Contact creator:</span>
-            <a href={`tel:${course.creatorContact}`} className="text-indigo-700 font-semibold hover:underline">
-              {course.creatorContact}
-            </a>
+            <div className="min-w-0 flex-1">
+              {course.creatorName && <span className="text-sm text-indigo-900 block truncate">{course.creatorName}</span>}
+              {course.creatorContact ? (
+                <a href={`tel:${course.creatorContact}`} className="text-indigo-700 font-semibold hover:underline text-sm sm:text-base break-all">
+                  {course.creatorContact}
+                </a>
+              ) : (
+                <span className="text-sm text-indigo-700">Contact not shared</span>
+              )}
+            </div>
           </div>
         )}
       </div>
 
       {/* Course header compact */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-100 px-2 sm:px-4 py-3">
-        <h1 className="text-lg font-bold text-gray-900 truncate">{course.title}</h1>
+      <div className="flex-shrink-0 bg-white border-b border-gray-100 px-3 sm:px-4 py-3">
+        <h1 className="text-base sm:text-lg font-bold text-gray-900 truncate">{course.title}</h1>
         <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{course.description}</p>
-        <div className="flex gap-2 mt-2">
-          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{course.category}</span>
-          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{course.durationDays} days</span>
+        <div className="flex flex-wrap gap-2 mt-2">
+          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-lg text-xs">{course.category}</span>
+          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-lg text-xs">{course.durationDays} days</span>
+          {course.isPaid && course.joinAmount > 0 && (
+            <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-lg text-xs font-medium">₹{course.joinAmount} to join</span>
+          )}
         </div>
       </div>
 

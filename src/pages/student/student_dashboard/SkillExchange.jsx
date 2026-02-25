@@ -29,42 +29,54 @@ const CourseCard = ({ course, onClick, isJoined, isDiscover, onJoin, joinLoading
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0 }}
     onClick={!isDiscover ? () => onClick(course) : undefined}
-    className={`bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all p-4 group ${!isDiscover ? "cursor-pointer" : ""}`}
+    className={`bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 p-4 sm:p-5 group ${!isDiscover ? "cursor-pointer" : ""}`}
   >
-    <div className="flex gap-4">
-      <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+    <div className="flex gap-3 sm:gap-4">
+      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 ring-1 ring-gray-100">
         {course.coverImage?.url ? (
           <img src={course.coverImage.url} alt="" className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <BookOpen className="w-8 h-8 text-gray-400" />
+            <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <h3 className={`font-semibold text-gray-900 truncate ${!isDiscover ? "group-hover:text-blue-600" : ""}`}>{course.title}</h3>
+          <h3 className={`font-semibold text-gray-900 truncate text-sm sm:text-base ${!isDiscover ? "group-hover:text-indigo-600" : ""}`}>{course.title}</h3>
           {!isDiscover && (
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${STATUS_BADGES[course.status]?.class || "bg-gray-100 text-gray-700"}`}>
               {STATUS_BADGES[course.status]?.label || course.status}
             </span>
           )}
           {isDiscover && (
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 bg-green-100 text-green-800">Open for 5 days</span>
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 bg-emerald-100 text-emerald-800">Open for 5 days</span>
           )}
         </div>
+        {(course.creatorName || course.creatorContact) && (
+          <p className="text-xs text-gray-500 mt-0.5 truncate">
+            {course.creatorName}
+            {course.creatorContact ? ` · ${course.creatorContact}` : ""}
+          </p>
+        )}
         <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{course.description}</p>
-        <div className="flex items-center gap-3 mt-2 text-xs text-gray-500 flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-3 mt-2 text-xs text-gray-500 flex-wrap">
           <span>{course.category}</span>
-          <span>•</span>
+          <span>·</span>
           <span>{course.durationDays} days</span>
-          {isJoined && <span className="text-green-600 font-medium">Joined</span>}
+          {course.isPaid && course.joinAmount > 0 && (
+            <>
+              <span>·</span>
+              <span className="font-medium text-amber-700">₹{course.joinAmount} to join</span>
+            </>
+          )}
+          {isJoined && <span className="text-emerald-600 font-medium">Joined</span>}
           {isDiscover && (
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onJoin?.(course); }}
               disabled={joinLoading === course.courseId}
-              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 disabled:opacity-50"
+              className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
             >
               {joinLoading === course.courseId ? <Loader2 size={14} className="animate-spin" /> : <LogIn size={14} />}
               Join
@@ -72,7 +84,7 @@ const CourseCard = ({ course, onClick, isJoined, isDiscover, onJoin, joinLoading
           )}
         </div>
       </div>
-      {!isDiscover && <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 flex-shrink-0" />}
+      {!isDiscover && <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 flex-shrink-0 hidden sm:block" />}
     </div>
   </motion.div>
 );
@@ -211,44 +223,48 @@ const SkillExchange = () => {
       : "Join a course from Browse Courses or using the Join Course button";
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 py-4">
+    <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 min-h-[60vh]">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <BookOpen size={26} className="text-indigo-600" />
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <span className="p-2 rounded-xl bg-indigo-100 text-indigo-600">
+              <BookOpen size={24} className="sm:w-7 sm:h-7" />
+            </span>
             Skill Exchange
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">Create & join peer-led courses</p>
+          <p className="text-sm text-gray-500 mt-1">Create & join peer-led courses</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => setShowJoinModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 px-3 py-2.5 sm:px-4 bg-white border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors text-sm sm:text-base shadow-sm"
           >
-            <LogIn size={18} />
-            Join Course
+            <LogIn size={18} className="flex-shrink-0" />
+            <span>Join</span>
+            <span className="hidden sm:inline"> Course</span>
           </button>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-2 px-3 py-2.5 sm:px-4 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors text-sm sm:text-base shadow-md shadow-indigo-200"
           >
-            <Plus size={18} />
-            Create Course
+            <Plus size={18} className="flex-shrink-0" />
+            <span>Create</span>
+            <span className="hidden sm:inline"> Course</span>
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-gray-200">
+      <div className="flex gap-1 sm:gap-2 mb-6 border-b border-gray-200 overflow-x-auto pb-px -mx-1 px-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 font-medium text-sm rounded-t-lg transition-colors ${
+            className={`px-3 sm:px-4 py-2.5 font-medium text-sm rounded-t-xl transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === tab.id
                 ? "bg-indigo-50 text-indigo-700 border-b-2 border-indigo-600 -mb-px"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
             }`}
           >
             {tab.label}
@@ -276,17 +292,17 @@ const SkillExchange = () => {
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <AnimatePresence mode="wait">
             {!tabData?.length ? (
               <motion.div
                 key="empty"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-gray-50 rounded-xl border border-gray-200 p-12 text-center"
+                className="bg-gradient-to-b from-gray-50 to-white rounded-2xl border border-gray-200 p-8 sm:p-12 text-center"
               >
-                <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-600 font-medium">{tabEmptyMessage}</p>
+                <BookOpen className="w-14 h-14 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600 font-medium text-sm sm:text-base">{tabEmptyMessage}</p>
                 <p className="text-sm text-gray-500 mt-1">{tabEmptyHint}</p>
               </motion.div>
             ) : (
