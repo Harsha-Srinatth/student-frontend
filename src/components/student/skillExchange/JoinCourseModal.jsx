@@ -4,19 +4,22 @@ import api from "../../../services/api";
 import toast from "react-hot-toast";
 
 export default function JoinCourseModal({ onClose, onSuccess }) {
-  const [courseId, setCourseId] = useState("");
+  const [courseIdOrGroupId, setCourseIdOrGroupId] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!courseId.trim()) {
-      toast.error("Enter a Course ID");
+    const value = courseIdOrGroupId.trim();
+    if (!value) {
+      toast.error("Enter a Course ID or Group ID");
       return;
     }
 
     setSubmitting(true);
     try {
-      await api.post("/student/courses/join", { courseId: courseId.trim() });
+      const isLikelyGroupId = value.length > 12 || value.includes("-");
+      const payload = isLikelyGroupId ? { groupId: value } : { courseId: value.toUpperCase() };
+      await api.post("/student/courses/join", payload);
       onSuccess();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to join course");
@@ -36,15 +39,14 @@ export default function JoinCourseModal({ onClose, onSuccess }) {
         </div>
         <form onSubmit={handleSubmit} className="p-6">
           <p className="text-sm text-gray-600 mb-4">
-            Enter the Course ID shared by the creator to join the course.
+            Enter the <strong>Course ID</strong> (e.g. A1B2C3D4) or <strong>Group ID</strong> (the long code shared by the creator) to join. The course must be approved by faculty before others can join.
           </p>
           <input
             type="text"
-            value={courseId}
-            onChange={(e) => setCourseId(e.target.value.toUpperCase())}
-            placeholder="e.g. A1B2C3D4"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono uppercase"
-            maxLength={12}
+            value={courseIdOrGroupId}
+            onChange={(e) => setCourseIdOrGroupId(e.target.value)}
+            placeholder="Course ID or Group ID"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono"
           />
           <div className="flex gap-3 mt-6">
             <button

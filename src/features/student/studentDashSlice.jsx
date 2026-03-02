@@ -26,6 +26,7 @@ export const fetchSDashboardData = createAsyncThunk(
         pendingApprovals: state.studentDashboard.pendingApprovals || [],
         rejectedApprovals: state.studentDashboard.rejectedApprovals || [],
         approvedApprovals: state.studentDashboard.approvedApprovals || [],
+        topTenStudents: state.studentDashboard.topTenStudents || [],
       };
     }
     
@@ -141,6 +142,13 @@ const dashboardSlice = createSlice({
     },
     loading: false,
     error: null,
+    topTenStudents: [],
+    teachingPoints: 0,
+    projectsPoints: 0,
+    problemSolvingRank: 0,
+    extraCurricularPoints: 0,
+    coCurricularPoints: 0,
+    weightedPoints: 0,
     // Timestamps for stale checking (Redux is the cache, timestamps help determine freshness)
     lastFetched: null,
     achievementsLastFetched: null,
@@ -239,6 +247,13 @@ const dashboardSlice = createSlice({
         hackathons: [],
         projects: [],
       };
+      state.topTenStudents = [];
+      state.teachingPoints = 0;
+      state.projectsPoints = 0;
+      state.problemSolvingRank = 0;
+      state.extraCurricularPoints = 0;
+      state.coCurricularPoints = 0;
+      state.weightedPoints = 0;
       state.lastFetched = null;
       state.achievementsLastFetched = null;
       state.approvalsLastFetched = null;
@@ -281,6 +296,13 @@ const dashboardSlice = createSlice({
         
         // Update timestamp (Redux is the cache)
         state.lastFetched = Date.now();
+        state.topTenStudents = action.payload.topTenStudents || [];
+        state.teachingPoints = action.payload.teachingPoints || 0;
+        state.projectsPoints = action.payload.projectsPoints || 0;
+        state.problemSolvingRank = action.payload.problemSolvingRank || 0;
+        state.extraCurricularPoints = action.payload.extraCurricularPoints || 0;
+        state.coCurricularPoints = action.payload.coCurricularPoints || 0;
+        state.weightedPoints = action.payload.weightedPoints || 0;
         } else {
           // From cache - don't touch loading state to avoid unnecessary toggles
           if (import.meta.env.DEV) {

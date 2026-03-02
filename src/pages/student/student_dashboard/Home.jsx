@@ -4,12 +4,12 @@ import PageContainer from "../../../components/shared/PageContainer";
 import QuickStats from "./QuickStats";
 import AttendencePer from "./AttendencePer";
 import Credits from "./Credits";
+import TopTenStudents from "../../../components/shared/weeklyPerformance/topTenSudents.jsx";
 import RecentActivities from "./RecentActivities";
 import Announcements from "./Announcements";
 import RejectedApprovals from "./RejectedApprovels";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { fetchSDashboardData } from "../../../features/student/studentDashSlice";
 
 const StudentHome = () => {
@@ -21,7 +21,7 @@ const StudentHome = () => {
   useEffect(() => {
     dispatch(fetchSDashboardData());
   }, [dispatch]);
- 
+
   return (
     <PageContainer>
       <WelcomeBanner
@@ -34,7 +34,12 @@ const StudentHome = () => {
         announcementsRoute="/student/announcements"
       />
 
-            {/* Top Row - Quick Stats and Attendance */}
+      {/* Leaderboard: top 10 by points — shown at top below header */}
+      <div className="mb-6">
+        <TopTenStudents />
+      </div>
+
+      {/* Top Row - Quick Stats and Attendance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
         <div className="h-full">
           <AttendencePer />

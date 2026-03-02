@@ -52,20 +52,19 @@ export const fetchFacultyDashboardData = createAsyncThunk(
 );
 
 // Async thunk for fetching pending approvals list
-// Redux is the cache - only fetch if data doesn't exist
+// API returns array of students with pendingApprovals (each item has type, description, achievementId).
+// Redux is the cache - only fetch if data doesn't exist.
 export const fetchPendingApprovals = createAsyncThunk(
   'facultyDashboard/fetchPendingApprovals',
   async (_, { rejectWithValue, getState }) => {
     try {
       const state = getState();
       const { pendingApprovals, pendingLoading } = state.facultyDashboard;
-      
-      // If data already exists in Redux (our cache) and we're not loading, skip fetch
-      // Only skip if we have actual data (array, even if empty) and we're not currently loading
+
       if (!pendingLoading && Array.isArray(pendingApprovals)) {
         return { fromCache: true, data: pendingApprovals };
       }
-      
+
       const response = await api.get('/faculty/pending-approvals');
       return response.data || [];
     } catch (error) {

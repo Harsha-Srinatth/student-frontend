@@ -34,6 +34,7 @@ const DOCUMENT_TYPES = [
 export default function UploadDocument() {
   const [formData, setFormData] = useState({
     type: "certificate",
+    achievementType: "co-curricular", // co-curricular | extra-curricular | academic (for points)
     title: "",
     issuer: "",
     organizer: "",
@@ -112,7 +113,8 @@ export default function UploadDocument() {
 
   const resetForm = () => {
     setFormData({
-      type: formData.type, // Keep the same type
+      type: formData.type,
+      achievementType: formData.achievementType,
       title: "",
       issuer: "",
       organizer: "",
@@ -183,7 +185,6 @@ export default function UploadDocument() {
     setFormData({
       ...formData,
       type,
-      // Reset all fields except type
       title: "",
       issuer: "",
       organizer: "",
@@ -272,29 +273,46 @@ export default function UploadDocument() {
                 Document Type *
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {DOCUMENT_TYPES.map((type) => {
-                  const Icon = type.icon;
-                  const isSelected = formData.type === type.value;
-                  
+                {DOCUMENT_TYPES.map((docType) => {
+                  const Icon = docType.icon;
+                  const isSelected = formData.type === docType.value;
                   return (
                     <button
-                      key={type.value}
+                      key={docType.value}
                       type="button"
-                      onClick={() => handleTypeChange(type.value)}
+                      onClick={() => handleTypeChange(docType.value)}
                       className={`p-4 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${
                         isSelected
-                          ? 'border-transparent bg-gradient-to-br ' + type.gradient + ' text-white shadow-lg'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:shadow-md'
+                          ? "border-transparent bg-gradient-to-br " + docType.gradient + " text-white shadow-lg"
+                          : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:shadow-md"
                       }`}
                     >
                       <div className="flex flex-col items-center space-y-2">
                         <Icon className="w-6 h-6" />
-                        <span className="text-sm font-medium">{type.label}</span>
+                        <span className="text-sm font-medium">{docType.label}</span>
                       </div>
                     </button>
                   );
                 })}
               </div>
+            </div>
+
+            {/* Category type (for faculty points: co-curricular / extra-curricular / academic) */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Category (for points) *
+              </label>
+              <select
+                name="achievementType"
+                value={formData.achievementType}
+                onChange={handleChange}
+                className="w-full max-w-xs px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+              >
+                <option value="co-curricular">Co-curricular</option>
+                <option value="extra-curricular">Extra-curricular</option>
+                <option value="academic">Academic</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">Faculty will award points based on this category.</p>
             </div>
 
             {/* Dynamic Form Fields */}

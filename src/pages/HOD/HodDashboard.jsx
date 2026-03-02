@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import WelcomeBanner from "../../components/shared/WelcomeBanner";
+import FetchTopTenStudents from "../../components/shared/weeklyPerformance/FetchTopTenStudents.jsx";
 
 const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#06B6D4", "#F97316"];
 
@@ -88,6 +89,11 @@ export default function HODDashboard() {
         gradient="bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600"
         announcementsRoute="/hod/announcements"
       />
+
+      {/* Leaderboard: top 10 students — shown at top below header */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-4">
+        <FetchTopTenStudents leaderboardPath="/hod/students/leaderboard" profilePath="/hod/students/view-all" />
+      </motion.div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">

@@ -63,6 +63,18 @@ export const deleteDoubt = createAsyncThunk(
   }
 );
 
+export const deleteReply = createAsyncThunk(
+  "doubts/deleteReply",
+  async ({ doubtId, replyId }, { rejectWithValue }) => {
+    try {
+      await api.delete(`/student/doubts/${doubtId}/replies/${replyId}`);
+      return { doubtId, replyId };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to delete reply");
+    }
+  }
+);
+
 export const toggleSolved = createAsyncThunk(
   "doubts/toggleSolved",
   async ({ doubtId }, { rejectWithValue }) => {
@@ -103,6 +115,7 @@ const doubtsSlice = createSlice({
     collegeDoubts: [],
     selectedDoubt: null,
     repliesByDoubt: {},
+    viewerStudentId: null,
 
     // Pagination
     myDoubtsPage: 1,
@@ -166,8 +179,26 @@ const doubtsSlice = createSlice({
       }
     },
 
+    // Socket-driven: reply deleted
+    removeReplyFromSocket: (state, action) => {
+      const { doubtId, replyId } = action.payload;
+      if (!state.repliesByDoubt[doubtId]) return;
+      state.repliesByDoubt[doubtId] = state.repliesByDoubt[doubtId].filter((r) => r._id !== replyId);
+      const list = state.repliesByDoubt[doubtId];
+      const newCount = list?.length ?? 0;
+      const updateCount = (d) => {
+        if (d._id === doubtId) d.replyCount = Math.max(0, (d.replyCount || 0) - 1);
+      };
+      state.myDoubts.forEach(updateCount);
+      state.collegeDoubts.forEach(updateCount);
+      if (state.selectedDoubt?._id === doubtId) {
+        state.selectedDoubt.replyCount = Math.max(0, (state.selectedDoubt.replyCount || 0) - 1);
+      }
+    },
+
     clearSelectedDoubt: (state) => {
       state.selectedDoubt = null;
+      state.viewerStudentId = null;
     },
 
     clearDoubtsData: () => doubtsSlice.getInitialState(),
@@ -209,8 +240,9 @@ const doubtsSlice = createSlice({
         state.detailError = null;
       })
       .addCase(fetchDoubtDetail.fulfilled, (state, action) => {
-        const { doubt, replies, pagination, page } = action.payload;
+        const { doubt, replies, pagination, page, currentStudentId } = action.payload;
         state.selectedDoubt = doubt;
+        if (currentStudentId != null) state.viewerStudentId = currentStudentId;
         if (page === 1) {
           state.repliesByDoubt[doubt._id] = replies;
         } else {
@@ -266,6 +298,21 @@ const doubtsSlice = createSlice({
         if (state.selectedDoubt?._id === doubtId) state.selectedDoubt = null;
       })
 
+      // deleteReply
+      .addCase(deleteReply.fulfilled, (state, action) => {
+        const { doubtId, replyId } = action.payload;
+        if (!state.repliesByDoubt[doubtId]) return;
+        state.repliesByDoubt[doubtId] = state.repliesByDoubt[doubtId].filter((r) => r._id !== replyId);
+        const updateCount = (d) => {
+          if (d._id === doubtId) d.replyCount = Math.max(0, (d.replyCount || 0) - 1);
+        };
+        state.myDoubts.forEach(updateCount);
+        state.collegeDoubts.forEach(updateCount);
+        if (state.selectedDoubt?._id === doubtId) {
+          state.selectedDoubt.replyCount = Math.max(0, (state.selectedDoubt.replyCount || 0) - 1);
+        }
+      })
+
       // toggleSolved
       .addCase(toggleSolved.fulfilled, (state, action) => {
         const { doubt } = action.payload;
@@ -282,6 +329,7 @@ export const {
   addDoubtFromSocket,
   addReplyFromSocket,
   removeDoubtFromSocket,
+  removeReplyFromSocket,
   updateDoubtFromSocket,
   clearSelectedDoubt,
   clearDoubtsData,

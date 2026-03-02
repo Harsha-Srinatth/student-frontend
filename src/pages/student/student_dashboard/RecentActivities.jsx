@@ -1,11 +1,12 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchSDashboardData } from "../../../features/student/studentDashSlice";
 import { CheckCircle, XCircle, Clock, User, MessageCircle, ArrowRight } from "lucide-react";
 
 const RecentActivities = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const studentDashboard = useSelector((state) => state.studentDashboard);
   const pendingApprovals = studentDashboard.pendingApprovals || [];

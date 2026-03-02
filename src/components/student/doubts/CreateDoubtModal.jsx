@@ -2,32 +2,10 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { X, Send, Tag, Type, AlignLeft } from "lucide-react";
 import { createDoubt } from "../../../features/student/doubtsSlice";
+import { TAGS, getTagClass, DOUBT_COLORS, DOUBT_ANIMATION } from "./doubtTheme";
 
-const TAGS = [
-  "general",
-  "academics",
-  "placements",
-  "exams",
-  "events",
-  "hostel",
-  "library",
-  "sports",
-  "technical",
-  "other",
-];
-
-const TAG_COLORS = {
-  general: "bg-gray-100 text-gray-700 border-gray-300",
-  academics: "bg-blue-100 text-blue-700 border-blue-300",
-  placements: "bg-purple-100 text-purple-700 border-purple-300",
-  exams: "bg-red-100 text-red-700 border-red-300",
-  events: "bg-yellow-100 text-yellow-700 border-yellow-300",
-  hostel: "bg-orange-100 text-orange-700 border-orange-300",
-  library: "bg-teal-100 text-teal-700 border-teal-300",
-  sports: "bg-green-100 text-green-700 border-green-300",
-  technical: "bg-indigo-100 text-indigo-700 border-indigo-300",
-  other: "bg-slate-100 text-slate-700 border-slate-300",
-};
+const TITLE_MAX = 200;
+const DESC_MAX = 5000;
 
 const CreateDoubtModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -41,7 +19,7 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     if (!title.trim() || !description.trim()) return;
 
-    const result = await dispatch(createDoubt({ title, description, tag }));
+    const result = await dispatch(createDoubt({ title: title.trim(), description: description.trim(), tag }));
     if (!result.error) {
       setTitle("");
       setDescription("");
@@ -53,56 +31,65 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#3D3A36]/40 backdrop-blur-sm transition-opacity duration-200"
         onClick={onClose}
-        style={{ animation: "fadeIn 0.2s ease-out" }}
+        onKeyDown={(e) => e.key === "Escape" && onClose()}
+        role="button"
+        tabIndex={0}
+        aria-label="Close modal"
       />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden"
-        style={{ animation: "fadeInUp 0.3s ease-out" }}
+        className={`relative w-full sm:max-w-lg max-h-[90vh] sm:max-h-[85vh] flex flex-col ${DOUBT_COLORS.cardBg} rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden transition-transform duration-300 ease-out`}
+        role="dialog"
+        aria-labelledby="create-doubt-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <h2 className="text-lg font-bold text-gray-900">Ask a Doubt</h2>
+        <div className={`flex items-center justify-between px-4 sm:px-6 py-4 border-b ${DOUBT_COLORS.border} ${DOUBT_COLORS.primarySubtle}`}>
+          <h2 id="create-doubt-title" className={`text-lg font-bold ${DOUBT_COLORS.textPrimary}`}>
+            Ask a Doubt
+          </h2>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 hover:bg-gray-200 rounded-full"
+            className={`p-2 rounded-xl ${DOUBT_COLORS.textMuted} hover:bg-[#E0DAD2] transition-colors ${DOUBT_ANIMATION.buttonPress}`}
+            aria-label="Close"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={20} />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1">
           {/* Title */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1.5">
-              <Type size={15} />
+            <label htmlFor="doubt-title" className={`flex items-center gap-2 text-sm font-semibold ${DOUBT_COLORS.textPrimary} mb-1.5`}>
+              <Type size={15} strokeWidth={2} />
               Title
             </label>
             <input
+              id="doubt-title"
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value.slice(0, TITLE_MAX))}
               placeholder="What's your doubt about?"
-              maxLength={200}
+              maxLength={TITLE_MAX}
               required
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                         placeholder:text-gray-400"
+              className={`w-full px-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm ${DOUBT_COLORS.inputBg} placeholder:text-[#8C8782] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/30 focus:border-[#8B7355] transition-all duration-200`}
             />
-            <p className="text-xs text-gray-400 mt-1 text-right">{title.length}/200</p>
+            <p className={`text-xs ${DOUBT_COLORS.textMuted} mt-1 text-right`}>
+              {title.length}/{TITLE_MAX}
+            </p>
           </div>
 
           {/* Tag */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-              <Tag size={15} />
+            <label className={`flex items-center gap-2 text-sm font-semibold ${DOUBT_COLORS.textPrimary} mb-2`}>
+              <Tag size={15} strokeWidth={2} />
               Tag
             </label>
             <div className="flex flex-wrap gap-2">
@@ -111,12 +98,11 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
                   key={t}
                   type="button"
                   onClick={() => setTag(t)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border capitalize
-                    ${
-                      tag === t
-                        ? TAG_COLORS[t] + " ring-2 ring-offset-1 ring-blue-400"
-                        : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
-                    }`}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border capitalize transition-all duration-200 ${
+                    tag === t
+                      ? `${getTagClass(t)} ring-2 ring-offset-1 ring-[#8B7355]/50 border-[#8B7355]/40`
+                      : "bg-[#F8F6F2] text-[#6B6560] border-[#E8E4DE] hover:bg-[#EDE8E2]"
+                  }`}
                 >
                   {t}
                 </button>
@@ -126,39 +112,36 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
 
           {/* Description */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1.5">
-              <AlignLeft size={15} />
+            <label htmlFor="doubt-desc" className={`flex items-center gap-2 text-sm font-semibold ${DOUBT_COLORS.textPrimary} mb-1.5`}>
+              <AlignLeft size={15} strokeWidth={2} />
               Description
             </label>
             <textarea
+              id="doubt-desc"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your doubt in detail..."
-              maxLength={5000}
+              onChange={(e) => setDescription(e.target.value.slice(0, DESC_MAX))}
+              placeholder="Describe your doubt in detail so others can help..."
+              maxLength={DESC_MAX}
               required
               rows={5}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm resize-none
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                         placeholder:text-gray-400"
+              className={`w-full px-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm resize-none ${DOUBT_COLORS.inputBg} placeholder:text-[#8C8782] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/30 focus:border-[#8B7355] transition-all duration-200`}
             />
-            <p className="text-xs text-gray-400 mt-1 text-right">{description.length}/5000</p>
+            <p className={`text-xs ${DOUBT_COLORS.textMuted} mt-1 text-right`}>
+              {description.length}/{DESC_MAX}
+            </p>
           </div>
 
           {/* Submit */}
           <button
             type="submit"
             disabled={createLoading || !title.trim() || !description.trim()}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600
-                       text-white font-semibold py-3 rounded-xl
-                       hover:from-blue-700 hover:to-indigo-700
-                       disabled:opacity-50 disabled:cursor-not-allowed
-                       active:scale-[0.98]"
+            className={`w-full flex items-center justify-center gap-2 ${DOUBT_COLORS.primary} ${DOUBT_COLORS.textOnBrown} font-semibold py-3 rounded-xl ${DOUBT_COLORS.primaryHover} disabled:opacity-50 disabled:cursor-not-allowed ${DOUBT_ANIMATION.buttonPress}`}
           >
             {createLoading ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
               <>
-                <Send size={16} />
+                <Send size={16} strokeWidth={2.2} />
                 Post Doubt
               </>
             )}
@@ -170,4 +153,3 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
 };
 
 export default CreateDoubtModal;
-

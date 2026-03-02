@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { X, Upload, Loader2, Award, IndianRupee } from "lucide-react";
 import { z } from "zod";
 import api from "../../../services/api";
@@ -30,6 +30,7 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
   const [teachingPoints, setTeachingPoints] = useState(null);
   const [canSetPaidCourse, setCanSetPaidCourse] = useState(false);
   const [pointsLoading, setPointsLoading] = useState(true);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -100,10 +101,10 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
       if (isPaid && joinAmount > 0) fd.append("joinAmount", String(joinAmount));
       if (coverFile) fd.append("coverImage", coverFile);
 
-      await api.post("/student/courses", fd, {
+      const { data } = await api.post("/student/courses", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      onSuccess();
+      onSuccess(data?.data);
     } catch (err) {
       const msg = err.response?.data?.message || "Failed to create course";
       toast.error(msg);
@@ -114,10 +115,10 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[95vh] overflow-y-auto shadow-xl my-4">
-        <div className="sticky top-0 bg-white flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 z-10">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Create Course</h2>
-          <button type="button" onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Close">
+      <div className="bg-white rounded-2xl w-full max-w-lg md:max-w-xl lg:max-w-2xl lg:min-h-[90vh] lg:h-[90vh] max-h-[95vh] overflow-y-auto shadow-xl my-4 border border-teal-200/60 flex flex-col">
+        <div className="sticky top-0 bg-teal-50/80 flex items-center justify-between p-4 sm:p-6 border-b border-teal-200/60 z-10">
+          <h2 className="text-lg sm:text-xl font-bold text-teal-900">Create Course</h2>
+          <button type="button" onClick={onClose} className="p-2 hover:bg-teal-100 rounded-xl text-teal-700 transition-colors" aria-label="Close">
             <X size={20} />
           </button>
         </div>
@@ -125,13 +126,13 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
         {/* Teaching points eligibility */}
         <div className="px-4 sm:px-6 pt-4">
           {pointsLoading ? (
-            <div className="flex items-center gap-2 text-gray-500 text-sm">
+            <div className="flex items-center gap-2 text-teal-600 text-sm">
               <Loader2 size={16} className="animate-spin" />
               Checking eligibility...
             </div>
           ) : (
-            <div className={`flex items-center gap-2 text-sm rounded-xl px-4 py-3 ${canSetPaidCourse ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-slate-50 text-slate-700 border border-slate-200"}`}>
-              <Award size={18} className="flex-shrink-0" />
+            <div className={`flex items-center gap-2 text-sm rounded-xl px-4 py-3 ${canSetPaidCourse ? "bg-green-200/60 text-green-900 border border-green-300/80" : "bg-teal-50 text-teal-800 border border-teal-200"}`}>
+              <Award size={18} className="flex-shrink-0 text-teal-600" />
               <span>
                 {canSetPaidCourse
                   ? `You have ${teachingPoints} teaching points. You can create free or paid courses.`
@@ -141,7 +142,7 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Course Title *</label>
             <input
@@ -149,7 +150,7 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
               value={form.title}
               onChange={handleChange}
               placeholder="e.g. Python Basics"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+              className="w-full px-4 py-2.5 border border-teal-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 bg-gray-50/50 placeholder:text-gray-500 transition-shadow"
             />
             {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
           </div>
@@ -161,7 +162,7 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
               onChange={handleChange}
               rows={4}
               placeholder="What will students learn?"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y min-h-[80px]"
+              className="w-full px-4 py-2.5 border border-teal-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 bg-gray-50/50 resize-y min-h-[80px] placeholder:text-gray-500"
             />
             {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
           </div>
@@ -172,7 +173,7 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
                 name="category"
                 value={form.category}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 border border-teal-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 bg-gray-50/50 text-gray-900"
               >
                 <option value="">Select category</option>
                 {CATEGORIES.map((c) => (
@@ -189,16 +190,16 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
                 min={1}
                 value={form.durationDays}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2.5 border border-teal-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 bg-gray-50/50"
               />
               {errors.durationDays && <p className="text-red-500 text-sm mt-1">{errors.durationDays}</p>}
             </div>
           </div>
 
           {/* Paid course & join amount — only when 250+ points */}
-          <div className="rounded-xl border border-gray-200 bg-gray-50/80 p-4 space-y-4">
+          <div className="rounded-xl border border-teal-200 bg-pink-50/50 p-4 space-y-4">
             {!canSetPaidCourse && (
-              <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              <p className="text-xs text-amber-800 bg-amber-100/80 border border-amber-200 rounded-xl px-3 py-2">
                 Earn 250 teaching points (e.g. 50 per completed course) to set a join amount for your courses.
               </p>
             )}
@@ -209,7 +210,7 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
                 checked={canSetPaidCourse && form.isPaid}
                 onChange={handleChange}
                 disabled={!canSetPaidCourse}
-                className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50"
+                className="w-4 h-4 rounded border-teal-300 text-teal-600 focus:ring-teal-400 disabled:opacity-50"
               />
               <span className="text-sm font-medium text-gray-700">Paid course (students pay to join)</span>
             </label>
@@ -217,7 +218,7 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Amount to join (₹) *</label>
                 <div className="relative">
-                  <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-600" />
                   <input
                     name="joinAmount"
                     type="number"
@@ -226,7 +227,7 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
                     value={form.joinAmount}
                     onChange={handleChange}
                     placeholder="e.g. 99"
-                    className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full pl-9 pr-4 py-2.5 border border-teal-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 bg-gray-50/50 placeholder:text-gray-500"
                   />
                 </div>
                 {errors.joinAmount && <p className="text-red-500 text-sm mt-1">{errors.joinAmount}</p>}
@@ -236,34 +237,37 @@ export default function CreateCourseModal({ onClose, onSuccess }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50 flex-shrink-0">
-                {preview ? (
-                  <img src={preview} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
-                )}
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="text-sm max-w-full"
-              />
-            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl border-2 border-dashed border-teal-200 flex items-center justify-center overflow-hidden bg-teal-50/50 hover:bg-teal-100/50 hover:border-teal-300 transition-colors cursor-pointer"
+            >
+              {preview ? (
+                <img src={preview} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-teal-400" />
+              )}
+            </button>
           </div>
           <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2.5 border border-teal-200 rounded-xl font-medium text-teal-800 hover:bg-teal-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting || !canCreate}
-              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              className="flex-1 px-4 py-2.5 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
               title={!canCreate ? "Loading eligibility..." : undefined}
             >
               {submitting ? <Loader2 size={18} className="animate-spin" /> : "Create Course"}

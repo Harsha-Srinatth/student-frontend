@@ -50,6 +50,7 @@ export const store = configureStore({
           'doubts/addDoubtFromSocket',
           'doubts/addReplyFromSocket',
           'doubts/removeDoubtFromSocket',
+          'doubts/removeReplyFromSocket',
           'doubts/updateDoubtFromSocket',
         ],
         ignoredActionPaths: [

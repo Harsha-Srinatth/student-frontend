@@ -28,6 +28,7 @@ export const FacultySidebarLinks = [
   { icon: <ClipboardList size={20} />, label: 'Attendance', route: '/faculty/add/attendance' },
   { icon: <BookOpenCheck size={20} />, label: 'Marks Entry', route: '/faculty/add/marks' },
   { icon: <BookOpen size={20} />, label: 'Course Approvals', route: '/faculty/course-approvals' },
+  { icon: <GraduationCap size={20} />, label: 'Course Completions', route: '/faculty/course-completions' },
   { icon: <Settings size={20} />, label: 'Settings', route: '/faculty/settings' },
 ];
 

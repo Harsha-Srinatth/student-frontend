@@ -1,32 +1,51 @@
 import React, { useState } from "react";
 import api from "../../../services/api";
 
+const TYPE_TO_ARRAY = {
+  certificate: "certifications",
+  workshop: "workshops",
+  club: "clubsJoined",
+  internship: "internships",
+  project: "projects",
+  other: "others",
+};
+
 const StudentDetailView = ({ student, onBack }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
+  // Points per approval card (keyed by achievementId); required when approving (0–50)
+  const [pointsByAchievementId, setPointsByAchievementId] = useState({});
 
-  const handleApproval = async (type, description, action) => {
+  const handleApproval = async (type, achievementId, action, points) => {
     try {
       setLoading(true);
-      await api.post(`/faculty/approve/${student.studentid}`, {
-        action: action,
-        message: message,
-        type: type,
-        description: description
-      });
-      // Show success message
+      const payload = {
+        action,
+        message: message || undefined,
+        type,
+        achievementId,
+      };
+      if (action === "approve") {
+        const pts = points != null && !Number.isNaN(Number(points)) ? Math.min(50, Math.max(0, Number(points))) : 0;
+        payload.points = pts;
+      }
+      await api.post(`/faculty/approve/${student.studentid}`, payload);
       setShowMessage(true);
       setTimeout(() => {
         setShowMessage(false);
-        onBack(); // Go back to list
+        onBack();
       }, 2000);
     } catch (error) {
-      console.error('Error updating approval:', error);
-      alert('Failed to update approval. Please try again.');
+      console.error("Error updating approval:", error);
+      alert(error.response?.data?.message || "Failed to update approval. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const setPointsFor = (achievementId, value) => {
+    setPointsByAchievementId((prev) => ({ ...prev, [achievementId]: value }));
   };
 
   const getTypeIcon = (type) => {
@@ -52,25 +71,11 @@ const StudentDetailView = ({ student, onBack }) => {
   };
 
   const getSubmissionDetails = (approval) => {
-    switch (approval.type) {
-      case 'certificate':
-        const cert = student.certifications?.find(c => c.title === approval.description);
-        return cert;
-      case 'workshop':
-        const workshop = student.workshops?.find(w => w.title === approval.description);
-        return workshop;
-      case 'club':
-        const club = student.clubsJoined?.find(c => (c.title === approval.description || c.clubName === approval.description));
-        return club;
-      case 'internship':
-        const internship = student.internships?.find(i => `${i.organization} - ${i.role}` === approval.description);
-        return internship;
-      case 'project':
-        const project = student.projects?.find(p => p.title === approval.description);
-        return project;
-      default:
-        return null;
-    }
+    const idStr = approval.achievementId ? String(approval.achievementId) : null;
+    if (!idStr) return null;
+    const arrayName = TYPE_TO_ARRAY[approval.type];
+    if (!arrayName || !student[arrayName]) return null;
+    return student[arrayName].find((doc) => doc._id && String(doc._id) === idStr) || null;
   };
 
   if (showMessage) {
@@ -134,9 +139,10 @@ const StudentDetailView = ({ student, onBack }) => {
           
           {student.pendingApprovals?.map((approval, index) => {
             const submissionDetails = getSubmissionDetails(approval);
-            
+            const achievementId = approval.achievementId || approval._id;
+            const pointsVal = pointsByAchievementId[achievementId] ?? "";
             return (
-              <div key={index} className="border border-gray-200 rounded-xl p-6">
+              <div key={achievementId || index} className="border border-gray-200 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <span className="text-2xl">{getTypeIcon(approval.type)}</span>
@@ -299,8 +305,8 @@ const StudentDetailView = ({ student, onBack }) => {
                 )}
 
                 {/* Approval Actions */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                  <div className="flex-1 mr-4">
+                <div className="flex flex-wrap items-end gap-4 pt-4 border-t border-gray-200">
+                  <div className="flex-1 min-w-[200px]">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Add a message (optional):
                     </label>
@@ -312,10 +318,24 @@ const StudentDetailView = ({ student, onBack }) => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     />
                   </div>
-                  
+                  {/* Points (0–50) to the left of Approve/Reject */}
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                      Points (0–50):
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={50}
+                      value={pointsVal}
+                      onChange={(e) => setPointsFor(achievementId, e.target.value)}
+                      placeholder="0"
+                      className="w-20 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
                   <div className="flex space-x-3">
                     <button
-                      onClick={() => handleApproval(approval.type, approval.description, 'reject')}
+                      onClick={() => handleApproval(approval.type, achievementId, "reject", 0)}
                       disabled={loading}
                       className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                     >
@@ -328,9 +348,8 @@ const StudentDetailView = ({ student, onBack }) => {
                       )}
                       <span>Reject</span>
                     </button>
-                    
                     <button
-                      onClick={() => handleApproval(approval.type, approval.description, 'approve')}
+                      onClick={() => handleApproval(approval.type, achievementId, "approve", pointsVal)}
                       disabled={loading}
                       className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                     >
@@ -345,7 +364,6 @@ const StudentDetailView = ({ student, onBack }) => {
                     </button>
                   </div>
                 </div>
-                {/* No _id warning needed anymore */}
               </div>
             );
           })}

@@ -25,6 +25,7 @@ import {
   addDoubtFromSocket,
   addReplyFromSocket,
   removeDoubtFromSocket,
+  removeReplyFromSocket,
   updateDoubtFromSocket,
 } from '../features/student/doubtsSlice';
 
@@ -105,6 +106,7 @@ function registerAllListeners(store) {
   // ─── Doubt feature ─────────────────────────────────────
   socketService.on('doubt:new', (data) => { if (data) d(addDoubtFromSocket(data)); });
   socketService.on('doubt:reply', (data) => { if (data) d(addReplyFromSocket(data)); });
+  socketService.on('doubt:replyDelete', (data) => { if (data) d(removeReplyFromSocket(data)); });
   socketService.on('doubt:delete', (data) => { if (data) d(removeDoubtFromSocket(data)); });
   socketService.on('doubt:update', (data) => { if (data) d(updateDoubtFromSocket(data)); });
 
