@@ -139,10 +139,10 @@ const Announcements = () => {
   };
 
   const defaultCardConfig = {
-    bg: "bg-gradient-to-br from-blue-50 to-blue-100/50",
-    border: "border-l-4 border-blue-500",
+    bg: "bg-gradient-to-br from-teal-50 to-teal-100/50",
+    border: "border-l-4 border-teal-500",
     icon: Info,
-    iconColor: "text-blue-500",
+    iconColor: "text-teal-500",
   };
 
   const formatDate = (dateString) => {
@@ -162,20 +162,20 @@ const Announcements = () => {
       <section className="w-full bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
         <div className="p-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
+            <div className="p-3 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl">
               <Bell className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">Announcements</h3>
+              <h3 className="text-2xl font-bold text-black">Announcements</h3>
               <p className="text-sm text-gray-500">Stay updated with latest news</p>
             </div>
           </div>
           <div className="flex flex-col items-center justify-center py-16">
             <div className="relative">
-              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-              <Sparkles className="w-6 h-6 text-blue-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+              <div className="w-16 h-16 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin"></div>
+              <Sparkles className="w-6 h-6 text-teal-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
             </div>
-            <p className="mt-6 text-gray-600 font-medium">Loading announcements...</p>
+            <p className="mt-6 text-teal-600 font-medium">Loading announcements...</p>
           </div>
         </div>
       </section>
@@ -184,15 +184,15 @@ const Announcements = () => {
 
   if (error) {
     return (
-      <section className="w-full bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      <section className="w-full bg-white rounded-2xl shadow-lg border border-teal-100 overflow-hidden">
         <div className="p-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
+            <div className="p-3 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl">
               <Bell className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">Announcements</h3>
-              <p className="text-sm text-gray-500">Stay updated with latest news</p>
+              <h3 className="text-2xl font-bold text-black">Announcements</h3>
+              <p className="text-sm text-teal-500">Stay updated with latest news</p>
             </div>
           </div>
           <div className="text-center py-12">
@@ -209,22 +209,22 @@ const Announcements = () => {
   return (
     <section className="w-full bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
       {/* Header */}
-      <div className="p-6 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b border-gray-100">
+      <div className="p-6 bg-gradient-to-r from-teal-50 via-teal-50 to-teal-50 border-b border-teal-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+            <div className="p-3 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl shadow-lg">
               <Bell className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">Announcements</h3>
+              <h3 className="text-2xl font-bold text-black">Announcements</h3>
               <p className="text-sm text-gray-600 mt-0.5">Stay updated with latest news and updates</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {announcements.length > 0 && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-semibold text-gray-700">
+              <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-teal-200">
+                <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
+                <span className="text-sm font-semibold text-teal-700">
                   {announcements.length} {announcements.length === 1 ? 'announcement' : 'announcements'}
                 </span>
               </div>
@@ -233,7 +233,7 @@ const Announcements = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/student/club-announcements/create')}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all"
             >
               <Plus className="w-4 h-4" />
               Create Club Announcement
@@ -247,11 +247,8 @@ const Announcements = () => {
         {announcements.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="relative mb-6">
-              <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                <Bell className="w-12 h-12 text-gray-400" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
+              <div className="w-24 h-24 bg-gradient-to-br from-teal-100 to-teal-200 rounded-full flex items-center justify-center">
+                <Bell className="w-12 h-12 text-teal-500" />
               </div>
             </div>
             <h4 className="text-xl font-bold text-gray-900 mb-2">No Announcements Yet</h4>
@@ -279,7 +276,7 @@ const Announcements = () => {
                         <img
                           src={announcement.clubImage}
                           alt={announcement.clubName || "Club"}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-blue-500 shadow-md"
+                          className="w-12 h-12 rounded-full object-cover border-2 border-teal-500 shadow-md"
                         />
                       </div>
                     ) : (
@@ -292,7 +289,7 @@ const Announcements = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-4 mb-3">
                         <div className="flex-1">
-                          <h4 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                          <h4 className="text-lg font-bold text-gray-900 group-hover:text-teal-600 transition-colors">
                             {announcement.title}
                           </h4>
                           {announcement.clubName && (
@@ -306,7 +303,7 @@ const Announcements = () => {
                             <div className="flex items-center gap-1">
                               <button
                                 onClick={(e) => handleEdit(e, announcement)}
-                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                className="p-1.5 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
                                 title="Edit announcement"
                               >
                                 <Edit className="w-4 h-4" />
@@ -327,7 +324,7 @@ const Announcements = () => {
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-cyan-500 text-white hover:bg-cyan-600 transition-colors shadow-sm"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-teal-500 text-white hover:bg-teal-600 transition-colors shadow-sm"
                               title="Open registration or participation link"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
@@ -351,7 +348,7 @@ const Announcements = () => {
                           <>
                             <span className="text-gray-300">•</span>
                             <div className="flex items-center gap-1.5">
-                              <Calendar className="w-4 h-4 text-blue-500" />
+                              <Calendar className="w-4 h-4 text-teal-500" />
                               <span className="font-medium">Event: {formatDate(announcement.eventDate)}</span>
                             </div>
                           </>
@@ -373,7 +370,7 @@ const Announcements = () => {
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1.5 font-medium text-cyan-600 hover:text-cyan-700 hover:underline"
+                              className="inline-flex items-center gap-1.5 font-medium text-teal-600 hover:text-teal-700 hover:underline"
                             >
                               <ExternalLink className="w-4 h-4" />
                               Register / Participate

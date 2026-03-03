@@ -15,7 +15,7 @@ const MainDashboard = () => {
 
   return (
     <SocketProvider>
-      <div className="flex h-screen w-full bg-white text-black">
+      <div className="flex h-screen w-full text-black bg-green-50">
         {/* Sidebar - fixed width like Instagram (64px on large screens) */}
         <aside className="hidden lg:block lg:w-64 h-full min-h-0 overflow-hidden bg-gray-100 flex-shrink-0">
           <Sidebar /> 

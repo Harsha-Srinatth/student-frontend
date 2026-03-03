@@ -128,17 +128,17 @@ export default function StudentClubsEnrol() {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 bg-green-50">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8 text-center"
       >
-        <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-br from-teal-600 to-green-600 bg-clip-text text-transparent">
           Explore & Join Clubs
         </h1>
-        <p className="mt-2 text-gray-600 text-sm sm:text-base">
+        <p className="mt-2 text-sm sm:text-base text-black">
           Discover communities to learn, collaborate, and grow!
         </p>
       </motion.div>
@@ -149,8 +149,8 @@ export default function StudentClubsEnrol() {
           onClick={() => setActiveTab("explore")}
           className={`px-6 py-3 text-sm font-semibold transition-colors border-b-2 ${
             activeTab === "explore"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-gray-900"
+              ? "border-teal-600 text-teal-600"
+              : "border-transparent text-gray-800 hover:text-teal-600"
           }`}
         >
           <span className="inline-flex items-center gap-2">
@@ -162,8 +162,8 @@ export default function StudentClubsEnrol() {
           onClick={() => setActiveTab("joined")}
           className={`px-6 py-3 text-sm font-semibold transition-colors border-b-2 ${
             activeTab === "joined"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-gray-600 hover:text-gray-900"
+              ? "border-teal-600 text-teal-600"
+              : "border-transparent text-gray-800 hover:text-teal-600"
           }`}
         >
           <span className="inline-flex items-center gap-2">
@@ -199,12 +199,12 @@ export default function StudentClubsEnrol() {
           {/* Search & Category Filter */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1">
-          <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search clubs by name or category..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition"
+            placeholder="Search Clubs By Name or Category..."
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100 transition"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
@@ -214,8 +214,8 @@ export default function StudentClubsEnrol() {
               onClick={() => setCategory(c)}
               className={`whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition ${
                 category === c
-                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-gradient-to-br from-teal-600 to-green-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-800 hover:bg-gray-200"
               }`}
             >
               {c}
@@ -227,7 +227,7 @@ export default function StudentClubsEnrol() {
       {/* Loading State */}
       {clubsLoading && clubs.length === 0 && (
         <div className="text-center py-12">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-teal-600 border-t-transparent"></div>
           <p className="mt-4 text-gray-600">Loading clubs...</p>
         </div>
       )}
@@ -308,8 +308,8 @@ export default function StudentClubsEnrol() {
                       isEnrolled
                         ? "bg-emerald-100 text-emerald-700 cursor-not-allowed"
                         : isLoading
-                        ? "bg-blue-400 text-white cursor-wait"
-                        : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg"
+                        ? "bg-teal-600 text-white cursor-wait"
+                        : "bg-gradient-to-r from-teal-600 to-green-600 text-white hover:from-teal-700 hover:to-green-700 shadow-md hover:shadow-lg"
                     }`}
                   >
                     {isLoading ? (
@@ -347,7 +347,6 @@ export default function StudentClubsEnrol() {
           <p className="text-gray-500 text-lg">No clubs found matching your search.</p>
         </motion.div>
       )}
-
       {/* Enrollment Modal */}
       <EnrollmentModal
         isOpen={showModal}

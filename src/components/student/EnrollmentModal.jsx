@@ -51,7 +51,7 @@ export default function EnrollmentModal({ isOpen, club, onClose, onConfirm, isLo
             className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl max-h-[90vh] flex flex-col"
           >
             {/* Header with Club Image */}
-            <div className="relative h-32 sm:h-36 w-full overflow-hidden flex-shrink-0">
+            <div className="relative h-48 sm:h-64 w-full overflow-hidden flex-shrink-0">
               <img
                 src={club.imageUrl || club.img}
                 alt={club.clubName || club.name}
@@ -66,7 +66,7 @@ export default function EnrollmentModal({ isOpen, club, onClose, onConfirm, isLo
               <button
                 onClick={onClose}
                 disabled={isLoading}
-                className="absolute right-3 top-3 w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm text-gray-700 hover:bg-white hover:scale-110 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="absolute right-3 top-3 w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm text-black hover:bg-white hover:scale-110 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -201,7 +201,7 @@ export default function EnrollmentModal({ isOpen, club, onClose, onConfirm, isLo
                 <button
                   onClick={handleConfirm}
                   disabled={isLoading}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95"
+                  className="flex-1 rounded-xl bg-gradient-to-r from-teal-600 to-green-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:from-teal-700 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95"
                 >
                   {isLoading ? (
                     <>

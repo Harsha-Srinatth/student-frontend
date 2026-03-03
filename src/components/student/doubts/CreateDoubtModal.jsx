@@ -34,7 +34,7 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-[#3D3A36]/40 backdrop-blur-sm transition-opacity duration-200"
+        className="absolute inset-0 bg-gray-800 backdrop-blur-sm transition-opacity duration-200"
         onClick={onClose}
         onKeyDown={(e) => e.key === "Escape" && onClose()}
         role="button"
@@ -56,7 +56,7 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className={`p-2 rounded-xl ${DOUBT_COLORS.textMuted} hover:bg-[#E0DAD2] transition-colors ${DOUBT_ANIMATION.buttonPress}`}
+            className={`p-2 rounded-xl ${DOUBT_COLORS.textMuted} hover:bg-teal-100 transition-colors ${DOUBT_ANIMATION.buttonPress}`}
             aria-label="Close"
           >
             <X size={20} />
@@ -79,7 +79,7 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
               placeholder="What's your doubt about?"
               maxLength={TITLE_MAX}
               required
-              className={`w-full px-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm ${DOUBT_COLORS.inputBg} placeholder:text-[#8C8782] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/30 focus:border-[#8B7355] transition-all duration-200`}
+              className={`w-full px-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm ${DOUBT_COLORS.inputBg} placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-200 transition-all duration-200`}
             />
             <p className={`text-xs ${DOUBT_COLORS.textMuted} mt-1 text-right`}>
               {title.length}/{TITLE_MAX}
@@ -100,8 +100,8 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
                   onClick={() => setTag(t)}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-full border capitalize transition-all duration-200 ${
                     tag === t
-                      ? `${getTagClass(t)} ring-2 ring-offset-1 ring-[#8B7355]/50 border-[#8B7355]/40`
-                      : "bg-[#F8F6F2] text-[#6B6560] border-[#E8E4DE] hover:bg-[#EDE8E2]"
+                      ? `${getTagClass(t)} ring-2 ring-offset-1 ring-teal-200 border-teal-200`
+                      : "bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100"
                   }`}
                 >
                   {t}
@@ -124,7 +124,7 @@ const CreateDoubtModal = ({ isOpen, onClose }) => {
               maxLength={DESC_MAX}
               required
               rows={5}
-              className={`w-full px-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm resize-none ${DOUBT_COLORS.inputBg} placeholder:text-[#8C8782] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/30 focus:border-[#8B7355] transition-all duration-200`}
+              className={`w-full px-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm resize-none ${DOUBT_COLORS.inputBg} placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-200 transition-all duration-200`}
             />
             <p className={`text-xs ${DOUBT_COLORS.textMuted} mt-1 text-right`}>
               {description.length}/{DESC_MAX}

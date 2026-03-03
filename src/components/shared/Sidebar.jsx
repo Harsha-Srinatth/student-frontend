@@ -53,7 +53,7 @@ const Sidebar = () => {
       {/* 🔹 Logo & App Name */}
       <div className="flex-shrink-0 flex flex-col items-center py-6 px-3 border-b border-gray-800">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 
+          <div className="w-10 h-10 bg-gradient-to-r from-teal-500 to-teal-600 
           rounded-full flex items-center justify-center 
           text-white font-bold shadow-md hover:scale-105 transition overflow-hidden">
           <img
@@ -63,7 +63,7 @@ const Sidebar = () => {
            />
          </div>
 
-          <h1 className="font-bold text-lg bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <h1 className="font-bold text-lg bg-gradient-to-r from-teal-500 to-teal-600 bg-clip-text text-transparent">
             {userRole === "admin" ? "Admin Portal" : 
              userRole === "hod" ? "HOD Portal" :
              userRole === "faculty" ? "Faculty Portal" : "Student Hub"}
@@ -118,7 +118,7 @@ const Sidebar = () => {
                     transition-all duration-500 ease-in-out group
                     ${
                       isActive
-                        ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg"
+                        ? "bg-gradient-to-r from-teal-900 to-teal-950 text-white shadow-lg"
                         : `${hoverClass} text-gray-300`
                     }`}
                 >

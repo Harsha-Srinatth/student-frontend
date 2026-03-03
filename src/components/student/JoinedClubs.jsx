@@ -144,7 +144,7 @@ export default function JoinedClubs() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-teal-600 border-t-transparent"></div>
         <p className="mt-4 text-gray-600">Loading your clubs...</p>
       </div>
     );
@@ -164,12 +164,12 @@ export default function JoinedClubs() {
     <div className="w-full">
       {/* Header */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 p-2">
+        <div className="rounded-full bg-gradient-to-br from-teal-600 to-green-600 p-2">
           <FiUsers className="w-6 h-6 text-white" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">My Joined Clubs</h2>
-          <p className="text-sm text-gray-600">View details and members of clubs you've joined</p>
+          <h2 className="text-2xl font-bold text-black">My Joined Clubs</h2>
+          <p className="text-sm text-black">View details and members of clubs you've joined</p>
         </div>
       </div>
 
@@ -185,10 +185,10 @@ export default function JoinedClubs() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md hover:shadow-xl transition-all duration-300"
+              className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md hover:shadow-xl hover:border-teal-600 transition-all duration-300"
             >
               {/* Club Image */}
-              <div className="relative h-32 w-full overflow-hidden">
+              <div className="relative h-38 w-full overflow-hidden">
                 <img
                   src={club.imageUrl || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80"}
                   alt={club.clubName}
@@ -201,7 +201,7 @@ export default function JoinedClubs() {
                   const roleInfo = getRoleInfo(enrollment.role);
                   const RoleIcon = roleInfo.icon;
                   return (
-                    <div className="absolute top-3 left-3">
+                    <div className="absolute top-3 left-2">
                       <span className={`inline-flex items-center gap-1.5 rounded-full ${roleInfo.bgColor} ${roleInfo.textColor} px-3 py-1.5 text-xs font-bold border-2 ${roleInfo.borderColor} ${roleInfo.badgeClass} backdrop-blur-sm`}>
                         <RoleIcon className="w-3.5 h-3.5" />
                         {roleInfo.label}
@@ -221,16 +221,16 @@ export default function JoinedClubs() {
               {/* Club Info */}
               <div className="p-4">
                 <h3 className="text-lg font-bold text-gray-900 mb-1">{club.clubName}</h3>
-                <p className="text-sm text-gray-600 line-clamp-2 mb-3 min-h-[2.5rem]">
+                <p className="text-sm text-gray-800 line-clamp-2 mb-3 min-h-[2.5rem]">
                   {club.description || "No description available"}
                 </p>
 
                 {/* Club Leadership Info */}
                 {(club.facultyCoordinatorDetails || club.studentHeadDetails) && (
-                  <div className="mb-3 space-y-1.5 text-xs text-gray-600">
+                  <div className="mb-3 space-y-1.5 text-xs text-gray-900">
                     {club.facultyCoordinatorDetails && (
                       <div className="flex items-center gap-1.5">
-                        <FiUser className="w-3 h-3 text-blue-600" />
+                        <FiUser className="w-3 h-3 text-green-600" />
                         <span className="truncate">
                           Coordinator: {club.facultyCoordinatorDetails.fullname}
                         </span>
@@ -238,7 +238,7 @@ export default function JoinedClubs() {
                     )}
                     {club.studentHeadDetails && (
                       <div className="flex items-center gap-1.5">
-                        <FiUsers className="w-3 h-3 text-purple-600" />
+                        <FiUsers className="w-3 h-3 text-green-600" />
                         <span className="truncate">
                           Head: {club.studentHeadDetails.fullname}
                         </span>
@@ -248,14 +248,14 @@ export default function JoinedClubs() {
                 )}
 
                 {/* Enrollment Details */}
-                <div className="space-y-2 mb-4 text-xs text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <FiCalendar className="w-3 h-3" />
+                <div className="space-y-2 mb-4 text-xs">
+                  <div className="flex items-center gap-2 text-black">
+                    <FiCalendar className="w-3 h-3 text-green-600" />
                     <span>Joined: {formatDate(enrollment.joinedOn)}</span>
                   </div>
                   {club.amounttojoin > 0 && (
-                    <div className="flex items-center gap-2">
-                      <FiDollarSign className="w-3 h-3" />
+                    <div className="flex items-center gap-2 text-black">
+                      <FiDollarSign className="w-3 h-3 text-red-600" />
                       <span>Fee: ₹{club.amounttojoin}</span>
                     </div>
                   )}
@@ -264,7 +264,7 @@ export default function JoinedClubs() {
                 {/* View Members Button */}
                 <button
                   onClick={() => handleViewMembers(enrollment.clubId)}
-                  className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full rounded-lg bg-gradient-to-r from-teal-600 to-green-600 px-4 py-2.5 text-sm font-semibold text-white hover:from-teal-700 hover:to-green-700 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                   <FiUsers className="w-4 h-4" />
                   View Members
@@ -288,14 +288,14 @@ export default function JoinedClubs() {
               className="relative z-10 w-full max-w-6xl max-h-[95vh] overflow-hidden rounded-3xl bg-white shadow-2xl flex flex-col"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-gray-200 flex-shrink-0">
+              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-gray-100 flex-shrink-0 bg-green-50">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-600 to-green-600 flex items-center justify-center shadow-lg">
                     <FiUsers className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Club Members</h3>
-                    <p className="text-sm text-gray-600">
+                    <h3 className="text-xl sm:text-2xl font-bold text-black">Club Members</h3>
+                    <p className="text-sm text-black">
                       {clubs.find(c => c.clubId === selectedClubId)?.clubName || "Loading..."}
                     </p>
                   </div>

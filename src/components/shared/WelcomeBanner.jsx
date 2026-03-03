@@ -23,12 +23,11 @@ const WelcomeBanner = ({
   greeting = "Welcome back",
   description = "Here's a quick overview of your activity.",
   emoji = "👋",
-  gradient = "bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600",
+  gradient = "bg-gradient-to-r from-teal-500 to-teal-600 border-b border-teal-100",
   announcementsRoute = null,
 }) => {
   const loadingGradient =
-    "bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500";
-
+    "bg-gradient-to-r from-teal-500 to-teal-600";
   if (loading) {
     return (
       <section
@@ -60,7 +59,7 @@ const WelcomeBanner = ({
         <h2 className="text-2xl font-bold">
           {greeting}, {name || "User"} {emoji}
         </h2>
-        <p className="mt-2 opacity-90">
+        <p className="mt-2 opacity-95">
           {description}
         </p>
       </div>

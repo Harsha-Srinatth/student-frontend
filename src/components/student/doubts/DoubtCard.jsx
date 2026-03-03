@@ -27,7 +27,7 @@ const DoubtCard = memo(({ doubt, onClick, onDelete, isMine = false }) => {
         }
       }}
       className={`group relative ${DOUBT_COLORS.cardBg} border ${DOUBT_COLORS.border} rounded-2xl p-4 cursor-pointer
-        hover:border-[#C4B5A0] hover:shadow-md hover:shadow-[#EDE8E2]/50 ${DOUBT_ANIMATION.cardHover} active:scale-[0.99]`}
+        hover:border-teal-500 hover:shadow-md hover:shadow-teal-100 ${DOUBT_ANIMATION.cardHover} active:scale-[0.99]`}
     >
       {doubt.isSolved && (
         <div className={`absolute top-3 right-3 flex items-center gap-1 ${DOUBT_COLORS.solved} text-xs font-semibold px-2.5 py-1 rounded-full`}>
@@ -41,10 +41,10 @@ const DoubtCard = memo(({ doubt, onClick, onDelete, isMine = false }) => {
             <img
               src={avatarUrl}
               alt=""
-              className="w-10 h-10 rounded-full object-cover ring-2 ring-[#EDE8E2]"
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-teal-200"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-[#8B7355] flex items-center justify-center text-white font-bold text-sm ring-2 ring-[#EDE8E2]">
+            <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-sm ring-2 ring-teal-200">
               {initials}
             </div>
           )}
@@ -63,7 +63,7 @@ const DoubtCard = memo(({ doubt, onClick, onDelete, isMine = false }) => {
             </span>
           </div>
 
-          <h3 className={`text-[15px] font-semibold ${DOUBT_COLORS.textPrimary} leading-snug mb-1 line-clamp-1 group-hover:text-[#5C564D] transition-colors`}>
+          <h3 className={`text-[15px] font-semibold ${DOUBT_COLORS.textPrimary} leading-snug mb-1 line-clamp-1 group-hover:text-teal-600 transition-colors`}>
             {doubt.title}
           </h3>
           <p className={`text-sm ${DOUBT_COLORS.textSecondary} leading-relaxed line-clamp-2`}>
@@ -82,7 +82,7 @@ const DoubtCard = memo(({ doubt, onClick, onDelete, isMine = false }) => {
                   e.stopPropagation();
                   onDelete(doubt._id);
                 }}
-                className={`flex items-center gap-1 text-xs font-medium rounded-lg px-2 py-1.5 opacity-90 group-hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity ${DOUBT_COLORS.delete}`}
+                className={`flex items-center gap-1 text-xs font-medium rounded-lg px-2 py-1.5 opacity-90 group-hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity text-red-600 hover:bg-red-50 ${DOUBT_COLORS.delete}`}
                 aria-label="Delete this doubt"
               >
                 <Trash2 size={13} />

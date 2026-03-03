@@ -151,19 +151,19 @@ const DoubtDetail = () => {
       <div className={`w-full max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto min-h-screen ${DOUBT_COLORS.pageBg} px-3 sm:px-4 py-4`}>
         <button
           onClick={goBack}
-          className="flex items-center gap-1.5 text-[#6B6560] hover:text-[#3D3A36] mb-4 text-sm font-medium transition-colors"
+          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-800 mb-4 text-sm font-medium transition-colors"
         >
           <ArrowLeft size={18} /> Back
         </button>
         <div className="space-y-4 animate-pulse">
-          <div className="h-6 w-3/4 bg-[#E8E4DE] rounded" />
-          <div className="h-4 w-1/4 bg-[#E8E4DE] rounded-full" />
-          <div className="h-20 bg-[#EDE8E2] rounded-xl" />
+          <div className="h-6 w-3/4 bg-teal-100 rounded" />
+          <div className="h-4 w-1/4 bg-teal-100 rounded-full" />
+          <div className="h-20 bg-teal-50 rounded-xl" />
           <div className="space-y-3 mt-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#E8E4DE]" />
-                <div className="flex-1 h-16 bg-[#EDE8E2] rounded-xl" />
+                <div className="w-8 h-8 rounded-full bg-teal-100" />
+                <div className="flex-1 h-16 bg-teal-50 rounded-xl" />
               </div>
             ))}
           </div>
@@ -177,15 +177,15 @@ const DoubtDetail = () => {
       <div className={`w-full max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto min-h-screen ${DOUBT_COLORS.pageBg} px-3 sm:px-4 py-4`}>
         <button
           onClick={goBack}
-          className="flex items-center gap-1.5 text-[#6B6560] hover:text-[#3D3A36] mb-4 text-sm font-medium"
+          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-800 mb-4 text-sm font-medium"
         >
           <ArrowLeft size={18} /> Back
         </button>
-        <div className="text-center py-16 rounded-2xl bg-white border border-[#E8E4DE]">
+        <div className="text-center py-16 rounded-2xl bg-white border border-teal-200">
           <p className={`${DOUBT_COLORS.error} mb-2`}>{detailError}</p>
           <button
             onClick={() => dispatch(fetchDoubtDetail({ doubtId, page: 1, limit: 30 }))}
-            className="text-[#8B7355] font-medium text-sm hover:underline"
+            className="text-teal-600 font-medium text-sm hover:underline"
           >
             Try again
           </button>
@@ -204,7 +204,7 @@ const DoubtDetail = () => {
       >
         <button
           onClick={goBack}
-          className="flex items-center gap-1.5 text-[#6B6560] hover:text-[#3D3A36] text-sm font-medium transition-colors"
+          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-800 text-sm font-medium transition-colors"
         >
           <ArrowLeft size={18} /> Back
         </button>
@@ -213,7 +213,7 @@ const DoubtDetail = () => {
             <button
               onClick={handleToggleSolved}
               className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-                selectedDoubt.isSolved ? DOUBT_COLORS.solved + " border-[#9CAF82]/50" : "bg-[#EDE8E2] text-[#6B6560] border-[#E8E4DE] hover:bg-[#E0DAD2]"
+                selectedDoubt.isSolved ? DOUBT_COLORS.solved + " border-emerald-300" : "bg-teal-100 text-teal-800 border-teal-200 hover:bg-teal-200"
               }`}
             >
               <CheckCircle2 size={14} />
@@ -221,7 +221,7 @@ const DoubtDetail = () => {
             </button>
             <button
               onClick={handleDelete}
-              className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border ${DOUBT_COLORS.delete} border-[#E8C4BC]`}
+              className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border ${DOUBT_COLORS.delete} border-red-200`}
             >
               <Trash2 size={13} /> Delete
             </button>
@@ -236,10 +236,10 @@ const DoubtDetail = () => {
             <img
               src={selectedDoubt.createdByAvatar}
               alt=""
-              className="w-11 h-11 rounded-full object-cover ring-2 ring-[#EDE8E2]"
+              className="w-11 h-11 rounded-full object-cover ring-2 ring-teal-200"
             />
           ) : (
-            <div className="w-11 h-11 rounded-full bg-[#8B7355] flex items-center justify-center text-white font-bold text-sm ring-2 ring-[#EDE8E2]">
+            <div className="w-11 h-11 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-sm ring-2 ring-teal-200">
               {selectedDoubt.createdByName?.charAt(0).toUpperCase() || "?"}
             </div>
           )}
@@ -273,12 +273,12 @@ const DoubtDetail = () => {
       </div>
 
       {/* Replies — chat style: others left, mine right */}
-      <div className={`flex-1 overflow-y-auto px-3 sm:px-5 py-4 space-y-2 bg-[#F8F6F2]`}>
+      <div className={`flex-1 overflow-y-auto px-3 sm:px-5 py-4 space-y-2 ${DOUBT_COLORS.inputBg}`}>
         {hasMoreReplies[doubtId] && (
           <div className="text-center mb-3">
             <button
               onClick={handleLoadMore}
-              className="text-[#8B7355] text-xs font-semibold hover:underline"
+              className="text-teal-600 text-xs font-semibold hover:underline"
             >
               Load earlier replies
             </button>
@@ -287,7 +287,7 @@ const DoubtDetail = () => {
 
         {replies.length === 0 && (
           <div className="text-center py-12">
-            <MessageCircle size={40} className="mx-auto text-[#C4B5A0] mb-3" />
+            <MessageCircle size={40} className="mx-auto text-teal-300 mb-3" />
             <p className={`text-sm ${DOUBT_COLORS.textMuted}`}>No replies yet. Be the first to respond!</p>
           </div>
         )}
@@ -309,12 +309,12 @@ const DoubtDetail = () => {
                     <img
                       src={reply.createdByAvatar}
                       alt=""
-                      className="w-8 h-8 rounded-full object-cover ring-2 ring-[#EDE8E2]"
+                      className="w-8 h-8 rounded-full object-cover ring-2 ring-teal-200"
                     />
                   ) : (
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 ring-[#EDE8E2] ${
-                        isMyReply ? "bg-[#8B7355]" : "bg-[#A09A92]"
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 ring-teal-200 ${
+                        isMyReply ? "bg-teal-600" : "bg-slate-500"
                       }`}
                     >
                       {reply.createdByName?.charAt(0).toUpperCase() || "?"}
@@ -325,8 +325,8 @@ const DoubtDetail = () => {
                 <div
                   className={
                     isMyReply
-                      ? "bg-[#8B7355] text-white rounded-2xl rounded-tr-md px-4 py-2.5 shadow-sm"
-                      : `bg-white border ${DOUBT_COLORS.border} text-[#3D3A36] rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm`
+                      ? `${DOUBT_COLORS.messageMine} text-white rounded-2xl rounded-tr-md px-4 py-2.5 shadow-sm`
+                      : `bg-white border ${DOUBT_COLORS.border} ${DOUBT_COLORS.textPrimary} rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm`
                   }
                 >
                   <div className="flex items-center justify-between gap-2 mb-1">
@@ -334,7 +334,7 @@ const DoubtDetail = () => {
                       {isMyReply ? "You" : reply.createdByName}
                     </span>
                     {reply.createdByRole === "faculty" && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#E8DCC8] text-[#5C5040]">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-800">
                         Faculty
                       </span>
                     )}
@@ -343,7 +343,7 @@ const DoubtDetail = () => {
                         <button
                           type="button"
                           onClick={() => setReplyMenuOpen(showMenu ? null : reply._id)}
-                          className={`p-0.5 rounded-lg opacity-70 hover:opacity-100 ${isMyReply ? "text-white/90 hover:bg-white/20" : "text-[#6B6560] hover:bg-[#EDE8E2]"}`}
+                          className={`p-0.5 rounded-lg opacity-70 hover:opacity-100 ${isMyReply ? "text-white/90 hover:bg-white/20" : "text-slate-600 hover:bg-slate-100"}`}
                           aria-label="Message options"
                         >
                           <MoreVertical size={14} />
@@ -355,7 +355,7 @@ const DoubtDetail = () => {
                               onClick={() => setReplyMenuOpen(null)}
                               aria-hidden="true"
                             />
-                            <div className="absolute right-0 top-6 z-20 bg-white border border-[#E8E4DE] rounded-lg shadow-lg py-1 min-w-[120px]">
+                            <div className={`absolute right-0 top-6 z-20 bg-white border ${DOUBT_COLORS.border} rounded-lg shadow-lg py-1 min-w-[120px]`}>
                               <button
                                 type="button"
                                 onClick={() => handleDeleteReply(reply._id)}
@@ -398,7 +398,7 @@ const DoubtDetail = () => {
               placeholder="Type your reply..."
               rows={1}
               maxLength={REPLY_MAX}
-              className={`w-full px-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm resize-none bg-[#F8F6F2] placeholder:text-[#8C8782] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/30 focus:border-[#8B7355] transition-all duration-200 max-h-32 overflow-y-auto`}
+              className={`w-full px-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm resize-none ${DOUBT_COLORS.inputBg} placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-500 transition-all duration-200 max-h-32 overflow-y-auto`}
               style={{ minHeight: "44px" }}
             />
             <p className={`text-[10px] ${DOUBT_COLORS.textMuted} text-right mt-0.5`}>

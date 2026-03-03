@@ -139,7 +139,7 @@ const AskDoubt = () => {
           <div>
             <h1 className={`text-xl sm:text-2xl font-bold ${DOUBT_COLORS.textPrimary} flex items-center gap-2`}>
               <span className={`p-1.5 rounded-xl ${DOUBT_COLORS.primarySubtle}`}>
-                <MessageCircle size={24} className="text-[#8B7355]" strokeWidth={1.8} />
+                <MessageCircle size={24} className="text-teal-600" strokeWidth={1.8} />
               </span>
               Ask Doubt
             </h1>
@@ -150,7 +150,7 @@ const AskDoubt = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={handleRefresh}
-              className={`p-2.5 ${DOUBT_COLORS.primarySubtle} rounded-xl ${DOUBT_COLORS.textSecondary} hover:bg-[#E0DAD2] transition-colors duration-200`}
+              className={`p-2.5 ${DOUBT_COLORS.primarySubtle} rounded-xl ${DOUBT_COLORS.textSecondary} hover:bg-teal-100 transition-colors duration-200`}
               title="Refresh"
               aria-label="Refresh doubts"
             >
@@ -158,7 +158,7 @@ const AskDoubt = () => {
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
-              className={`flex items-center gap-2 ${DOUBT_COLORS.primary} ${DOUBT_COLORS.textOnBrown} font-semibold px-4 py-2.5 rounded-xl shadow-md ${DOUBT_COLORS.primaryHover} ${DOUBT_ANIMATION.buttonPress}`}
+              className={`flex items-center gap-2 ${DOUBT_COLORS.primary} ${DOUBT_COLORS.textOnBrown} font-semibold px-4 py-2.5 rounded-xl shadow-md hover:bg-teal-600 ${DOUBT_ANIMATION.buttonPress}`}
             >
               <Plus size={18} strokeWidth={2.2} />
               <span className="hidden sm:inline">Ask Doubt</span>
@@ -169,19 +169,19 @@ const AskDoubt = () => {
 
       {/* Search */}
       <div className="relative mb-4">
-        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8C8782]" />
+        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search by title, description or tag..."
-          className={`w-full pl-10 pr-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm ${DOUBT_COLORS.inputBg} placeholder:text-[#8C8782] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/20 focus:border-[#8B7355] transition-all duration-200`}
+          className={`w-full pl-10 pr-4 py-2.5 border ${DOUBT_COLORS.border} rounded-xl text-sm ${DOUBT_COLORS.inputBg} placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-200 transition-all duration-200`}
           aria-label="Search doubts"
         />
       </div>
 
       {/* Tabs */}
-      <div className="flex rounded-xl p-1 bg-[#EDE8E2] mb-5 overflow-hidden">
+      <div className="flex rounded-xl p-1 bg-teal-100 mb-5 overflow-hidden">
         <button
           type="button"
           onClick={() => setActiveTab(TAB_MY)}
@@ -191,7 +191,7 @@ const AskDoubt = () => {
         >
           <User size={18} />
           <span>My Doubts</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === TAB_MY ? "bg-white/20" : "bg-[#E0DAD2] text-[#5C564D]"}`}>
+          <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === TAB_MY ? "bg-white/20" : "bg-teal-100 text-teal-800"}`}>
             {filteredMy.length}
           </span>
         </button>
@@ -204,7 +204,7 @@ const AskDoubt = () => {
         >
           <Users size={18} />
           <span>College</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === TAB_COLLEGE ? "bg-white/20" : "bg-[#E0DAD2] text-[#5C564D]"}`}>
+          <span className={`text-xs px-2 py-0.5 rounded-full ${activeTab === TAB_COLLEGE ? "bg-white/20" : "bg-teal-100 text-teal-800"}`}>
             {filteredCollege.length}
           </span>
         </button>
@@ -212,7 +212,7 @@ const AskDoubt = () => {
 
       {/* Error */}
       {feedError && (
-        <div className="text-center py-8 rounded-xl bg-white border border-[#E8E4DE] px-4">
+        <div className="text-center py-8 rounded-xl bg-white border border-teal-200 px-4">
           <p className={DOUBT_COLORS.error + " mb-2"}>{feedError}</p>
           <button onClick={handleRefresh} className="text-[#8B7355] font-medium text-sm hover:underline">
             Try again

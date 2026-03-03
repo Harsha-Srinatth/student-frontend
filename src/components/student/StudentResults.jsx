@@ -20,6 +20,7 @@ import {
   Animated circular progress
 ---------------------------*/
 function SmallCircle({ value = 0, max = 100 }) {
+  const id = React.useId().replace(/:/g, "");
   const clamped = Math.max(0, Math.min(value, max));
   const pct = Math.round((clamped / max) * 100);
   const radius = 16;
@@ -34,7 +35,7 @@ function SmallCircle({ value = 0, max = 100 }) {
           cx="25"
           cy="25"
           r={radius}
-          stroke="#e5e7eb"
+          stroke="#ccfbf1"
           strokeWidth={stroke}
           fill="transparent"
         />
@@ -42,7 +43,7 @@ function SmallCircle({ value = 0, max = 100 }) {
           cx="25"
           cy="25"
           r={radius}
-          stroke="url(#grad1)"
+          stroke={`url(#grad-${id})`}
           strokeWidth={stroke}
           fill="transparent"
           strokeLinecap="round"
@@ -52,9 +53,9 @@ function SmallCircle({ value = 0, max = 100 }) {
           transition={{ duration: 1, ease: "easeOut" }}
         />
         <defs>
-          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#60a5fa" />
-            <stop offset="100%" stopColor="#2563eb" />
+          <linearGradient id={`grad-${id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0d9488" />
+            <stop offset="100%" stopColor="#059669" />
           </linearGradient>
         </defs>
         <text
@@ -77,10 +78,10 @@ function SmallCircle({ value = 0, max = 100 }) {
   Skeleton shimmer
 ---------------------------*/
 const Skeleton = () => (
-  <div className="rounded-xl p-4 bg-white/60 backdrop-blur animate-pulse shadow">
-    <div className="h-4 bg-gray-200 rounded w-2/3 mb-3" />
-    <div className="h-3 bg-gray-200 rounded w-1/2 mb-3" />
-    <div className="h-6 bg-gray-200 rounded w-full" />
+  <div className="rounded-xl p-4 bg-white/70 backdrop-blur animate-pulse shadow border border-teal-100">
+    <div className="h-4 bg-teal-100 rounded w-2/3 mb-3" />
+    <div className="h-3 bg-teal-100/80 rounded w-1/2 mb-3" />
+    <div className="h-6 bg-teal-100/60 rounded w-full" />
   </div>
 );
 
@@ -165,24 +166,17 @@ export default function StudentResults() {
   const isFutureSem = activeSem > currentSem;
 
   return (
-    <div className="w-full mx-auto max-w-7xl px-4 py-6 space-y-6 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div className="w-full min-h-screen flex flex-col mx-auto max-w-7xl px-4 py-6 bg-gradient-to-br from-teal-50 via-emerald-50 to-green-100">
+      <div className="flex-1 flex flex-col space-y-6">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-      >
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            📊 My Results
-          </h1>
-          <p className="text-sm text-slate-600">
-            Current semester:{" "}
-            <span className="font-semibold text-blue-700 drop-shadow">
-              {currentSem}
-            </span>
-          </p>
-        </div>
+      <div className="text-center py-4 sm:py-6">
+        <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-br from-teal-600 to-green-600 bg-clip-text text-transparent">
+          My Results
+        </h1>
+        <p className="mt-2 text-sm sm:text-base text-slate-700">
+          Track your academic progress and achievements
+        </p>
+      </div>
 
         <div className="flex flex-wrap gap-2">
           {semesters.map((sem) => {
@@ -197,9 +191,9 @@ export default function StudentResults() {
                 className={`h-9 px-4 rounded-lg text-sm font-medium shadow-md transition-all
                   ${
                     isActive
-                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+                      ? "bg-gradient-to-r from-teal-600 to-green-600 text-white"
                       : isCurrent
-                      ? "border-2 border-blue-400 text-blue-700 bg-white"
+                      ? "border-2 border-teal-400 text-teal-700 bg-white"
                       : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
                   }`}
               >
@@ -208,7 +202,6 @@ export default function StudentResults() {
             );
           })}
         </div>
-      </motion.div>
 
       {/* Error */}
       <AnimatePresence>
@@ -226,8 +219,8 @@ export default function StudentResults() {
       </AnimatePresence>
 
       {/* Subjects */}
-      <div>
-        <h3 className="text-lg font-semibold mb-3">📘 Subjects</h3>
+      <div className="flex-1 min-h-0">
+        <h3 className="text-lg font-semibold mb-3 text-teal-800">📘 Subjects</h3>
         {curriculumLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -243,25 +236,25 @@ export default function StudentResults() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.03 }}
                 whileHover={{ scale: 1.02 }}
-                className="flex items-center justify-between gap-3 rounded-xl bg-white p-4 shadow hover:shadow-lg transition"
+                className="flex items-center justify-between gap-3 rounded-xl bg-white/90 border border-teal-100 p-4 shadow hover:shadow-lg transition"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <div className="text-sm font-medium truncate">{s.name}</div>
+                    <div className="text-sm font-medium truncate text-slate-800">{s.name}</div>
                     {isFutureSem ? (
-                      <FiLock className="text-gray-400" />
+                      <FiLock className="text-slate-400" />
                     ) : (
-                      <FiCheckCircle className="text-green-500" />
+                      <FiCheckCircle className="text-teal-500" />
                     )}
                   </div>
                   <div className="text-xs text-slate-500 truncate">{s.code}</div>
                 </div>
                 {isFutureSem ? (
-                  <span className="text-xs rounded-full px-2 py-1 bg-gray-100 text-gray-600 border border-gray-300 flex items-center gap-1">
+                  <span className="text-xs rounded-full px-2 py-1 bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1">
                     <FiLock size={12} /> Locked
                   </span>
                 ) : (
-                  <span className="text-xs rounded-full px-2 py-1 bg-green-50 text-green-700 border border-green-200">
+                  <span className="text-xs rounded-full px-2 py-1 bg-teal-50 text-teal-700 border border-teal-200">
                     Coming Soon
                   </span>
                 )}
@@ -273,7 +266,7 @@ export default function StudentResults() {
 
       {/* Mid Results + Graph (only if not future sem) */}
       {!isFutureSem && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch flex-1 min-h-[320px]">
           <MidCard
             mid={1}
             resultsLoading={resultsLoading}
@@ -285,21 +278,23 @@ export default function StudentResults() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="rounded-2xl bg-white p-4 shadow-lg"
+            className="rounded-2xl bg-white/90 border border-teal-100 p-4 shadow-lg flex flex-col min-h-[280px]"
           >
-            <h3 className="text-lg font-semibold mb-3 text-center">
+            <h3 className="text-lg font-semibold mb-3 text-center text-teal-800">
               📊 Mid 1 vs Mid 2 Comparison
             </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="Mid1" fill="#60a5fa" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="Mid2" fill="#2563eb" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="flex-1 min-h-[260px]">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <XAxis dataKey="name" stroke="#0d9488" />
+                  <YAxis stroke="#0d9488" />
+                  <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #ccfbf1" }} />
+                  <Legend />
+                  <Bar dataKey="Mid1" fill="#14b8a6" radius={[6, 6, 0, 0]} name="Mid 1" />
+                  <Bar dataKey="Mid2" fill="#059669" radius={[6, 6, 0, 0]} name="Mid 2" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </motion.div>
 
           <MidCard
@@ -311,6 +306,7 @@ export default function StudentResults() {
           />
         </div>
       )}
+      </div>
     </div>
   );
 }
@@ -346,34 +342,34 @@ function MidCard({ mid, resultsLoading, resultsBySem, activeSem, subjectsForSem 
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl bg-white/80 backdrop-blur-xl p-6 shadow-lg hover:shadow-2xl transition"
+      className="rounded-2xl bg-green-50 border border-teal-100 backdrop-blur-xl p-6 shadow-lg hover:shadow-xl transition flex flex-col"
     >
       <div className="flex items-center justify-between mb-4">
-        <div className="text-xl font-semibold text-slate-800">
+        <div className="text-lg sm:text-xl font-semibold text-teal-800">
           Mid {mid} Performance
         </div>
         {resultsLoading ? (
-          <div className="px-3 py-1 rounded-full bg-gray-100 animate-pulse text-sm">
+          <div className="px-3 py-1 rounded-full bg-teal-100 animate-pulse text-sm text-teal-700">
             Loading...
           </div>
         ) : noData ? (
-          <div className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1 text-sm">
+          <div className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1 text-sm">
             <FiAlertCircle /> No marks yet
           </div>
         ) : (
-          <div className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-semibold text-sm">
+          <div className="px-3 py-1 rounded-full bg-teal-100 text-teal-800 font-semibold text-sm border border-teal-200">
             {avgPct}% avg
           </div>
         )}
       </div>
 
       {/* Subject list */}
-      <div className="space-y-3">
+      <div className="space-y-3 flex-1">
         {resultsLoading
           ? Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="rounded-lg p-3 animate-pulse bg-white/70 h-12"
+                className="rounded-lg p-3 animate-pulse bg-teal-50/80 h-12"
               />
             ))
           : chartData.map((it, idx) => (
@@ -383,7 +379,7 @@ function MidCard({ mid, resultsLoading, resultsBySem, activeSem, subjectsForSem 
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.05 }}
                 whileHover={{ scale: 1.02 }}
-                className="flex items-center justify-between rounded-lg bg-white p-3 shadow-sm hover:shadow-md transition"
+                className="flex items-center justify-between rounded-lg bg-white border border-teal-50 p-3 shadow-sm hover:shadow-md hover:border-teal-200 transition"
               >
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{it.name}</span>

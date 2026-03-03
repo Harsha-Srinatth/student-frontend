@@ -3,12 +3,12 @@
  * Used by: LeaderboardTablePage, topTenSudents, AllStudentsWithScore.
  */
 export const LEADERBOARD_TABS = [
-  { key: "weightedPoints", label: "Overall Performance" },
+    { key: "problemSolvingRank", label: "Competitive Exams Score" },
   { key: "teachingPoints", label: "Teaching Score" },
   { key: "projectsPoints", label: "Projects Score" },
-  { key: "extraCurricularPoints", label: "Beyond Academics Score" },
-  { key: "coCurricularPoints", label: "Technical Activities Score" },
-  { key: "problemSolvingRank", label: "Problem Solving Score" },
+  { key: "coCurricularPoints", label: "Technical Activities Score"},
+  { key: "extraCurricularPoints", label: "Sports Score" },
+  { key: "weightedPoints", label: "Weekly Performances" },
 ];
 
 export const MEDAL = ["🥇", "🥈", "🥉"];

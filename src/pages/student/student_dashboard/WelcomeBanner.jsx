@@ -12,12 +12,9 @@ const WelcomeBanner = () => {
     dispatch(fetchSDashboardData());
   }, [dispatch]);
 
-  const bannerGradient =
-    "bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600";
-
   if (loading) {
     return (
-      <section className={`${bannerGradient} px-4 py-5 sm:p-6 text-white rounded-2xl shadow-lg`}>
+      <section className={`bg-gradient-to-r from-teal-500 via-teal-50 to-teal-50 border-b border-teal-100 px-4 py-5 sm:p-6 text-white rounded-2xl shadow-lg`}>
         <div className="h-7 w-48 bg-white/20 rounded animate-pulse" />
         <div className="h-4 w-64 bg-white/10 rounded mt-3 animate-pulse" />
       </section>
@@ -26,14 +23,14 @@ const WelcomeBanner = () => {
 
   if (error) {
     return (
-      <section className={`${bannerGradient} px-4 py-5 sm:p-6 text-white rounded-2xl shadow-lg`}>
+      <section className={`bg-gradient-to-r from-teal-500 via-teal-50 to-teal-50 border-b border-teal-100 px-4 py-5 sm:p-6 text-white rounded-2xl shadow-lg`}>
         <h2 className="text-lg sm:text-2xl font-bold text-red-200 break-words">Error: {error}</h2>
       </section>
     );
   }
 
   return (
-    <section className={`${bannerGradient} px-4 py-5 sm:p-6 text-white rounded-2xl shadow-lg`}>
+    <section className={`bg-gradient-to-r from-teal-500 via-teal-50 to-teal-50 border-b border-teal-100 px-4 py-5 sm:p-6 text-white rounded-2xl shadow-lg`}>
       <h2 className="text-lg sm:text-2xl font-bold break-words">
         Welcome back, {student?.fullname || "Student"} 👋
       </h2>

@@ -1,58 +1,58 @@
 /**
- * Doubts feature theme — warm brown/cream palette (no AI-style blues).
+ * Doubts feature theme — teal/emerald palette (matches student portal).
  * Production-friendly, accessible, works on all devices.
  */
 
 export const DOUBT_COLORS = {
   // Backgrounds
-  pageBg: "bg-[#FAF8F5]",
+  pageBg: "bg-[#F0FDFA]",
   cardBg: "bg-white",
-  cardHover: "hover:bg-[#FDFCFA]",
-  inputBg: "bg-[#F8F6F2]",
-  messageOther: "bg-[#F0EDE8]",
-  messageMine: "bg-[#8B7355]", // warm brown
-  messageMineLight: "bg-[#A0826D]",
+  cardHover: "hover:bg-[#ECFDF5]",
+  inputBg: "bg-[#F0FDFA]",
+  messageOther: "bg-[#E6FFFA]",
+  messageMine: "bg-[#0D9488]",
+  messageMineLight: "bg-[#14B8A6]",
 
   // Borders
-  border: "border-[#E8E4DE]",
-  borderFocus: "border-[#8B7355]",
-  ring: "ring-[#8B7355]/20",
+  border: "border-[#CCFBF1]",
+  borderFocus: "border-[#0D9488]",
+  ring: "ring-[#0D9488]/20",
 
   // Text
-  textPrimary: "text-[#3D3A36]",
-  textSecondary: "text-[#6B6560]",
-  textMuted: "text-[#8C8782]",
+  textPrimary: "text-[#134E4A]",
+  textSecondary: "text-[#0F766E]",
+  textMuted: "text-[#64748B]",
   textOnBrown: "text-white",
 
-  // Primary actions (brown shades)
-  primary: "bg-[#8B7355]",
-  primaryHover: "hover:bg-[#7A6549]",
-  primaryLight: "bg-[#C4B5A0]",
-  primarySubtle: "bg-[#EDE8E2]",
+  // Primary actions (teal shades)
+  primary: "bg-[#0D9488]",
+  primaryHover: "hover:bg-[#0F766E]",
+  primaryLight: "bg-[#5EEAD4]",
+  primarySubtle: "bg-[#CCFBF1]",
 
   // Tabs
-  tabActive: "bg-[#8B7355] text-white",
-  tabInactive: "bg-[#EDE8E2] text-[#6B6560] hover:bg-[#E0DAD2]",
+  tabActive: "bg-[#0D9488] text-white",
+  tabInactive: "bg-[#CCFBF1] text-[#0F766E] hover:bg-[#99F6E4]",
 
-  // Tags (warm, muted)
+  // Tags (teal/green/slate)
   tag: {
-    general: "bg-[#E8E4DE] text-[#5C564D]",
-    academics: "bg-[#D4C4B0] text-[#5C4A3A]",
-    placements: "bg-[#C9B8A8] text-[#4A3D32]",
-    exams: "bg-[#D4B5A5] text-[#5C4030]",
-    events: "bg-[#E8DCC8] text-[#5C5040]",
-    hostel: "bg-[#D9C9B8] text-[#4A4035]",
-    library: "bg-[#C4B8A8] text-[#4A453D]",
-    sports: "bg-[#B8C4A8] text-[#3D4A35]",
-    technical: "bg-[#B8A8C4] text-[#3D354A]",
-    other: "bg-[#D0D0CC] text-[#4A4A45]",
+    general: "bg-[#E0F2F1] text-[#115E59]",
+    academics: "bg-[#B2DFDB] text-[#0D5C52]",
+    placements: "bg-[#80CBC4] text-[#004D40]",
+    exams: "bg-[#A7F3D0] text-[#065F46]",
+    events: "bg-[#D1FAE5] text-[#047857]",
+    hostel: "bg-[#CCFBF1] text-[#0F766E]",
+    library: "bg-[#B2F5EA] text-[#0D5C52]",
+    sports: "bg-[#A7F3D0] text-[#065F46]",
+    technical: "bg-[#C4B5FD] text-[#4C1D95]",
+    other: "bg-[#E2E8F0] text-[#475569]",
   },
 
   // States
-  solved: "bg-[#9CAF82] text-[#2D3A20]", // soft green
-  delete: "text-[#A65D4A] hover:text-[#8B4A3A] hover:bg-[#F5E8E5]",
-  error: "text-[#A65D4A]",
-  success: "text-[#5A7A4A]",
+  solved: "bg-[#86EFAC] text-[#14532D]",
+  delete: "text-[#DC2626] hover:text-[#B91C1C] hover:bg-[#FEE2E2]",
+  error: "text-[#DC2626]",
+  success: "text-[#059669]",
 };
 
 export const DOUBT_ANIMATION = {
