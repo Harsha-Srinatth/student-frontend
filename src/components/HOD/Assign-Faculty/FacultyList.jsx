@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Users, Mail, Phone, BookOpen, Search, CheckCircle2, Calendar, X, MoreVertical, Trash2 } from 'lucide-react';
 import { fetchDepartmentFaculty, removeFacultyAssignment, fetchDepartmentStudents } from '../../../features/HOD/hodAssignmentSlice';
@@ -13,10 +13,7 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showRemoveMenu, setShowRemoveMenu] = useState(null);
 
-  useEffect(() => {
-    dispatch(fetchDepartmentFaculty());
-  }, [dispatch]);
-
+  // Parent HodAssignment already fetches faculty on mount; avoid duplicate requests (prevents ERR_INSUFFICIENT_RESOURCES)
   const handleRemoveAssignment = async (facultyId, section, e) => {
     e.stopPropagation();
     if (window.confirm(`Are you sure you want to remove this faculty from Section ${section}?`)) {

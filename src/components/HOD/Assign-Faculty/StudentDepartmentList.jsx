@@ -15,10 +15,7 @@ export default function StudentList({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState(null);
 
-  useEffect(() => {
-    dispatch(fetchDepartmentStudents());
-  }, [dispatch]);
-
+  // Parent HodAssignment already fetches students on mount; avoid duplicate requests (prevents ERR_INSUFFICIENT_RESOURCES)
   useEffect(() => {
     if (selectedFacultyId) {
       dispatch(fetchFacultyAssignments(selectedFacultyId));

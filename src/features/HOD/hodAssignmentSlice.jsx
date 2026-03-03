@@ -199,14 +199,17 @@ const hodAssignmentSlice = createSlice({
       .addCase(fetchDepartmentFaculty.fulfilled, (state, action) => {
         state.facultyLoading = false;
         state.facultyError = null;
-        if (action.payload && !action.payload.fromCache) {
-          const data = Array.isArray(action.payload)
-            ? action.payload
-            : (action.payload.data ?? action.payload?.faculty ?? action.payload ?? []);
-          state.faculty = Array.isArray(data) ? data : [];
-        } else if (!action.payload) {
-          state.faculty = [];
+        if (action.payload?.fromCache) {
+          state.faculty = Array.isArray(action.payload.data) ? action.payload.data : [];
+          return;
         }
+        if (!action.payload) {
+          state.faculty = [];
+          return;
+        }
+        const raw = action.payload.data ?? action.payload.faculty ?? action.payload;
+        const data = Array.isArray(raw) ? raw : (raw && typeof raw === 'object' && Array.isArray(raw.faculty) ? raw.faculty : []);
+        state.faculty = Array.isArray(data) ? data : [];
       })
       .addCase(fetchDepartmentFaculty.rejected, (state, action) => {
         state.facultyLoading = false;
@@ -220,31 +223,44 @@ const hodAssignmentSlice = createSlice({
       .addCase(fetchDepartmentStudents.fulfilled, (state, action) => {
         state.studentsLoading = false;
         state.studentsError = null;
-        if (action.payload && !action.payload.fromCache) {
-          const data = Array.isArray(action.payload)
-            ? action.payload
-            : (action.payload.data ?? action.payload?.sections ?? action.payload ?? []);
-          const studentsList = Array.isArray(data) ? data : [];
-          state.students = studentsList;
-
-          // Auto-group students by section (programName)
+        if (action.payload?.fromCache) {
+          const list = Array.isArray(action.payload.data) ? action.payload.data : [];
+          state.students = list;
           const grouped = {};
-          state.students.forEach(student => {
+          list.forEach(student => {
             const sectionKey = student.programName || student.section || 'UNASSIGNED';
             if (!grouped[sectionKey]) grouped[sectionKey] = [];
             grouped[sectionKey].push(student);
           });
-
           state.sections = Object.entries(grouped).map(([section, students]) => ({
             name: section,
             section,
             studentCount: students.length,
             students
           }));
-        } else if (!action.payload) {
+          return;
+        }
+        if (!action.payload) {
           state.students = [];
           state.sections = [];
+          return;
         }
+        const raw = action.payload.data ?? action.payload.sections ?? action.payload.students ?? action.payload;
+        const studentsList = Array.isArray(raw) ? raw : (raw && typeof raw === 'object' && Array.isArray(raw.students) ? raw.students : []);
+        state.students = Array.isArray(studentsList) ? studentsList : [];
+
+        const grouped = {};
+        state.students.forEach(student => {
+          const sectionKey = student.programName || student.section || 'UNASSIGNED';
+          if (!grouped[sectionKey]) grouped[sectionKey] = [];
+          grouped[sectionKey].push(student);
+        });
+        state.sections = Object.entries(grouped).map(([section, students]) => ({
+          name: section,
+          section,
+          studentCount: students.length,
+          students
+        }));
       })
       .addCase(fetchDepartmentStudents.rejected, (state, action) => {
         state.studentsLoading = false;

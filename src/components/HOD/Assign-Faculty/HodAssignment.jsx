@@ -5,7 +5,6 @@ import FacultyList from './FacultyList';
 import StudentList from './StudentDepartmentList';
 import AssignmentModal from './AssignmentModel';
 import { fetchDepartmentFaculty, fetchDepartmentStudents, setHODInfo, selectAssignmentStats } from '../../../features/HOD/hodAssignmentSlice';
-import { getYearLabel } from '../../../utils/sectionUtils';
 import api from '../../../services/api';
 
 export default function HODPortal() {
@@ -27,15 +26,17 @@ export default function HODPortal() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [loadTimedOut, setLoadTimedOut] = useState(false);
 
-  // Stop showing full-page loading after timeout so user sees "No data" or content
+  // Stop showing full-page loading after short timeout so user sees layout and can retry.
+  // Only update state when value actually changes to avoid "Maximum update depth" loop.
+  const loading = facultyLoading || studentsLoading;
   useEffect(() => {
-    if (facultyLoading || studentsLoading) {
-      setLoadTimedOut(false);
-      const t = setTimeout(() => setLoadTimedOut(true), 12000);
+    if (loading) {
+      setLoadTimedOut((prev) => (prev ? false : prev));
+      const t = setTimeout(() => setLoadTimedOut(true), 5000);
       return () => clearTimeout(t);
     }
-    setLoadTimedOut(false);
-  }, [facultyLoading, studentsLoading]);
+    setLoadTimedOut((prev) => (prev ? false : prev));
+  }, [loading]);
 
   // Fetch HOD information on mount (non-blocking)
   useEffect(() => {
@@ -74,9 +75,10 @@ export default function HODPortal() {
     setShowModal(false);
   };
 
-  // Only show full-page loading when BOTH requests are still pending (so we show content as soon as either finishes)
+  // Only show full-page loading when BOTH requests still pending; stop after 5s so user sees layout
   const isLoading = facultyLoading && studentsLoading && !loadTimedOut;
   const hasError = facultyError || studentsError;
+  const hasNoData = !facultyLoading && !studentsLoading && faculty.length === 0 && sections.length === 0;
 
   if (isLoading && !hasError) {
     return (
@@ -199,6 +201,23 @@ export default function HODPortal() {
           </div>
         )}
 
+        {/* No data / slow load: show message and Retry when both requests finished and we have no data */}
+        {hasNoData && !hasError && (
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <p className="text-sm text-amber-800 font-medium">No faculty or sections found for your department.</p>
+            <p className="text-sm text-amber-700 mt-1">If you expected data, check that faculty and students are added, then retry.</p>
+            <button
+              type="button"
+              onClick={() => {
+                dispatch(fetchDepartmentFaculty());
+                dispatch(fetchDepartmentStudents());
+              }}
+              className="mt-3 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Main Content Grid – always show both columns; each shows loading, data, or empty state */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
