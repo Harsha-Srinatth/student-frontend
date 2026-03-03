@@ -198,14 +198,15 @@ const hodAssignmentSlice = createSlice({
       })
       .addCase(fetchDepartmentFaculty.fulfilled, (state, action) => {
         state.facultyLoading = false;
-        if (action.payload && !action.payload.fromCache) {
-          // Handle different response structures
-          const data = Array.isArray(action.payload) 
-            ? action.payload 
-            : (action.payload.data || action.payload || []);
-          state.faculty = Array.isArray(data) ? data : [];
-        }
         state.facultyError = null;
+        if (action.payload && !action.payload.fromCache) {
+          const data = Array.isArray(action.payload)
+            ? action.payload
+            : (action.payload.data ?? action.payload?.faculty ?? action.payload ?? []);
+          state.faculty = Array.isArray(data) ? data : [];
+        } else if (!action.payload) {
+          state.faculty = [];
+        }
       })
       .addCase(fetchDepartmentFaculty.rejected, (state, action) => {
         state.facultyLoading = false;
@@ -218,38 +219,32 @@ const hodAssignmentSlice = createSlice({
       })
       .addCase(fetchDepartmentStudents.fulfilled, (state, action) => {
         state.studentsLoading = false;
+        state.studentsError = null;
         if (action.payload && !action.payload.fromCache) {
-          // Handle different response structures
-          const data = Array.isArray(action.payload) 
-            ? action.payload 
-            : (action.payload.data || action.payload || []);
-          state.students = Array.isArray(data) ? data : [];
-          
+          const data = Array.isArray(action.payload)
+            ? action.payload
+            : (action.payload.data ?? action.payload?.sections ?? action.payload ?? []);
+          const studentsList = Array.isArray(data) ? data : [];
+          state.students = studentsList;
+
           // Auto-group students by section (programName)
           const grouped = {};
           state.students.forEach(student => {
-            // Use programName as section identifier
             const sectionKey = student.programName || student.section || 'UNASSIGNED';
-            if (!grouped[sectionKey]) {
-              grouped[sectionKey] = [];
-            }
+            if (!grouped[sectionKey]) grouped[sectionKey] = [];
             grouped[sectionKey].push(student);
           });
-          
-          // Use department from HOD info or from first student for display context only
-          const departmentCode = state.hodInfo?.department?.code || 
-                                state.hodInfo?.department?.name?.toUpperCase().substring(0, 3) ||
-                                (state.students.length > 0 ? state.students[0].department_id?.toUpperCase().substring(0, 3) : '');
-          
+
           state.sections = Object.entries(grouped).map(([section, students]) => ({
-            // Display name with department prefix for clarity, but section value is the actual programName
-            name: section, // programName is the section (e.g., "CSBS", "IT-A", "CSE-A")
-            section: section, // This is the actual programName used for assignment
+            name: section,
+            section,
             studentCount: students.length,
             students
           }));
+        } else if (!action.payload) {
+          state.students = [];
+          state.sections = [];
         }
-        state.studentsError = null;
       })
       .addCase(fetchDepartmentStudents.rejected, (state, action) => {
         state.studentsLoading = false;

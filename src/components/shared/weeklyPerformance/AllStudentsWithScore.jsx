@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
 import { Search, Loader2, Trophy } from "lucide-react";
 import api from "../../../services/api";
 import PageContainer from "../PageContainer";
@@ -9,9 +10,10 @@ import { LEADERBOARD_TABS, MEDAL } from "./leaderboardConstants.js";
 
 const AllStudentsWithScore = () => {
   const location = useLocation();
+  const userRole = Cookies.get("userRole");
   const currentUser = useSelector((state) => state.studentDashboard?.student);
   const currentStudentId = currentUser?.studentid || currentUser?.studentId;
-  const isStudentView = Boolean(currentStudentId);
+  const isStudentView = userRole === "student" && Boolean(currentStudentId);
 
   const [searchInput, setSearchInput] = useState("");
   const [activeTab, setActiveTab] = useState("weightedPoints");

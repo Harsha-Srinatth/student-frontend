@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import { Trophy, Crown, Medal, TrendingUp, Search, Loader2, Calendar } from "lucide-react";
 import api from "../../../services/api";
 import PageContainer from "../PageContainer";
@@ -23,12 +24,13 @@ function formatScore(pts, key) {
 
 const LeaderboardTablePage = ({ viewAllPath = "/student/students/view-all" }) => {
   const navigate = useNavigate();
+  const userRole = Cookies.get("userRole");
   const currentStudentId = useSelector(
     (state) =>
       state.studentDashboard?.student?.studentid ||
       state.studentDashboard?.student?.studentId
   );
-  const isStudentView = Boolean(currentStudentId);
+  const isStudentView = userRole === "student" && Boolean(currentStudentId);
 
   const [searchInput, setSearchInput] = useState("");
   const [activeCol, setActiveCol] = useState("weightedPoints");
@@ -47,7 +49,9 @@ const LeaderboardTablePage = ({ viewAllPath = "/student/students/view-all" }) =>
     try {
       const params = year != null && weekNumber != null ? { year, week: weekNumber } : {};
       const { data } = await api.get("/api/students/leaderboard", { params });
-      setStudents(data?.data ?? []);
+      const raw = data?.data;
+      const list = Array.isArray(raw) ? raw : (raw && typeof raw === "object" && !Array.isArray(raw) ? [raw] : []);
+      setStudents(list);
       setWeekMeta(data?.meta ?? null);
     } catch {
       setStudents([]);

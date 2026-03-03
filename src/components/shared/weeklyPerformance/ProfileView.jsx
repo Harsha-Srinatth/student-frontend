@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Cookies from "js-cookie";
 import {
   ArrowLeft, Award, Briefcase, Loader2, Sparkles, Star,
   ChevronDown, ChevronUp, MapPin,
@@ -9,7 +10,9 @@ import ComparePanel from "./ComparePanel.jsx";
 
 const ProfileView = ({ profile, onBack, myStudent }) => {
   const p = profile;
-  const isOtherStudent = Boolean(
+  const userRole = Cookies.get("userRole");
+  const isStudentViewer = userRole === "student";
+  const isOtherStudent = isStudentViewer && Boolean(
     myStudent &&
       p.studentid !== (myStudent?.studentid || myStudent?.studentId)
   );

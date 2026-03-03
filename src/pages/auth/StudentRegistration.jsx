@@ -326,7 +326,7 @@ const StudentRegistration = () => {
       // cleaned.facultyid = cleaned.facultyid.toUpperCase();
       // But if they are numeric, don't upper-case.
 
-      const res = await api.post("/register/student", cleaned);
+      const res = await api.post("/register/student", cleaned, { timeout: 25000 });
 
       setResponseMessage({ type: "success", text: res.data?.message || "Registration successful" });
       setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, ""])));
@@ -344,11 +344,13 @@ const StudentRegistration = () => {
       setTimeout(() => (navigate("/roleforlogin")), 1200);
     } catch (error) {
       console.error("Registration error:", error);
+      const isTimeout = error?.code === "ECONNABORTED" || error?.message?.includes("timeout");
       setResponseMessage({
         type: "error",
-        text:
-          error?.response?.data?.message ||
-          "Registration failed. Please try again."
+        text: isTimeout
+          ? "Request timed out. Please check your connection and try again."
+          : error?.response?.data?.message ||
+            "Registration failed. Please try again."
       });
     } finally {
       setLoading(false);

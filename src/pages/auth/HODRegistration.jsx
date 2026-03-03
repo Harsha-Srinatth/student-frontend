@@ -113,7 +113,7 @@ export default function HODRegistration() {
         dataToSend.fcmToken = fcmToken;
       }
       
-      const response = await api.post("/register/hod", dataToSend);
+      const response = await api.post("/register/hod", dataToSend, { timeout: 25000 });
 
       setSuccess(true);
       setTimeout(() => {
@@ -121,7 +121,10 @@ export default function HODRegistration() {
       }, 2000);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Registration failed");
+      const isTimeout = err?.code === "ECONNABORTED" || err?.message?.includes("timeout");
+      setError(isTimeout
+        ? "Request timed out. Please check your connection and try again."
+        : err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
