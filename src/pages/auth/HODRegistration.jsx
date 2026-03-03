@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Building2, CheckCircle2, Loader2 } from "lucide-react";
+import { Building2, CheckCircle2, Loader2, Search } from "lucide-react";
 import PasswordInput from "../../components/shared/PasswordInput";
 import { requestPermission } from "../../../firebase.js";
 
@@ -21,8 +21,11 @@ export default function HODRegistration() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [collegeName, setCollegeName] = useState(null);
-  const [checkingCollege, setCheckingCollege] = useState(false);
+  const [collegeSearchQuery, setCollegeSearchQuery] = useState("");
+  const [collegeResults, setCollegeResults] = useState([]);
+  const [searchingCollege, setSearchingCollege] = useState(false);
+  const [showCollegeResults, setShowCollegeResults] = useState(false);
+  const [selectedCollege, setSelectedCollege] = useState(null);
   const [fcmToken, setFcmToken] = useState(null);
 
   // Request FCM token on component mount
@@ -41,45 +44,59 @@ export default function HODRegistration() {
     getFCMToken();
   }, []);
 
-  // Check college name when collegeId changes
+  // Search colleges when query changes (same as student portal – uses /colleges/search)
   useEffect(() => {
-    const checkCollege = async () => {
-      const collegeIdValue = formData.collegeId?.trim();
-      if (!collegeIdValue || collegeIdValue.length < 2) {
-        setCollegeName(null);
+    const searchColleges = async () => {
+      const query = collegeSearchQuery?.trim();
+      if (!query || query.length < 2) {
+        setCollegeResults([]);
+        setShowCollegeResults(false);
+        if (query.length === 0) setSelectedCollege(null);
         return;
       }
-
-      setCheckingCollege(true);
+      setSearchingCollege(true);
       try {
-        const response = await api.get(`/college/${encodeURIComponent(collegeIdValue)}`);
+        const response = await api.get(`/colleges/search?query=${encodeURIComponent(query)}`);
         if (response.data?.success && response.data?.data) {
-          setCollegeName(response.data.data.collegeName);
+          setCollegeResults(response.data.data);
+          setShowCollegeResults(true);
         } else {
-          setCollegeName(null);
+          setCollegeResults([]);
+          setShowCollegeResults(false);
         }
-      } catch (error) {
-        // College not found or error - that's okay, user can still register
-        // Only log if it's not a 404 (expected during typing)
-        if (error.response?.status !== 404) {
-          console.error("College lookup error:", error);
-        }
-        setCollegeName(null);
+      } catch (err) {
+        if (err.response?.status !== 404) console.error("College search error:", err);
+        setCollegeResults([]);
+        setShowCollegeResults(false);
       } finally {
-        setCheckingCollege(false);
+        setSearchingCollege(false);
       }
     };
-
-    // Debounce the check
-    const timeoutId = setTimeout(checkCollege, 500);
+    const timeoutId = setTimeout(searchColleges, 500);
     return () => clearTimeout(timeoutId);
-  }, [formData.collegeId]);
+  }, [collegeSearchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showCollegeResults && !event.target.closest(".college-search-container")) {
+        setShowCollegeResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showCollegeResults]);
+
+  const handleCollegeSelect = (college) => {
+    setFormData((prev) => ({ ...prev, collegeId: college.collegeId }));
+    setSelectedCollege(college);
+    setCollegeSearchQuery(college.collegeId);
+    setShowCollegeResults(false);
+  };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    if (name === "collegeId") setCollegeSearchQuery(value.trim());
   };
 
   const handleSubmit = async (e) => {
@@ -182,33 +199,59 @@ export default function HODRegistration() {
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2 md:col-span-2 college-search-container">
                   <label className="block text-sm font-semibold text-gray-700">College ID *</label>
                   <div className="relative">
                     <input
                       type="text"
                       name="collegeId"
-                      placeholder="Enter college ID"
+                      placeholder="Search by College ID or Name"
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       value={formData.collegeId}
                       onChange={handleChange}
+                      onFocus={() => collegeSearchQuery.length >= 2 && setShowCollegeResults(true)}
                       required
                     />
-                    {checkingCollege && (
+                    {searchingCollege && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
                       </div>
                     )}
-                    {collegeName && !checkingCollege && (
+                    {selectedCollege && !searchingCollege && formData.collegeId === selectedCollege.collegeId && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <CheckCircle2 className="h-5 w-5 text-green-500" />
                       </div>
                     )}
+                    {!searchingCollege && !selectedCollege && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <Search className="h-5 w-5 text-gray-400" />
+                      </div>
+                    )}
                   </div>
-                  {collegeName && (
+                  {showCollegeResults && collegeResults.length > 0 && (
+                    <div className="mt-1 absolute z-50 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      {collegeResults.map((college) => (
+                        <button
+                          key={college.collegeId}
+                          type="button"
+                          onClick={() => handleCollegeSelect(college)}
+                          className="w-full px-4 py-3 text-left hover:bg-purple-50 transition-colors border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Building2 className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-gray-900 truncate">{college.collegeName}</p>
+                              <p className="text-sm text-gray-600">ID: {college.collegeId}</p>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {selectedCollege && (
                     <div className="mt-2 flex items-center space-x-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
                       <Building2 className="h-4 w-4" />
-                      <span className="font-medium">{collegeName}</span>
+                      <span className="font-medium">{selectedCollege.collegeName}</span>
                     </div>
                   )}
                 </div>

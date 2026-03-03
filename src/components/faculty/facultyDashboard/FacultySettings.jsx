@@ -31,7 +31,7 @@ const FacultyDetailsCard = ({ facultyData }) => (
         <div className="flex items-center gap-2"><Mail className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Email:</span> <span className="text-gray-800">{facultyData.email}</span></div>
         <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Mobile:</span> <span className="text-gray-800">{facultyData.mobile}</span></div>
         <div className="flex items-center gap-2"><Building2 className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Department:</span> <span className="text-gray-800">{facultyData.dept}</span></div>
-        <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Institution:</span> <span className="text-gray-800">{facultyData.institution}</span></div>
+        <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Institution:</span> <span className="text-gray-800">{facultyData.institution || facultyData.collegeName || '—'}</span></div>
         <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Designation:</span> <span className="text-gray-800">{facultyData.designation}</span></div>
         <div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Date of Join:</span> <span className="text-gray-800">{facultyData.dateofjoin ? new Date(facultyData.dateofjoin).toLocaleDateString() : ''}</span></div>
       </div>
@@ -72,7 +72,8 @@ const FacultySettings = () => {
         fullname: faculty.fullname,
         facultyid: faculty.facultyid,
         dept: faculty.dept,
-        institution: faculty.institution,
+        institution: faculty.collegeName ?? faculty.institution,
+        collegeName: faculty.collegeName,
         profilePic:
           faculty.image?.url ||
           "https://api.dicebear.com/7.x/avataaars/svg?seed=faculty",

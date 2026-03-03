@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Building2, CheckCircle2, Loader2 } from "lucide-react";
+import { Building2, CheckCircle2, Loader2, Search } from "lucide-react";
 import PasswordInput from "../../components/shared/PasswordInput";
 import { requestPermission } from "../../../firebase.js";
 
@@ -45,8 +45,11 @@ const FacultyRegistration = () => {
   const [loading, setLoading] = useState(false);
   const [responseMessage, setResponseMessage] = useState(null);
   const [direction, setDirection] = useState(0);
-  const [collegeName, setCollegeName] = useState(null);
-  const [checkingCollege, setCheckingCollege] = useState(false);
+  const [collegeSearchQuery, setCollegeSearchQuery] = useState("");
+  const [collegeResults, setCollegeResults] = useState([]);
+  const [searchingCollege, setSearchingCollege] = useState(false);
+  const [showCollegeResults, setShowCollegeResults] = useState(false);
+  const [selectedCollege, setSelectedCollege] = useState(null);
   const [subjectInput, setSubjectInput] = useState("");
   const [fcmToken, setFcmToken] = useState(null);
 
@@ -66,39 +69,62 @@ const FacultyRegistration = () => {
     getFCMToken();
   }, []);
 
-  // Check college name when collegeId changes
+  // Search colleges when query changes (same as student portal – uses /colleges/search)
   useEffect(() => {
-    const checkCollege = async () => {
-      const collegeIdValue = formData.collegeId?.trim();
-      if (!collegeIdValue || collegeIdValue.length < 2) {
-        setCollegeName(null);
+    const searchColleges = async () => {
+      const query = collegeSearchQuery?.trim();
+      if (!query || query.length < 2) {
+        setCollegeResults([]);
+        setShowCollegeResults(false);
+        if (query.length === 0) {
+          setSelectedCollege(null);
+        }
         return;
       }
 
-      setCheckingCollege(true);
+      setSearchingCollege(true);
       try {
-        const response = await api.get(`/college/${encodeURIComponent(collegeIdValue)}`);
+        const response = await api.get(`/colleges/search?query=${encodeURIComponent(query)}`);
         if (response.data?.success && response.data?.data) {
-          setCollegeName(response.data.data.collegeName);
+          setCollegeResults(response.data.data);
+          setShowCollegeResults(true);
         } else {
-          setCollegeName(null);
+          setCollegeResults([]);
+          setShowCollegeResults(false);
         }
       } catch (error) {
-        // College not found or error - that's okay, user can still register
-        // Only log if it's not a 404 (expected during typing)
         if (error.response?.status !== 404) {
-          console.error("College lookup error:", error);
+          console.error("College search error:", error);
         }
-        setCollegeName(null);
+        setCollegeResults([]);
+        setShowCollegeResults(false);
       } finally {
-        setCheckingCollege(false);
+        setSearchingCollege(false);
       }
     };
 
-    // Debounce the check
-    const timeoutId = setTimeout(checkCollege, 500);
+    const timeoutId = setTimeout(searchColleges, 500);
     return () => clearTimeout(timeoutId);
-  }, [formData.collegeId]);
+  }, [collegeSearchQuery]);
+
+  // Close college dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showCollegeResults && !event.target.closest(".college-search-container")) {
+        setShowCollegeResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showCollegeResults]);
+
+  const handleCollegeSelect = (college) => {
+    setFormData((prev) => ({ ...prev, collegeId: college.collegeId }));
+    setSelectedCollege(college);
+    setCollegeSearchQuery(college.collegeId);
+    setShowCollegeResults(false);
+    if (errors.collegeId) setErrors((prev) => ({ ...prev, collegeId: null }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -110,8 +136,8 @@ const FacultyRegistration = () => {
     } else if (["fullname", "dept"].includes(name)) {
       newValue = capitalizeWords(value);
     } else if (name === "collegeId") {
-      // College ID can be alphanumeric, keep as is but trim
       newValue = value.trim();
+      setCollegeSearchQuery(newValue);
     }
 
     setFormData((prev) => ({ ...prev, [name]: newValue }));
@@ -128,7 +154,7 @@ const FacultyRegistration = () => {
       const config = fieldConfig[name];
 
       if (config?.required && (value === "" || value == null || (Array.isArray(value) && value.length === 0))) {
-        newErrors[name] = `${config.label} is required`;
+        newErrors[name] = `${config?.label ?? name} is required`;
         return;
       }
 
@@ -151,8 +177,9 @@ const FacultyRegistration = () => {
       }
 
       if (name === "subjects") {
-        const subjects = Array.isArray(value) ? value : [];
-        if (subjects.length === 0) {
+        const subjects = Array.isArray(formData.subjects) ? formData.subjects : [];
+        const validSubjects = subjects.filter((s) => s != null && String(s).trim());
+        if (validSubjects.length === 0) {
           newErrors[name] = "At least one subject is required";
         }
         return;
@@ -186,11 +213,13 @@ const FacultyRegistration = () => {
       // Prepare payload: trim strings and ensure ids/mobile are digits-only
       const cleaned = { ...formData };
       Object.keys(cleaned).forEach((k) => {
+        if (k === "subjects") return;
         if (typeof cleaned[k] === "string") cleaned[k] = cleaned[k].trim();
       });
 
       cleaned.facultyid = (cleaned.facultyid || "").replace(/\D/g, "");
       cleaned.mobile = (cleaned.mobile || "").replace(/\D/g, "");
+      cleaned.subjects = Array.isArray(formData.subjects) ? formData.subjects.filter((s) => s && String(s).trim()) : [];
 
       // Add FCM token if available
       if (fcmToken) {
@@ -202,7 +231,10 @@ const FacultyRegistration = () => {
       setResponseMessage({ type: "success", text: res.data?.message || "Registration successful" });
       setFormData(Object.fromEntries(Object.keys(fieldConfig).map((key) => [key, key === "subjects" ? [] : ""])));
       setErrors({});
-      setCollegeName(null);
+      setCollegeSearchQuery("");
+      setCollegeResults([]);
+      setSelectedCollege(null);
+      setShowCollegeResults(false);
       setSubjectInput("");
       setTimeout(() => navigate("/roleforlogin"), 1200);
     } catch (error) {
@@ -251,14 +283,13 @@ const FacultyRegistration = () => {
         ))}
       </div>
 
-      {responseMessage && (
-        <div
-          className={`mb-4 p-3 rounded-xl border ${
-            responseMessage.type === "success"
-              ? "bg-green-50 border-green-200 text-green-700"
-              : "bg-red-50 border-red-200 text-red-700"
-          }`}
-        >
+      {responseMessage?.type === "error" && (
+        <div className="mb-4 p-3 rounded-xl border bg-red-50 border-red-200 text-red-700">
+          {responseMessage.text}
+        </div>
+      )}
+      {responseMessage?.type === "success" && (
+        <div className="mb-4 p-3 rounded-xl border bg-green-50 border-green-200 text-green-700">
           {responseMessage.text}
         </div>
       )}
@@ -279,6 +310,8 @@ const FacultyRegistration = () => {
               const config = fieldConfig[name];
               const isCollegeId = name === "collegeId";
               const isSubjects = name === "subjects";
+
+              if (!config && !isSubjects) return null;
 
               if (isSubjects) {
                 return (
@@ -349,18 +382,18 @@ const FacultyRegistration = () => {
               }
 
               return (
-                <div key={name} className={`flex flex-col ${isCollegeId ? "sm:col-span-2" : ""}`}>
+                <div key={name} className={`flex flex-col ${isCollegeId ? "sm:col-span-2 college-search-container" : ""}`}>
                   <label className="text-sm font-semibold text-gray-700 mb-1">
-                    {config.label}
-                    {config.required && <span className="text-red-500">*</span>}
+                    {config?.label ?? name}
+                    {config?.required && <span className="text-red-500">*</span>}
                   </label>
                   <div className="relative">
-                    {config.type === "password" ? (
+                    {config?.type === "password" ? (
                       <PasswordInput
                         name={name}
                         value={formData[name]}
                         onChange={handleChange}
-                        placeholder={`Enter ${config.label.toLowerCase()}`}
+                        placeholder={`Enter ${(config?.label ?? name).toLowerCase()}`}
                         className={`px-4 py-2 pr-10 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 w-full ${
                           errors[name] ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
                         }`}
@@ -368,34 +401,60 @@ const FacultyRegistration = () => {
                     ) : (
                       <>
                         <input
-                          type={config.type}
+                          type={config?.type ?? "text"}
                           name={name}
                           value={formData[name]}
                           onChange={handleChange}
-                          placeholder={`Enter ${config.label.toLowerCase()}`}
+                          onFocus={() => isCollegeId && collegeSearchQuery.length >= 2 && setShowCollegeResults(true)}
+                          placeholder={isCollegeId ? "Search by College ID or Name" : `Enter ${(config?.label ?? name).toLowerCase()}`}
                           className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 w-full ${
                             errors[name]
                               ? "border-red-500 bg-red-50"
                               : "border-gray-300 hover:border-gray-400"
                           }`}
                         />
-                        {isCollegeId && checkingCollege && (
+                        {isCollegeId && searchingCollege && (
                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                             <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
                           </div>
                         )}
-                        {isCollegeId && collegeName && !checkingCollege && (
+                        {isCollegeId && selectedCollege && !searchingCollege && formData.collegeId === selectedCollege.collegeId && (
                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                             <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          </div>
+                        )}
+                        {isCollegeId && !searchingCollege && !selectedCollege && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <Search className="h-4 w-4 text-gray-400" />
                           </div>
                         )}
                       </>
                     )}
                   </div>
-                  {isCollegeId && collegeName && (
+                  {isCollegeId && showCollegeResults && collegeResults.length > 0 && (
+                    <div className="mt-1 absolute z-50 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                      {collegeResults.map((college) => (
+                        <button
+                          key={college.collegeId}
+                          type="button"
+                          onClick={() => handleCollegeSelect(college)}
+                          className="w-full px-4 py-3 text-left hover:bg-green-50 transition-colors border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Building2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-gray-900 truncate">{college.collegeName}</p>
+                              <p className="text-sm text-gray-600">ID: {college.collegeId}</p>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {isCollegeId && selectedCollege && (
                     <div className="mt-2 flex items-center space-x-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
                       <Building2 className="h-4 w-4" />
-                      <span className="font-medium">{collegeName}</span>
+                      <span className="font-medium">{selectedCollege.collegeName}</span>
                     </div>
                   )}
                   {errors[name] && (

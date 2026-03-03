@@ -249,8 +249,8 @@ const StudentRegistration = () => {
       const trimmed = typeof rawValue === "string" ? rawValue.trim() : rawValue;
       const config = fieldConfig[name];
 
-      if (config.required && !trimmed) {
-        newErrors[name] = `${config.label} is required`;
+      if (config?.required && !trimmed) {
+        newErrors[name] = `${config?.label ?? name} is required`;
         return;
       }
 
@@ -417,20 +417,22 @@ const StudentRegistration = () => {
               const config = fieldConfig[name];
               const isInstitutionId = name === "institutionId";
               const isFacultyId = name === "facultyid";
-              
+
+              if (!config) return null;
+
               return (
                 <div key={name} className={`flex flex-col ${isInstitutionId || isFacultyId ? "sm:col-span-2" : ""} ${isInstitutionId ? "college-search-container" : "faculty-search-container"}`}>
                   <label className="text-sm font-semibold text-gray-700 mb-1">
-                    {config.label}
-                    {config.required && <span className="text-red-500">*</span>}
+                    {config?.label ?? name}
+                    {config?.required && <span className="text-red-500">*</span>}
                   </label>
                   <div className="relative">
-                    {config.type === "password" ? (
+                    {config?.type === "password" ? (
                       <PasswordInput
                         name={name}
                         value={formData[name]}
                         onChange={handleChange}
-                        placeholder={`Enter ${config.label.toLowerCase()}`}
+                        placeholder={`Enter ${(config?.label ?? name).toLowerCase()}`}
                         className={`px-4 py-2 pr-10 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 w-full ${
                           errors[name] ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
                         }`}
@@ -438,7 +440,7 @@ const StudentRegistration = () => {
                     ) : (
                       <>
                         <input
-                          type={config.type}
+                          type={config?.type ?? "text"}
                           name={name}
                           value={formData[name]}
                           onChange={handleChange}
@@ -455,7 +457,7 @@ const StudentRegistration = () => {
                               ? "Search by College ID or Name" 
                               : isFacultyId 
                               ? "Search by Faculty ID or Name (Select college first)" 
-                              : `Enter ${config.label.toLowerCase()}`
+                              : `Enter ${(config?.label ?? name).toLowerCase()}`
                           }
                           className={`px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 w-full ${
                             errors[name]

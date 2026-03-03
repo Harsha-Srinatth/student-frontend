@@ -62,7 +62,7 @@ const StudentSettings = ({ student: studentProp }) => {
         studentid: reduxStudent.studentid || "—",
         facultyName: reduxStudent.faculty?.fullname || "—",
         facultyid: reduxStudent.facultyid || reduxStudent.faculty?.facultyid || "—",
-        institution: reduxStudent.collegeName || "—",
+        institution: reduxStudent.collegeName ?? reduxStudent.institution ?? "—",
         profilePic: reduxStudent.profileImage?.url || "https://api.dicebear.com/7.x/avataaars/svg?seed=student",
       };
     }

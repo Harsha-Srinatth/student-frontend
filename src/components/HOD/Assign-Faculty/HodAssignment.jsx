@@ -74,16 +74,16 @@ export default function HODPortal() {
     setShowModal(false);
   };
 
-  const isLoading = ((facultyLoading && faculty.length === 0) || (studentsLoading && sections.length === 0)) && !loadTimedOut;
+  // Only show full-page loading when BOTH requests are still pending (so we show content as soon as either finishes)
+  const isLoading = facultyLoading && studentsLoading && !loadTimedOut;
   const hasError = facultyError || studentsError;
-  const hasNoData = !facultyLoading && !studentsLoading && faculty.length === 0 && sections.length === 0;
 
   if (isLoading && !hasError) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-700 font-medium text-lg">Loading faculty and students...</p>
+          <p className="text-gray-700 font-medium text-lg">Loading...</p>
           <p className="text-gray-500 text-sm mt-2">Please wait</p>
         </div>
       </div>
@@ -107,7 +107,11 @@ export default function HODPortal() {
                   Faculty Assignment Portal
                 </h1>
                 <p className="text-sm text-gray-600 mt-1">
-                  {hodInfo?.department?.name || hodInfo?.department || 'Department'} Department
+                  {hodInfo?.collegeName || hodInfo?.institution ? (
+                    <span>{hodInfo.collegeName || hodInfo.institution} · {hodInfo?.department?.name || hodInfo?.department || 'Department'} Department</span>
+                  ) : (
+                    <span>{hodInfo?.department?.name || hodInfo?.department || 'Department'} Department</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -196,22 +200,20 @@ export default function HODPortal() {
         )}
 
 
-        {/* Main Content Grid – hide when no data so we show a single "No data" state */}
-        {!hasNoData && (
-          <>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <FacultyList
-                key={`faculty-${refreshKey}`}
-                onSelectFaculty={setSelectedFaculty}
-                selectedFacultyId={selectedFaculty?.id || selectedFaculty?.facultyid}
-              />
-              <StudentList
-                key={`student-${refreshKey}`}
-                onSelectSection={setSelectedSection}
-                selectedSection={selectedSection?.section}
-                selectedFacultyId={selectedFaculty?.id || selectedFaculty?.facultyid}
-              />
-            </div>
+        {/* Main Content Grid – always show both columns; each shows loading, data, or empty state */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <FacultyList
+            key={`faculty-${refreshKey}`}
+            onSelectFaculty={setSelectedFaculty}
+            selectedFacultyId={selectedFaculty?.id || selectedFaculty?.facultyid}
+          />
+          <StudentList
+            key={`student-${refreshKey}`}
+            onSelectSection={setSelectedSection}
+            selectedSection={selectedSection?.section}
+            selectedFacultyId={selectedFaculty?.id || selectedFaculty?.facultyid}
+          />
+        </div>
 
             {/* Selection Summary & Action */}
             {(selectedFaculty || selectedSection) && (
@@ -279,28 +281,6 @@ export default function HODPortal() {
             </div>
           </div>
             )}
-          </>
-        )}
-
-        {/* No data state: show when loading is done and both lists are empty */}
-        {hasNoData && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12 text-center">
-            <Building2 className="h-20 w-20 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No data available</h3>
-            <p className="text-gray-600 mb-4">No faculty or students found in your department.</p>
-            <button
-              type="button"
-              onClick={() => {
-                setLoadTimedOut(false);
-                dispatch(fetchDepartmentFaculty());
-                dispatch(fetchDepartmentStudents());
-              }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-            >
-              Retry
-            </button>
-          </div>
-        )}
       </main>
 
       {showModal && selectedFaculty && selectedSection && (

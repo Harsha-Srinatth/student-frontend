@@ -119,9 +119,9 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
         {filteredFaculty.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <Users className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No faculty members found</p>
+            <p className="text-gray-500 font-medium">{searchQuery ? 'No faculty members found' : 'No faculty available'}</p>
             <p className="text-sm text-gray-400 mt-1">
-              {searchQuery ? 'Try adjusting your search' : 'Add faculty members to get started'}
+              {searchQuery ? 'Try adjusting your search' : 'There is no faculty in your department yet.'}
             </p>
           </div>
         ) : (

@@ -145,11 +145,11 @@ export default function StudentList({
         {filteredSections.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <BookOpen className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No sections found</p>
+            <p className="text-gray-500 font-medium">{searchQuery || selectedYear ? 'No sections found' : 'No students available'}</p>
             <p className="text-sm text-gray-400 mt-1">
               {searchQuery || selectedYear 
                 ? 'Try adjusting your filters' 
-                : 'No student sections available'}
+                : 'There are no students in your department yet.'}
             </p>
           </div>
         ) : (
