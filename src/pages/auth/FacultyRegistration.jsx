@@ -210,14 +210,14 @@ const FacultyRegistration = () => {
       setLoading(true);
       setResponseMessage(null);
 
-      // Prepare payload: trim strings and ensure ids/mobile are digits-only
+      // Prepare payload: trim strings; keep full facultyid (e.g. FAC-IT-04), mobile digits-only
       const cleaned = { ...formData };
       Object.keys(cleaned).forEach((k) => {
         if (k === "subjects") return;
         if (typeof cleaned[k] === "string") cleaned[k] = cleaned[k].trim();
       });
 
-      cleaned.facultyid = (cleaned.facultyid || "").replace(/\D/g, "");
+      // Faculty ID can be alphanumeric (e.g. FAC-IT-04) – do not strip to digits only
       cleaned.mobile = (cleaned.mobile || "").replace(/\D/g, "");
       cleaned.subjects = Array.isArray(formData.subjects) ? formData.subjects.filter((s) => s && String(s).trim()) : [];
 
