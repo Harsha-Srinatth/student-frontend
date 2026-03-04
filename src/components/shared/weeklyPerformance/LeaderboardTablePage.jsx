@@ -9,9 +9,9 @@ import ProfileView from "./ProfileView.jsx";
 import { LEADERBOARD_TABS } from "./leaderboardConstants.js";
 
 const RANK_META = [
-  { bg: "bg-amber-500", text: "text-white", ring: "ring-amber-200/50", icon: <Crown className="w-3.5 h-3.5 text-white" /> },
-  { bg: "bg-yellow-500", text: "text-white", ring: "ring-amber-200/40", icon: <Medal className="w-3.5 h-3.5 text-white" /> },
-  { bg: "bg-orange-500", text: "text-white", ring: "ring-amber-200/40", icon: <Medal className="w-3.5 h-3.5 text-white" /> },
+  { bg: "#D39C2F", text: "text-white", ring: "ring-[#D39C2F]/50", icon: <Crown className="w-3.5 h-3.5 text-white" /> },
+  { bg: "#5E6B7C", text: "text-white", ring: "ring-[#5E6B7C]/40", icon: <Medal className="w-3.5 h-3.5 text-white" /> },
+  { bg: "#C0846A", text: "text-white", ring: "ring-[#C0846A]/40", icon: <Medal className="w-3.5 h-3.5 text-white" /> },
 ];
 
 const LEADERBOARD_LIMIT = 30;
@@ -165,8 +165,8 @@ const LeaderboardTablePage = ({ viewAllPath = "/student/students/view-all" }) =>
     return (
       <PageContainer>
         <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <Loader2 className="w-8 h-8 text-[#8B7355] animate-spin" />
-          <p className="text-sm text-[#6B6560] font-medium">Loading profile…</p>
+          <Loader2 className="w-8 h-8 text-[#374763] animate-spin" />
+          <p className="text-sm text-[#5E6B7C] font-medium">Loading profile…</p>
         </div>
       </PageContainer>
     );
@@ -200,17 +200,17 @@ const LeaderboardTablePage = ({ viewAllPath = "/student/students/view-all" }) =>
           {/* Header: title left, search + week selector right */}
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-green-800 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#2F3E5C] tracking-tight">
                 Weekly Leaderboard – Top 30
               </h1>
-              <p className="text-sm sm:text-base text-green-800 mt-0.5">
+              <p className="text-sm sm:text-base text-[#5E6B7C] mt-0.5">
                 Snapshot for selected week · Select a column to sort · Click a row to view profile
               </p>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 lg:flex-shrink-0">
               {/* Week selector */}
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-green-800" />
+                <Calendar className="w-4 h-4 text-[#374763]" />
                 <select
                   value={selectedYear != null && selectedWeek != null ? `${selectedYear}-W${selectedWeek}` : "current"}
                   onChange={(e) => {
@@ -221,7 +221,7 @@ const LeaderboardTablePage = ({ viewAllPath = "/student/students/view-all" }) =>
                       if (!Number.isNaN(y) && !Number.isNaN(w)) handleWeekChange(y, w);
                     }
                   }}
-                  className="px-3 py-2 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-800/30 min-w-[140px]"
+                  className="px-3 py-2 bg-[#E9E6E1] border border-[#D9D6D0] rounded-xl text-[#2F3E5C] text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#374763]/30 min-w-[140px]"
                   disabled={weeksLoading}
                 >
                   <option value="current">This week</option>
@@ -234,16 +234,16 @@ const LeaderboardTablePage = ({ viewAllPath = "/student/students/view-all" }) =>
               </div>
               {/* Search */}
               <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-800" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#374763]" />
                 <input
                   type="text"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Search by name…"
-                  className="w-full pl-9 pr-9 py-2.5 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800 placeholder:text-green-800 focus:outline-none focus:ring-2 focus:ring-green-800/30"
+                  className="w-full pl-9 pr-9 py-2.5 bg-[#E9E6E1] border border-[#D9D6D0] rounded-xl text-sm text-[#2F3E5C] placeholder:text-[#5E6B7C] focus:outline-none focus:ring-2 focus:ring-[#374763]/30"
                 />
                 {searchLoading && (
-                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-800 animate-spin" />
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#374763] animate-spin" />
                 )}
               </div>
             </div>

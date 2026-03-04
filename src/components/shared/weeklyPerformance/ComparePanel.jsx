@@ -147,11 +147,11 @@ const MobilePipelineConnector = ({ active }) => (
 );
 
 const SUGGESTION_THEMES = [
-  { icon: TrendingUp, bg: "bg-slate-50", text: "text-slate-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
-  { icon: Target, bg: "bg-slate-50", text: "text-slate-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
-  { icon: BookOpen, bg: "bg-slate-50", text: "text-slate-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
-  { icon: Zap, bg: "bg-slate-50", text: "text-slate-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
-  { icon: Award, bg: "bg-slate-50", text: "text-slate-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
+  { icon: TrendingUp, bg: "bg-green-50", text: "text-green-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
+  { icon: Target, bg: "bg-green-50", text: "text-green-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
+  { icon: BookOpen, bg: "bg-green-50", text: "text-green-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
+  { icon: Zap, bg: "bg-green-50", text: "text-green-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
+  { icon: Award, bg: "bg-green-50", text: "text-green-700", border: "border-slate-200", iconBg: "bg-slate-200/80" },
 ];
 
 const ComparePanel = ({ myStudent, otherStudent, onClose }) => {

@@ -38,12 +38,12 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
   };
 
   const STATS = [
-    { label: "Weighted", val: p.weightedPoints, color: "#f59e0b" },
-    { label: "Teaching", val: p.teachingPoints, color: "#38bdf8" },
-    { label: "Projects", val: p.projectsPoints, color: "#34d399" },
-    { label: "Extra Curr.", val: p.extraCurricularPoints, color: "#a78bfa" },
-    { label: "Co-Curr.", val: p.coCurricularPoints, color: "#fb7185" },
-    { label: "Prob. Solv.", val: p.problemSolvingRank, color: "#fbbf24" },
+    { label: "Weighted", val: p.weightedPoints, color: "#0f766e" },
+    { label: "Teaching", val: p.teachingPoints, color: "#0f766e" },
+    { label: "Projects", val: p.projectsPoints, color: "#0f766e" },
+    { label: "Extra Curr.", val: p.extraCurricularPoints, color: "#0f766e" },
+    { label: "Co-Curr.", val: p.coCurricularPoints, color: "#0f766e" },
+    { label: "Prob. Solv.", val: p.problemSolvingRank, color: "#0f766e" },
   ];
 
   return (
@@ -73,9 +73,9 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
             <button
               type="button"
               onClick={onBack}
-              className="flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-500 hover:text-slate-800 transition-colors group py-2"
+              className="flex items-center gap-2 text-sm sm:text-base font-semibold text-black hover:text-green-800 transition-colors group py-2"
             >
-              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-0.5 transition-transform" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-0.5 transition-transform text-green-800" />
               Back
             </button>
             {isOtherStudent && (
@@ -83,7 +83,7 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                 type="button"
                 onClick={handleOpenCompare}
                 disabled={loadingMyProfile}
-                className="flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-white text-sm sm:text-base font-semibold bg-slate-700 hover:bg-slate-600 shadow-md hover:shadow-lg transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-white text-sm sm:text-base font-semibold bg-green-700 hover:bg-green-600 shadow-md hover:shadow-lg transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loadingMyProfile ? (
                   <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
@@ -101,29 +101,29 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
             <div
               className="relative px-6 py-8 overflow-hidden"
               style={{
-                background: "linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)",
+                background: "linear-gradient(135deg, #0f172a 0%, #0f766e 60%, #0f172a 100%)",
               }}
             >
               {/* Decorative circles */}
               <div
                 className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-10"
-                style={{ background: "radial-gradient(circle, #38bdf8, transparent)" }}
+                style={{ background: "radial-gradient(circle, #0f766e, transparent)" }}
               />
               <div
                 className="absolute bottom-0 left-0 w-32 h-32 rounded-full opacity-10"
-                style={{ background: "radial-gradient(circle, #a78bfa, transparent)" }}
+                style={{ background: "radial-gradient(circle, #0f766e, transparent)" }}
               />
 
               <div className="relative flex flex-col sm:flex-row gap-5 items-start sm:items-center">
                 {/* Avatar */}
                 <div
                   className="w-20 h-20 rounded-2xl overflow-hidden flex items-center justify-center shrink-0 ring-2 ring-white/20 shadow-2xl"
-                  style={{ background: "linear-gradient(135deg, #1e293b, #334155)" }}
+                  style={{ background: "radial-gradient(circle, #0f766e, transparent)" }}
                 >
                   {p.profilePic ? (
                     <img src={p.profilePic} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-3xl font-black text-slate-300">
+                    <span className="text-3xl font-black text-white">
                       {(p.fullname || "?")[0].toUpperCase()}
                     </span>
                   )}
@@ -133,22 +133,22 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                   <h2 className="text-xl font-black text-white tracking-tight">{p.fullname}</h2>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
                     {p.programName && (
-                      <span className="text-xs sm:text-sm font-medium text-slate-200 bg-slate-600/60 border border-slate-500/40 px-2.5 py-1 rounded-lg">
+                      <span className="text-xs sm:text-sm font-medium text-white bg-black/60 border border-black/40 px-2.5 py-1 rounded-lg">
                         {p.programName}
                       </span>
                     )}
                     {p.dept && (
-                      <span className="text-xs text-slate-400">{p.dept}</span>
+                        <span className="text-xs text-white">{p.dept}</span>
                     )}
                     {p.country && (
-                      <span className="flex items-center gap-1 text-xs text-slate-400">
+                      <span className="flex items-center gap-1 text-xs text-white">
                         <MapPin className="w-3 h-3" />
                         {p.country}
                       </span>
                     )}
                   </div>
                   {p.email && (
-                    <p className="text-slate-400 text-sm mt-1">{p.email}</p>
+                    <p className="text-white text-sm mt-1">{p.email}</p>
                   )}
                   {typeof p.stars === "number" && (
                     <div className="flex items-center gap-1 mt-2.5">
@@ -158,13 +158,13 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                           className={`w-3.5 h-3.5 transition-colors ${
                             i < Math.round(p.stars)
                               ? "fill-amber-400 text-amber-400"
-                              : "text-slate-600"
+                              : "text-white"
                           }`}
                         />
                       ))}
                       <span className="text-sm font-black text-white ml-1.5">
                         {Number(p.stars).toFixed(1)}
-                        <span className="text-slate-400 font-normal">/10</span>
+                        <span className="text-white font-normal">/10</span>
                       </span>
                     </div>
                   )}
@@ -177,7 +177,7 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
               {STATS.map(({ label, val, color }) => (
                 <div
                   key={label}
-                  className="flex flex-col items-center py-4 px-2 border-r border-slate-100 last:border-r-0 hover:bg-slate-50 transition-colors"
+                  className="flex flex-col items-center py-4 px-2 border-r border-white/20 last:border-r-0 hover:bg-slate-50 transition-colors"
                 >
                   <span
                     className="text-lg font-black"
@@ -204,15 +204,15 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                       onClick={() => setSkillsOpen((v) => !v)}
                     >
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-200 flex items-center justify-center">
-                          <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-600" />
+                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-teal-700 flex items-center justify-center">
+                          <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                         </div>
-                        <span className="text-sm sm:text-base font-bold text-slate-800 tracking-tight">Skills</span>
+                        <span className="text-sm sm:text-base font-bold text-green-800 tracking-tight">Skills</span>
                       </div>
                       {skillsOpen ? (
-                        <ChevronUp className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                        <ChevronUp className="w-4 h-4 text-green-800 group-hover:text-green-800" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                        <ChevronDown className="w-4 h-4 text-green-800 group-hover:text-green-800" />
                       )}
                     </button>
 
@@ -220,14 +220,14 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                       <div className="space-y-3 pl-2">
                         {p.skillsSection.certifications?.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-teal-800 mb-1.5">
                               Certifications
                             </p>
                             <div className="flex flex-wrap gap-2">
                               {p.skillsSection.certifications.map((c, i) => (
                                 <span
                                   key={i}
-                                  className="badge-pop text-xs sm:text-sm bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1.5 rounded-lg font-medium"
+                                  className="badge-pop text-xs sm:text-sm bg-green-100 text-teal-700 border border-green-200 px-2.5 py-1.5 rounded-lg font-medium"
                                 >
                                   {c.title}{c.type && ` · ${c.type}`}
                                 </span>
@@ -237,14 +237,14 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                         )}
                         {p.skillsSection.workshops?.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-teal-800 mb-1.5">
                               Workshops
                             </p>
                             <div className="flex flex-wrap gap-2">
                               {p.skillsSection.workshops.map((w, i) => (
                                 <span
                                   key={i}
-                                  className="badge-pop text-xs sm:text-sm bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1.5 rounded-lg font-medium"
+                                  className="badge-pop text-xs sm:text-sm bg-green-100 text-teal-700 border border-green-200 px-2.5 py-1.5 rounded-lg font-medium"
                                 >
                                   {w.title}{w.type && ` · ${w.type}`}
                                 </span>
@@ -254,14 +254,14 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                         )}
                         {p.skillsSection.projects?.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-teal-800 mb-1.5">
                               Projects
                             </p>
                             <div className="flex flex-wrap gap-2">
                               {p.skillsSection.projects.map((pr, i) => (
                                 <span
                                   key={i}
-                                  className="badge-pop text-xs sm:text-sm bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1.5 rounded-lg font-medium"
+                                  className="badge-pop text-xs sm:text-sm bg-green-100 text-teal-700 border border-green-200 px-2.5 py-1.5 rounded-lg font-medium"
                                 >
                                   {pr.title}{pr.type && ` · ${pr.type}`}
                                 </span>
@@ -272,7 +272,7 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                         {!p.skillsSection.certifications?.length &&
                           !p.skillsSection.workshops?.length &&
                           !p.skillsSection.projects?.length && (
-                            <p className="text-sm text-slate-500">No skills listed</p>
+                            <p className="text-sm text-teal-800">No skills listed</p>
                           )}
                       </div>
                     )}
@@ -287,17 +287,17 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                       onClick={() => setExtraOpen((v) => !v)}
                     >
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-200 flex items-center justify-center">
-                          <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-600" />
+                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-teal-700 flex items-center justify-center">
+                          <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                         </div>
-                        <span className="text-sm sm:text-base font-bold text-slate-800 tracking-tight">
+                        <span className="text-sm sm:text-base font-bold text-teal-800 tracking-tight">
                           Extra Curricular
                         </span>
                       </div>
                       {extraOpen ? (
-                        <ChevronUp className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                        <ChevronUp className="w-4 h-4 text-teal-800 group-hover:text-teal-800" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                        <ChevronDown className="w-4 h-4 text-teal-800 group-hover:text-teal-800" />
                       )}
                     </button>
 
@@ -305,10 +305,10 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                       <div className="space-y-3 pl-2">
                         {p.extraCurricularSection.clubs?.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Clubs</p>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-teal-800 mb-1.5">Clubs</p>
                             <div className="flex flex-wrap gap-2">
                               {p.extraCurricularSection.clubs.map((c, i) => (
-                                <span key={i} className="text-xs sm:text-sm bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1.5 rounded-lg font-medium">
+                                <span key={i} className="text-xs sm:text-sm bg-green-100 text-teal-700 border border-green-200 px-2.5 py-1.5 rounded-lg font-medium">
                                   {c.clubName}{c.title && ` – ${c.title}`}
                                 </span>
                               ))}
@@ -317,10 +317,10 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                         )}
                         {p.extraCurricularSection.internships?.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Internships</p>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-teal-800 mb-1.5">Internships</p>
                             <div className="flex flex-wrap gap-2">
                               {p.extraCurricularSection.internships.map((item, i) => (
-                                <span key={i} className="text-xs sm:text-sm bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1.5 rounded-lg font-medium">
+                                <span key={i} className="text-xs sm:text-sm bg-green-100 text-teal-700 border border-green-200 px-2.5 py-1.5 rounded-lg font-medium">
                                   {item.organization} – {item.role}
                                 </span>
                               ))}
@@ -329,10 +329,10 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                         )}
                         {p.extraCurricularSection.others?.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Others</p>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-teal-800 mb-1.5">Others</p>
                             <div className="flex flex-wrap gap-2">
                               {p.extraCurricularSection.others.map((o, i) => (
-                                <span key={i} className="text-xs sm:text-sm bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1.5 rounded-lg font-medium">
+                                <span key={i} className="text-xs sm:text-sm bg-green-100 text-teal-700 border border-green-200 px-2.5 py-1.5 rounded-lg font-medium">
                                   {o.title}
                                 </span>
                               ))}
@@ -342,7 +342,7 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                         {!p.extraCurricularSection.clubs?.length &&
                           !p.extraCurricularSection.internships?.length &&
                           !p.extraCurricularSection.others?.length && (
-                            <p className="text-sm text-slate-500">No extra curricular entries</p>
+                            <p className="text-sm text-teal-800">No extra curricular entries</p>
                           )}
                       </div>
                     )}
@@ -353,22 +353,22 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
               {/* Right: Compare CTA */}
               <div className="p-5 flex items-center justify-center">
                 {isOtherStudent ? (
-                  <div className="w-full rounded-xl sm:rounded-2xl p-5 sm:p-6 flex flex-col items-center text-center gap-4 border border-slate-200 bg-slate-50">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center bg-slate-700">
+                  <div className="w-full rounded-xl sm:rounded-2xl p-5 sm:p-6 flex flex-col items-center text-center gap-4 border border-green-200 bg-green-50">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center bg-green-700">
                       <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm sm:text-base font-bold text-slate-800">
+                      <p className="text-sm sm:text-base font-bold text-green-800">
                         Compare with your profile
                       </p>
-                      <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-green-800 mt-1 leading-relaxed">
                         See where you stand and get tips to improve your score
                       </p>
                     </div>
                     <button
                       onClick={handleOpenCompare}
                       disabled={loadingMyProfile}
-                      className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-white text-sm sm:text-base font-semibold bg-slate-700 hover:bg-slate-600 shadow-md transition-all active:scale-[0.98] disabled:opacity-60"
+                      className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-white text-sm sm:text-base font-semibold bg-green-700 hover:bg-green-600 shadow-md transition-all active:scale-[0.98] disabled:opacity-60"
                     >
                       {loadingMyProfile ? (
                         <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
@@ -380,7 +380,7 @@ const ProfileView = ({ profile, onBack, myStudent }) => {
                   </div>
                 ) : (
                   <div className="text-center">
-                    <p className="text-sm text-slate-500">This is your profile</p>
+                      <p className="text-sm text-green-800">This is your profile</p>
                   </div>
                 )}
               </div>

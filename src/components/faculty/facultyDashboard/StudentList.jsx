@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchStudentsByFaculty, fetchStudentDetails, showStudentModal, hideStudentModal } from '../../../features/faculty/facultySlice';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { Target, Code, Sparkles, BookOpen, BookOpenCheck } from 'lucide-react';
 
 const StudentList = () => {
   const dispatch = useDispatch();
@@ -388,6 +389,36 @@ const StudentList = () => {
                     <label className="text-sm font-medium text-gray-500">Date of Joining</label>
                     <p className="text-lg text-gray-900">{formatDate(selectedStudent.dateofjoin)}</p>
                   </div>
+                </div>
+              </div>
+
+              {/* Student Scores */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Student Scores</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {[
+                    { key: 'teachingPoints', label: 'Teaching Points', value: selectedStudent?.teachingPoints ?? 0, icon: BookOpenCheck },
+                    { key: 'projectsPoints', label: 'Projects Points', value: selectedStudent?.projectsPoints ?? 0, icon: Code },
+                    { key: 'problemSolvingRank', label: 'Problem Solving Rank', value: selectedStudent?.problemSolvingRank ?? 0, icon: Target },
+                    { key: 'extraCurricularPoints', label: 'Extra Curricular', value: selectedStudent?.extraCurricularPoints ?? 0, icon: Sparkles },
+                    { key: 'coCurricularPoints', label: 'Co-Curricular', value: selectedStudent?.coCurricularPoints ?? 0, icon: BookOpen },
+                  ].map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <div
+                        key={item.key}
+                        className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 border border-gray-100"
+                      >
+                        <span className="w-8 h-8 flex-shrink-0 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600">
+                          <Icon className="w-4 h-4" />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-gray-600 truncate">{item.label}</p>
+                          <p className="text-base font-bold text-gray-900">{item.value}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
