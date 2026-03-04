@@ -24,7 +24,7 @@ export default function YearFilter({ selectedYear, onYearChange }) {
           onClick={() => onYearChange(year.value)}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
             selectedYear === year.value
-              ? 'bg-blue-600 text-white shadow-md scale-105'
+              ? 'bg-teal-800 text-white shadow-md scale-105'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >

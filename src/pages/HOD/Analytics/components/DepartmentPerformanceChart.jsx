@@ -9,8 +9,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
-import { CHART_COLORS, CHART_CONFIG } from '../utils/chartConfig';
+} from 'recharts';  
+import { CHART_CONFIG } from '../utils/chartConfig';
 import { FiTrendingUp } from 'react-icons/fi';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -47,7 +47,7 @@ export default function DepartmentPerformanceChart({ data }) {
       className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 lg:p-8 hover:shadow-xl transition-shadow duration-300"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg shadow-md">
+        <div className="p-2 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg shadow-md">
           <FiTrendingUp className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -96,8 +96,8 @@ export default function DepartmentPerformanceChart({ data }) {
             >
               <defs>
                 <linearGradient id="performanceGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={CHART_COLORS.primary} stopOpacity={1} />
-                  <stop offset="100%" stopColor={CHART_COLORS.secondary} stopOpacity={0.8} />
+                  <stop offset="0%" stopColor="#0891b2" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#0369a1" stopOpacity={0.8} />
                 </linearGradient>
               </defs>
             </Bar>

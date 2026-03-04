@@ -47,7 +47,7 @@ export default function AttendanceChart({ data }) {
       className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition-shadow duration-300 h-full"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-lg shadow-md">
+        <div className="p-2 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg shadow-md">
           <FiUsers className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -96,8 +96,8 @@ export default function AttendanceChart({ data }) {
             >
               <defs>
                 <linearGradient id="attendanceGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={CHART_COLORS.success} stopOpacity={1} />
-                  <stop offset="100%" stopColor="#059669" stopOpacity={0.8} />
+                  <stop offset="0%" stopColor="#0891b2" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#0369a1" stopOpacity={0.8} />
                 </linearGradient>
               </defs>
             </Bar>

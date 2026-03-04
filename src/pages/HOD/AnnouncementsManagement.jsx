@@ -292,7 +292,7 @@ export default function AnnouncementsManagement() {
   return (
     <div className="p-6 space-y-6 w-full max-w-7xl mx-auto">
       {/* Enhanced Header */}
-      <div className="relative bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-2xl p-8 shadow-2xl overflow-hidden">
+      <div className="relative bg-gradient-to-r from-teal-700 to-teal-800 rounded-2xl p-8 shadow-2xl overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAzNGMwIDIuMjA5LTEuNzkxIDQtNCA0aC0xNmMtMi4yMDkgMC00LTEuNzkxLTQtNFYyNmMwLTIuMjA5IDEuNzkxLTQgNC00aDE2YzIuMjA5IDAgNCAxLjc5MSA0IDR2OHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvZz48L3N2Zz4=')] opacity-20"></div>
         <div className="relative flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-5">
@@ -301,7 +301,7 @@ export default function AnnouncementsManagement() {
             </div>
             <div>
               <h1 className="text-4xl font-bold text-white mb-2">Announcements Management</h1>
-              <p className="text-purple-100 text-base">Create and manage announcements for students and faculty</p>
+              <p className="text-teal-100 text-base">Create and manage announcements for students and faculty</p>
             </div>
           </div>
           <button
@@ -310,7 +310,7 @@ export default function AnnouncementsManagement() {
               setEditingAnnouncement(null);
               setShowModal(true);
             }}
-            className="flex items-center gap-3 px-6 py-4 bg-white text-purple-600 rounded-xl hover:bg-purple-50 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 font-bold text-lg"
+            className="flex items-center gap-3 px-6 py-4 bg-white text-teal-700 rounded-xl hover:bg-teal-50 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 font-bold text-lg"
           >
             <Plus className="w-6 h-6" />
             Create Announcement
@@ -383,7 +383,7 @@ export default function AnnouncementsManagement() {
                   setEditingAnnouncement(null);
                   setShowModal(true);
                 }}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 shadow-lg transition-all font-semibold"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-700 to-teal-800 text-white rounded-xl hover:from-teal-700 hover:to-teal-800 shadow-lg transition-all font-semibold"
               >
                 <Plus className="w-5 h-5" />
                 Create First Announcement
@@ -422,7 +422,7 @@ export default function AnnouncementsManagement() {
                       {/* Metadata */}
                       <div className="flex flex-wrap items-center gap-4 text-sm">
                         <div className="flex items-center gap-2 text-gray-600 bg-white/60 px-4 py-2 rounded-lg">
-                          <Users className="w-4 h-4 text-purple-500" />
+                          <Users className="w-4 h-4 text-teal-700" />
                           <span className="font-semibold capitalize">
                             {Array.isArray(announcement.targetAudience) 
                               ? announcement.targetAudience.join(", ") 
@@ -430,7 +430,7 @@ export default function AnnouncementsManagement() {
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-600 bg-white/60 px-4 py-2 rounded-lg">
-                          <Calendar className="w-4 h-4 text-indigo-500" />
+                          <Calendar className="w-4 h-4 text-teal-700" />
                           <span className="font-semibold">
                             {new Date(announcement.createdAt).toLocaleDateString("en-US", {
                               month: "short",
@@ -459,14 +459,14 @@ export default function AnnouncementsManagement() {
                   <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => handleEdit(announcement)}
-                      className="p-3 text-blue-600 hover:bg-blue-50 rounded-xl transition-all hover:scale-110 shadow-sm hover:shadow-md"
+                      className="p-3 text-teal-700 hover:bg-teal-50 rounded-xl transition-all hover:scale-110 shadow-sm hover:shadow-md"
                       title="Edit"
                     >
                       <Edit2 className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => handleDelete(announcement._id)}
-                      className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all hover:scale-110 shadow-sm hover:shadow-md"
+                      className="p-3 text-teal-700 hover:bg-teal-50 rounded-xl transition-all hover:scale-110 shadow-sm hover:shadow-md"
                       title="Delete"
                       disabled={deleting}
                     >
@@ -489,7 +489,7 @@ export default function AnnouncementsManagement() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-indigo-600 p-6 rounded-t-2xl">
+              <div className="sticky top-0 bg-gradient-to-r from-teal-700 to-teal-800 p-6 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">
                   {editingAnnouncement ? "Edit Announcement" : "Create New Announcement"}
@@ -517,7 +517,7 @@ export default function AnnouncementsManagement() {
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                   placeholder="Enter announcement title..."
                   required
                 />
@@ -531,7 +531,7 @@ export default function AnnouncementsManagement() {
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   rows={8}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all resize-none"
                   placeholder="Enter announcement content..."
                   required
                 />
@@ -568,7 +568,7 @@ export default function AnnouncementsManagement() {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="mt-3 w-full px-4 py-2 border-2 border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all text-gray-700 font-semibold"
+                      className="mt-3 w-full px-4 py-2 border-2 border-gray-300 rounded-xl hover:border-teal-500 hover:bg-teal-50 transition-all text-gray-700 font-semibold"
                     >
                       Change Image
                     </button>
@@ -577,10 +577,10 @@ export default function AnnouncementsManagement() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full px-4 py-12 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all flex flex-col items-center justify-center gap-3"
+                    className="w-full px-4 py-12 border-2 border-dashed border-gray-300 rounded-xl hover:border-teal-500 hover:bg-teal-50 transition-all flex flex-col items-center justify-center gap-3"
                   >
-                    <div className="p-3 bg-purple-100 rounded-full">
-                      <Upload className="w-6 h-6 text-purple-600" />
+                    <div className="p-3 bg-teal-100 rounded-full">
+                      <Upload className="w-6 h-6 text-teal-700" />
                     </div>
                     <div className="text-center">
                       <p className="text-gray-700 font-semibold">Click to upload image</p>
@@ -598,7 +598,7 @@ export default function AnnouncementsManagement() {
                   {["student", "faculty", "both"].map((audience) => (
                     <label 
                       key={audience} 
-                      className="flex items-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-xl cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all"
+                      className="flex items-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-xl cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition-all"
                     >
                       <input
                         type="checkbox"
@@ -616,7 +616,7 @@ export default function AnnouncementsManagement() {
                             });
                           }
                         }}
-                        className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+                        className="w-5 h-5 text-teal-700 rounded focus:ring-teal-500"
                       />
                       <span className="text-gray-700 font-semibold capitalize">{audience}</span>
                     </label>
@@ -632,7 +632,7 @@ export default function AnnouncementsManagement() {
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -648,7 +648,7 @@ export default function AnnouncementsManagement() {
                     type="date"
                     value={formData.expiresAt}
                     onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                   />
                 </div>
               </div>
@@ -669,7 +669,7 @@ export default function AnnouncementsManagement() {
                 <button
                   type="submit"
                   disabled={creating || updating}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-700 to-teal-800 text-white rounded-xl hover:from-teal-700 hover:to-teal-800 shadow-lg hover:shadow-xl transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {(creating || updating) ? (
                     <>

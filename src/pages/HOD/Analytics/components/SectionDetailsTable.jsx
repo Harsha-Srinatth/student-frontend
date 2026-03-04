@@ -18,7 +18,7 @@ export default function SectionDetailsTable({ sections }) {
       <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
         <table className="w-full border-collapse bg-white">
           <thead>
-            <tr className="bg-gradient-to-r from-blue-50 to-cyan-50">
+            <tr className="bg-gradient-to-r from-teal-50 to-teal-50">
               <th className="border-b border-slate-200 px-4 py-3 text-left font-semibold text-slate-900 text-sm">
                 Section
               </th>
@@ -62,7 +62,7 @@ export default function SectionDetailsTable({ sections }) {
                 className="hover:bg-slate-50 transition-colors border-b border-slate-100"
               >
                 <td className="px-4 py-3 font-semibold text-slate-900">
-                  <span className="inline-flex items-center justify-center min-w-[3rem] px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-bold">
+                  <span className="inline-flex items-center justify-center min-w-[3rem] px-3 py-1 rounded-full bg-teal-100 text-teal-700 text-sm font-bold">
                     {section.section || "N/A"}
                   </span>
                 </td>
@@ -89,7 +89,7 @@ export default function SectionDetailsTable({ sections }) {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-center">
-                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-semibold text-sm">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-teal-100 text-teal-700 font-semibold text-sm">
                     {section.attendanceRanges.good || 0}
                   </span>
                 </td>

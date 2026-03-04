@@ -18,7 +18,7 @@ const CustomTooltip = ({ active, payload }) => {
     return (
       <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
         <p className="font-semibold text-slate-900 mb-1">{data.name}</p>
-        <p className="text-sm text-blue-600 font-bold">
+        <p className="text-sm text-teal-700 font-bold">
           Attendance: {data.value}%
         </p>
       </div>
@@ -52,7 +52,7 @@ export default function SectionAttendanceAnalysis({ sectionAttendance, loading }
     return (
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
         <div className="text-center py-12">
-          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-12 h-12 border-4 border-teal-200 border-t-teal-700 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600">Loading section data...</p>
         </div>
       </div>
@@ -84,7 +84,7 @@ export default function SectionAttendanceAnalysis({ sectionAttendance, loading }
       className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 lg:p-8 hover:shadow-xl transition-shadow duration-300"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-gradient-to-br from-blue-600 to-sky-600 rounded-lg shadow-md">
+        <div className="p-2 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg shadow-md">
           <FiPieChart className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -114,7 +114,7 @@ export default function SectionAttendanceAnalysis({ sectionAttendance, loading }
                   label={CustomLabel}
                   outerRadius={120}
                   innerRadius={60}
-                  fill="#8884d8"
+                  fill="#0891b2"
                   dataKey="value"
                   animationBegin={0}
                   animationDuration={800}

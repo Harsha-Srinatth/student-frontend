@@ -2,8 +2,9 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import api from "../../services/api";
 import { fetchHODDashboardStats, fetchAllDepartments } from "../../features/HOD/hodDashSlice";
-import { fetchDepartmentFaculty, fetchDepartmentStudents, selectAssignmentStats } from "../../features/HOD/hodAssignmentSlice";
+import { fetchDepartmentFaculty, fetchDepartmentStudents, selectAssignmentStats, setHODInfo } from "../../features/HOD/hodAssignmentSlice";
 import {
   Users, GraduationCap, Megaphone, Building2, Award,
   BarChart3, Briefcase, ChevronRight, Trophy, CheckCircle2,
@@ -18,6 +19,7 @@ export default function HODDashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { stats, loading, error, allDepartments } = useSelector((s) => s.hodDashboard);
+  const { hodInfo } = useSelector((s) => s.hodAssignment);
   const assignmentStats = useSelector(selectAssignmentStats);
 
   useEffect(() => {
@@ -26,6 +28,26 @@ export default function HODDashboard() {
     dispatch(fetchDepartmentFaculty());
     dispatch(fetchDepartmentStudents());
   }, [dispatch]);
+
+  useEffect(() => {
+    const fetchHODInfo = async () => {
+      if (!hodInfo) {
+        try {
+          const response = await api.get("/hod/info");
+          const raw = response.data?.data?.hod ?? response.data?.hod ?? response.data?.data;
+          if (raw && (raw.hodId || raw.fullname || raw.email)) {
+            dispatch(setHODInfo({
+              ...raw,
+              mobile: raw.mobile ?? raw.mobileno ?? raw.phone ?? raw.contactNumber ?? raw.mobileNo,
+            }));
+          }
+        } catch (e) {
+          console.error("Error fetching HOD info:", e);
+        }
+      }
+    };
+    fetchHODInfo();
+  }, [dispatch, hodInfo]);
 
   if (loading && !stats) {
     return (
@@ -53,21 +75,16 @@ export default function HODDashboard() {
 
   const ov = stats?.overview || {};
   const statCards = [
-    { title: "Total Students", value: assignmentStats.totalStudents, icon: Users, color: "blue" },
-    { title: "Total Faculty", value: assignmentStats.totalFaculty, icon: GraduationCap, color: "emerald" },
-    { title: "Announcements", value: ov.activeAnnouncements || 0, icon: Megaphone, color: "purple" },
-    { title: "Sections", value: assignmentStats.totalSections, icon: Building2, color: "orange" },
-    { title: "Assigned Faculty", value: assignmentStats.assignedFacultyCount, icon: CheckCircle2, color: "cyan" },
-    { title: "Clubs", value: ov.totalClubs || 0, icon: Briefcase, color: "pink" },
+    { title: "Total Students", value: assignmentStats.totalStudents, icon: Users, color: "teal" },
+    { title: "Total Faculty", value: assignmentStats.totalFaculty, icon: GraduationCap, color: "teal" },
+    { title: "Announcements", value: ov.activeAnnouncements || 0, icon: Megaphone, color: "teal" },
+    { title: "Sections", value: assignmentStats.totalSections, icon: Building2, color: "teal" },
+    { title: "Assigned Faculty", value: assignmentStats.assignedFacultyCount, icon: CheckCircle2, color: "teal" },
+    { title: "Clubs", value: ov.totalClubs || 0, icon: Briefcase, color: "teal" },
   ];
 
   const colorMap = {
-    blue: { bg: "bg-blue-50", icon: "bg-blue-500", text: "text-blue-700" },
-    emerald: { bg: "bg-emerald-50", icon: "bg-emerald-500", text: "text-emerald-700" },
-    purple: { bg: "bg-purple-50", icon: "bg-purple-500", text: "text-purple-700" },
-    orange: { bg: "bg-orange-50", icon: "bg-orange-500", text: "text-orange-700" },
-    cyan: { bg: "bg-cyan-50", icon: "bg-cyan-500", text: "text-cyan-700" },
-    pink: { bg: "bg-pink-50", icon: "bg-pink-500", text: "text-pink-700" },
+    teal: { bg: "bg-teal-50", icon: "bg-teal-500", text: "text-teal-700" },
   };
 
   // Chart data for all departments
@@ -81,12 +98,12 @@ export default function HODDashboard() {
   return (
     <div className="w-full p-3 sm:p-5 lg:p-6 space-y-6">
       <WelcomeBanner
-        name={stats?.hodName || "HOD"}
+        name={hodInfo?.fullname || hodInfo?.name || stats?.hodName || "HOD"}
         loading={false}
         greeting="Welcome"
         description="Overview of your department management."
         emoji="👔"
-        gradient="bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600"
+        gradient="bg-gradient-to-r from-teal-700 to-teal-800"
         announcementsRoute="/hod/announcements"
       />
 
@@ -123,10 +140,10 @@ export default function HODDashboard() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
-              <BarChart3 size={20} className="text-blue-600" />
+              <BarChart3 size={20} className="text-teal-700" />
               <h2 className="text-lg font-bold text-gray-900">All Departments — Student Count</h2>
             </div>
-            <button onClick={() => navigate("/hod/analytics")} className="text-xs text-blue-600 font-medium flex items-center gap-1 hover:underline">
+            <button onClick={() => navigate("/hod/analytics")} className="text-xs text-teal-700 font-medium flex items-center gap-1 hover:underline">
               View Analytics <ChevronRight size={14} />
             </button>
           </div>
@@ -171,7 +188,7 @@ export default function HODDashboard() {
                     <td className="py-2.5 text-center text-gray-700">{d.totalCertifications}</td>
                     <td className="py-2.5 text-center text-gray-700">{d.totalProjects}</td>
                     <td className="py-2.5 text-center hidden sm:table-cell">
-                      <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">{d.performanceScore}</span>
+                      <span className="bg-teal-100 text-teal-700 text-xs font-bold px-2 py-0.5 rounded-full">{d.performanceScore}</span>
                     </td>
                   </tr>
                 ))}
@@ -192,7 +209,7 @@ export default function HODDashboard() {
             <div className="space-y-3">
               {stats.topPerformers.map((s, idx) => (
                 <div key={idx} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white bg-gradient-to-br from-yellow-400 to-orange-500 flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white bg-teal-700 flex-shrink-0">
                     {idx + 1}
                   </div>
                   {s.avatar ? (
@@ -206,7 +223,7 @@ export default function HODDashboard() {
                     <p className="text-sm font-semibold text-gray-900 truncate">{s.fullname}</p>
                     <p className="text-xs text-gray-500">{s.programName || s.studentid}</p>
                   </div>
-                  <div className="flex items-center gap-1 bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-full">
+                  <div className="flex items-center gap-1 bg-teal-100 text-teal-700 text-xs font-bold px-2 py-1 rounded-full">
                     <Award size={12} /> {s.achievementCount}
                   </div>
                 </div>
@@ -219,7 +236,7 @@ export default function HODDashboard() {
         {stats?.facultyWorkload?.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-5">
             <div className="flex items-center gap-2 mb-4">
-              <GraduationCap size={18} className="text-blue-500" />
+              <GraduationCap size={18} className="text-teal-700" />
               <h2 className="text-base font-bold text-gray-900">Faculty Workload</h2>
             </div>
             <div className="space-y-3">
@@ -228,7 +245,7 @@ export default function HODDashboard() {
                   {f.avatar ? (
                     <img src={f.avatar} alt="" className="w-9 h-9 rounded-full object-cover" />
                   ) : (
-                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-700">
+                    <div className="w-9 h-9 rounded-full bg-teal-100 flex items-center justify-center text-xs font-bold text-teal-700">
                       {f.fullname?.charAt(0) || "?"}
                     </div>
                   )}
@@ -236,7 +253,7 @@ export default function HODDashboard() {
                     <p className="text-sm font-semibold text-gray-900 truncate">{f.fullname}</p>
                     <p className="text-xs text-gray-500">{f.facultyid}</p>
                   </div>
-                  <div className="flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                  <div className="flex items-center gap-1 bg-teal-100 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-full">
                     <Users size={12} /> {f.studentCount}
                   </div>
                 </div>
@@ -250,14 +267,14 @@ export default function HODDashboard() {
       {stats?.sectionStats?.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Building2 size={18} className="text-indigo-500" />
+            <Building2 size={18} className="text-teal-700" />
             <h2 className="text-base font-bold text-gray-900">Students by Section</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             {stats.sectionStats.map((s, idx) => (
-              <div key={idx} className="p-3 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 hover:shadow-sm">
+              <div key={idx} className="p-3 bg-gradient-to-br from-teal-50 to-teal-50 rounded-xl border border-teal-100 hover:shadow-sm">
                 <p className="font-bold text-gray-900 text-sm truncate">{s.section}</p>
-                <p className="text-2xl font-bold text-indigo-600 mt-1">{s.studentCount}</p>
+                <p className="text-2xl font-bold text-teal-600 mt-1">{s.studentCount}</p>
                 <p className="text-[11px] text-gray-500">students</p>
               </div>
             ))}
@@ -270,16 +287,16 @@ export default function HODDashboard() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Megaphone size={18} className="text-purple-500" />
+              <Megaphone size={18} className="text-teal-700" />
               <h2 className="text-base font-bold text-gray-900">Recent Announcements</h2>
             </div>
-            <button onClick={() => navigate("/hod/announcements")} className="text-xs text-purple-600 font-medium flex items-center gap-1 hover:underline">
+            <button onClick={() => navigate("/hod/announcements")} className="text-xs text-teal-700 font-medium flex items-center gap-1 hover:underline">
               View All <ChevronRight size={14} />
             </button>
           </div>
           <div className="space-y-2.5">
             {stats.recentAnnouncements.map((a, idx) => (
-              <div key={idx} className="p-3 rounded-lg border-l-4 border-purple-400 bg-gray-50/50 hover:bg-gray-50">
+              <div key={idx} className="p-3 rounded-lg border-l-4 border-teal-400 bg-gray-50/50 hover:bg-gray-50">
                 <p className="font-semibold text-gray-900 text-sm">{a.title}</p>
                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                   {a.clubId && a.participationOrRegistrationLink && (
@@ -287,7 +304,7 @@ export default function HODDashboard() {
                       href={a.participationOrRegistrationLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700 hover:bg-cyan-200"
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 hover:bg-teal-200"
                     >
                       Registration / Participation link
                     </a>

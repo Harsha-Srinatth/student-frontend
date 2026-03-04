@@ -21,12 +21,12 @@ export default function Filters({
       className="mb-6 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-4 sm:p-6 border border-slate-200 shadow-sm"
     >
       <div className="flex items-center gap-2 mb-4">
-        <FiFilter className="w-5 h-5 text-blue-600" />
+        <FiFilter className="w-5 h-5 text-teal-700" />
         <h3 className="text-lg font-semibold text-slate-900">Filters</h3>
         {(selectedDepartment || selectedSemester || selectedSection) && (
           <button
             onClick={onClear}
-            className="ml-auto flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+            className="ml-auto flex items-center gap-1 text-sm text-teal-700 hover:text-teal-800 transition-colors"
           >
             <FiX className="w-4 h-4" />
             Clear
@@ -42,7 +42,7 @@ export default function Filters({
           <select
             value={selectedDepartment}
             onChange={(e) => onDepartmentChange(e.target.value)}
-            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white text-sm font-medium shadow-sm hover:shadow-md"
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all bg-white text-sm font-medium shadow-sm hover:shadow-md"
           >
             <option value="">All Departments</option>
             {departments.map((dept) => (
@@ -64,7 +64,7 @@ export default function Filters({
             <select
               value={selectedSemester}
               onChange={(e) => onSemesterChange(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white text-sm font-medium shadow-sm hover:shadow-md"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all bg-white text-sm font-medium shadow-sm hover:shadow-md"
             >
               <option value="">All Semesters</option>
               {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
@@ -88,7 +88,7 @@ export default function Filters({
               value={selectedSection}
               onChange={(e) => onSectionChange(e.target.value)}
               disabled={sectionsLoading}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white text-sm font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all bg-white text-sm font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="">All Sections</option>
               {sectionsLoading ? (

@@ -82,7 +82,7 @@ const CreateNewClubs = () => {
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+            className="px-4 py-2 bg-gradient-to-r from-teal-700 to-teal-800 text-white font-semibold rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
             Create New Club
@@ -91,7 +91,7 @@ const CreateNewClubs = () => {
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-teal-700" />
             <span className="ml-3 text-gray-600">Loading clubs...</span>
           </div>
         ) : clubs.length === 0 ? (
@@ -106,7 +106,7 @@ const CreateNewClubs = () => {
               </p>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+                className="px-4 py-2 bg-gradient-to-r from-teal-700 to-teal-800 text-white font-semibold rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
                 Create Your First Club

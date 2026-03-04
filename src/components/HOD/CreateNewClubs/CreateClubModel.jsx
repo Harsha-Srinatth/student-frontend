@@ -146,7 +146,7 @@ const CreateClubModal = ({ isOpen, onClose, onCreateClub }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-teal-50 via-white to-teal-50">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-2xl shadow-lg w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -168,7 +168,7 @@ const CreateClubModal = ({ isOpen, onClose, onCreateClub }) => {
               placeholder="Enter club name"
               value={formData.clubName}
               onChange={(e) => setFormData({ ...formData, clubName: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               required
             />
           </div>
@@ -181,7 +181,7 @@ const CreateClubModal = ({ isOpen, onClose, onCreateClub }) => {
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
               required
             />
           </div>
@@ -195,7 +195,7 @@ const CreateClubModal = ({ isOpen, onClose, onCreateClub }) => {
               min="0"
               value={formData.amounttojoin}
               onChange={(e) => setFormData({ ...formData, amounttojoin: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               required
             />
           </div>
@@ -251,7 +251,7 @@ const CreateClubModal = ({ isOpen, onClose, onCreateClub }) => {
                       setFormData({ ...formData, facultyCoordinator: '' });
                     }
                   }}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 />
                 {searchingFaculty && (
                   <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
@@ -302,7 +302,7 @@ const CreateClubModal = ({ isOpen, onClose, onCreateClub }) => {
                       setFormData({ ...formData, studentHead: '' });
                     }
                   }}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 />
                 {searchingStudent && (
                   <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
@@ -349,7 +349,7 @@ const CreateClubModal = ({ isOpen, onClose, onCreateClub }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-teal-700 to-teal-800 text-white font-semibold rounded-lg hover:from-teal-800 hover:to-teal-900 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

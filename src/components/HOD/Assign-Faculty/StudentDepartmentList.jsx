@@ -20,7 +20,7 @@ export default function StudentList({
     if (selectedFacultyId) {
       dispatch(fetchFacultyAssignments(selectedFacultyId));
     }
-  }, [dispatch, selectedFacultyId]);
+  }, [dispatch, selectedFacultyId]);  
 
   // Get year for a section
   const getSectionYear = (section) => {
@@ -85,7 +85,7 @@ export default function StudentList({
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700"></div>
         </div>
       </div>
     );
@@ -104,10 +104,10 @@ export default function StudentList({
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-green-50 to-white">
+      <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-white">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="bg-green-600 p-2 rounded-lg">
+            <div className="bg-teal-700 p-2 rounded-lg">
               <BookOpen className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -133,7 +133,7 @@ export default function StudentList({
             placeholder="Search sections (e.g., 1, A, B)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
@@ -163,17 +163,17 @@ export default function StudentList({
                 className={`px-6 py-4 transition-all cursor-pointer ${
                   isPartiallyAssigned && selectedFacultyId
                     ? 'hover:bg-yellow-50'
-                    : 'hover:bg-green-50'
+                    : 'hover:bg-teal-50'
                 } ${
                   isSelected
-                    ? 'bg-green-50 border-l-4 border-green-600'
+                    ? 'bg-teal-50 border-l-4 border-teal-700'
                     : 'border-l-4 border-transparent'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-3 mb-2 flex-wrap gap-2">
-                      <div className="bg-gradient-to-br from-green-500 to-green-600 text-white px-3 py-1 rounded-lg font-bold text-sm min-w-fit">
+                      <div className="bg-gradient-to-br from-teal-700 to-teal-800 text-white px-3 py-1 rounded-lg font-bold text-sm min-w-fit">
                         Section {section.name}
                       </div>
                       
@@ -183,7 +183,7 @@ export default function StudentList({
                           {sectionYears.map((year, idx) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200"
+                              className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-teal-100 text-teal-800 border border-teal-200"
                             >
                               {getYearLabel(year)}
                             </span>
@@ -207,7 +207,7 @@ export default function StudentList({
                         {selectedFacultyId && (
                           <span className="text-gray-500">
                             {' • '}
-                            <span className="font-medium text-green-600">
+                            <span className="font-medium text-teal-700">
                               {section.studentCount - assignedCount}
                             </span>
                             {' available'}
@@ -221,7 +221,7 @@ export default function StudentList({
                     <div
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         isSelected
-                          ? 'bg-green-600 text-white'
+                          ? 'bg-teal-800 text-white'
                           : 'bg-gray-100 text-gray-600'
                       }`}
                     >
@@ -230,7 +230,7 @@ export default function StudentList({
                     <ChevronRight
                       className={`h-5 w-5 transition-transform ${
                         isSelected
-                          ? 'text-green-600'
+                          ? 'text-teal-700'
                           : 'text-gray-400'
                       }`}
                     />

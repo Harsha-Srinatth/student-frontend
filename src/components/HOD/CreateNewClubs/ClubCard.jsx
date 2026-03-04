@@ -22,7 +22,7 @@ const ClubCard = ({ club, onEdit, onDelete, onAssign }) => {
   }, [isDropdownOpen]);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all duration-200">
+    <div className="bg-gradient-to-br from-teal-50 via-white to-teal-50 rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all duration-200">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
@@ -39,7 +39,7 @@ const ClubCard = ({ club, onEdit, onDelete, onAssign }) => {
             )}
             <div>
               <h3 className="font-semibold text-lg text-gray-900">{club.clubName}</h3>
-              <span className="mt-1 inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded">
+              <span className="mt-1 inline-block px-2 py-1 text-xs font-medium bg-teal-100 text-teal-700 rounded">
                 {club.clubDepartment}
               </span>
             </div>
@@ -84,7 +84,7 @@ const ClubCard = ({ club, onEdit, onDelete, onAssign }) => {
       <div className="space-y-3 pt-4 border-t border-gray-200">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <User className="h-4 w-4 text-blue-600" />
+            <User className="h-4 w-4 text-teal-700" />
           </div>
           <div className="flex-1">
             <p className="text-xs text-gray-500">Faculty Coordinator</p>
@@ -99,7 +99,7 @@ const ClubCard = ({ club, onEdit, onDelete, onAssign }) => {
 
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center">
-            <Crown className="h-4 w-4 text-yellow-600" />
+            <Crown className="h-4 w-4 text-teal-700" />
           </div>
           <div className="flex-1">
             <p className="text-xs text-gray-500">Student Head</p>
@@ -114,7 +114,7 @@ const ClubCard = ({ club, onEdit, onDelete, onAssign }) => {
 
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-            <Users className="h-4 w-4 text-green-600" />
+            <Users className="h-4 w-4 text-teal-700" />
           </div>
           <div>
             <p className="text-xs text-gray-500">Members</p>
@@ -123,8 +123,8 @@ const ClubCard = ({ club, onEdit, onDelete, onAssign }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <span className="text-xs font-bold text-blue-700">₹</span>
+          <div className="h-8 w-8 rounded-full bg-teal-100 flex items-center justify-center">
+            <span className="text-xs font-bold text-teal-700">₹</span>
           </div>
           <div>
             <p className="text-xs text-gray-500">Join Fee</p>

@@ -123,7 +123,7 @@ const AssignModal = ({ isOpen, onClose, club, onAssign }) => {
   if (!isOpen || !club) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-teal-50 via-white to-teal-50">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-2xl shadow-lg w-full max-w-md mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -142,7 +142,7 @@ const AssignModal = ({ isOpen, onClose, club, onAssign }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div className="space-y-2">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <User className="h-4 w-4 text-blue-600" />
+              <User className="h-4 w-4 text-teal-700" />
               Faculty Coordinator
             </label>
             <div className="relative">
@@ -158,7 +158,7 @@ const AssignModal = ({ isOpen, onClose, club, onAssign }) => {
                       setFacultyCoordinator('');
                     }
                   }}
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 />
                 {facultyCoordinator && (
                   <button
@@ -204,7 +204,7 @@ const AssignModal = ({ isOpen, onClose, club, onAssign }) => {
 
           <div className="space-y-2">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <Crown className="h-4 w-4 text-yellow-600" />
+              <Crown className="h-4 w-4 text-teal-700" />
               Student Club Head
             </label>
             <div className="relative">
@@ -220,7 +220,7 @@ const AssignModal = ({ isOpen, onClose, club, onAssign }) => {
                       setStudentHead('');
                     }
                   }}
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 />
                 {studentHead && (
                   <button
@@ -276,7 +276,7 @@ const AssignModal = ({ isOpen, onClose, club, onAssign }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-teal-700 to-teal-800 text-white font-semibold rounded-lg hover:from-teal-800 hover:to-teal-900 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

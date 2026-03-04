@@ -68,7 +68,7 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700"></div>
         </div>
       </div>
     );
@@ -87,10 +87,10 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+      <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-white">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="bg-blue-600 p-2 rounded-lg">
+            <div className="bg-teal-700 p-2 rounded-lg">
               <Users className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -107,7 +107,7 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
             placeholder="Search faculty by name, email, or designation..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
@@ -133,9 +133,9 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
               <div
                 key={memberId}
                 onClick={() => onSelectFaculty(member)}
-                className={`px-6 py-4 hover:bg-blue-50 transition-all cursor-pointer ${
+                className={`px-6 py-4 hover:bg-teal-50 transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-blue-50 border-l-4 border-blue-600'
+                    ? 'bg-teal-50 border-l-4 border-teal-700'
                     : 'border-l-4 border-transparent'
                 }`}
               >
@@ -146,7 +146,7 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
                         {member.name || member.fullname}
                       </h3>
                       {hasAssignments && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
                           <CheckCircle2 className="h-3 w-3 mr-1" />
                           {assignedSections.length} {assignedSections.length === 1 ? 'Section' : 'Sections'}
                         </span>
@@ -180,7 +180,7 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
                             {member.subjects.map((subject, idx) => (
                               <span
                                 key={idx}
-                                className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200"
+                                className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-teal-100 text-teal-800 border border-teal-200"
                               >
                                 {subject}
                               </span>
@@ -201,16 +201,16 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
                           {assignedSections.map((assignment, idx) => (
                             <div
                               key={idx}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200 group relative"
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-teal-100 text-teal-800 border border-teal-200 group relative"
                             >
                               <span className="font-bold">{assignment.section}</span>
                               {assignment.years && assignment.years.length > 0 && (
-                                <span className="text-blue-600">
+                                <span className="text-teal-700">
                                   ({assignment.years.map(y => getYearLabel(y)).join(', ')})
                                 </span>
                               )}
                               {assignment.assignmentType && (
-                                <span className="text-blue-500">• {assignment.assignmentType}</span>
+                                <span className="text-teal-700">• {assignment.assignmentType}</span>
                               )}
                               <button
                                 onClick={(e) => handleRemoveAssignment(member.facultyid ?? member.id, assignment.section, e)}
@@ -231,7 +231,7 @@ export default function FacultyList({ onSelectFaculty, selectedFacultyId }) {
                     <div
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         isSelected
-                          ? 'bg-blue-600 text-white'
+                        ? 'bg-teal-800 text-white'
                           : 'bg-gray-100 text-gray-600'
                       }`}
                     >

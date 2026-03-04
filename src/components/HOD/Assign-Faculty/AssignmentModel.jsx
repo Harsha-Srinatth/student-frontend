@@ -10,7 +10,7 @@ const ASSIGNMENT_TYPES = [
   'Project Guide',
   'Research Supervisor',
   'Course Coordinator'
-];
+];  
 
 export default function AssignmentModal({
   faculty,
@@ -72,7 +72,7 @@ export default function AssignmentModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-gradient-to-r from-teal-700 to-teal-800 px-6 py-5 flex items-center justify-between z-10">
           <div className="flex items-center space-x-3">
             <div className="bg-white bg-opacity-20 p-2 rounded-lg">
               <UserCheck className="h-6 w-6 text-white" />
@@ -112,9 +112,9 @@ export default function AssignmentModal({
           )}
 
           {/* Faculty Information */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+          <div className="bg-teal-50 border border-teal-200 rounded-xl p-5">
             <div className="flex items-center space-x-2 mb-3">
-              <UserCheck className="h-5 w-5 text-blue-600" />
+              <UserCheck className="h-5 w-5 text-teal-700" />
               <h3 className="text-sm font-semibold text-blue-900 uppercase tracking-wide">Faculty Member</h3>
             </div>
             <div className="space-y-2">
@@ -126,13 +126,13 @@ export default function AssignmentModal({
                 </p>
               )}
               {faculty.sectionsAssigned && faculty.sectionsAssigned.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-blue-200">
-                  <p className="text-xs font-semibold text-blue-700 mb-2">Currently Assigned To:</p>
+                <div className="mt-3 pt-3 border-t border-teal-200">
+                  <p className="text-xs font-semibold text-teal-700 mb-2">Currently Assigned To:</p>
                   <div className="flex flex-wrap gap-2">
                     {faculty.sectionsAssigned.map((assignment, idx) => (
                       <span
                         key={idx}
-                        className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200"
+                        className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-teal-100 text-teal-800 border border-teal-200"
                       >
                         Section {assignment.section}
                         {assignment.assignmentType && ` • ${assignment.assignmentType}`}
@@ -145,14 +145,14 @@ export default function AssignmentModal({
           </div>
 
           {/* Section Information */}
-          <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+          <div className="bg-teal-50 border border-teal-200 rounded-xl p-5">
             <div className="flex items-center space-x-2 mb-3">
-              <BookOpen className="h-5 w-5 text-green-600" />
+              <BookOpen className="h-5 w-5 text-teal-700" />
               <h3 className="text-sm font-semibold text-green-900 uppercase tracking-wide">Student Section</h3>
             </div>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
-                <div className="bg-gradient-to-br from-green-500 to-green-600 text-white px-4 py-2 rounded-lg font-bold text-lg">
+                <div className="bg-gradient-to-br from-teal-700 to-teal-800 text-white px-4 py-2 rounded-lg font-bold text-lg">
                   Section {section.name}
                 </div>
                 {sectionYears.length > 0 && (
@@ -160,9 +160,9 @@ export default function AssignmentModal({
                     {sectionYears.map((year, idx) => (
                       <span
                         key={idx}
-                        className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200"
+                        className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-teal-100 text-teal-800 border border-teal-200"
                       >
-                        {getYearLabel(year)}
+                        {getYearLabel(year)}  
                       </span>
                     ))}
                   </div>
@@ -184,10 +184,10 @@ export default function AssignmentModal({
                 )}
               </div>
               
-              <div className="bg-white rounded-lg p-3 border border-green-200">
+              <div className="bg-white rounded-lg p-3 border border-teal-200">
                 <p className="text-sm text-gray-700">
                   <span className="font-semibold">Impact:</span> This assignment will be applied to all{' '}
-                  <span className="font-bold text-green-700">{section.studentCount}</span> students in Section {section.name}.
+                  <span className="font-bold text-teal-700">{section.studentCount}</span> students in Section {section.name}.
                   {sectionYears.length > 0 && (
                     <span> These students are in {sectionYears.map(y => getYearLabel(y)).join(' and ')}.</span>
                   )}
@@ -204,7 +204,7 @@ export default function AssignmentModal({
             <select
               value={assignmentType}
               onChange={(e) => setAssignmentType(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all bg-white"
             >
               {ASSIGNMENT_TYPES.map((type) => (
                 <option key={type} value={type}>
@@ -224,7 +224,7 @@ export default function AssignmentModal({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Add any additional notes about this assignment..."
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all resize-none"
             />
             <p className="text-xs text-gray-500 mt-1">These notes will be stored with the assignment record.</p>
           </div>
@@ -242,7 +242,7 @@ export default function AssignmentModal({
           <button
             onClick={handleAssignSection}
             disabled={assigning}
-            className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-md"
+            className="px-6 py-2.5 bg-teal-700 text-white font-medium rounded-lg hover:bg-teal-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-md"
           >
             {assigning ? (
               <>

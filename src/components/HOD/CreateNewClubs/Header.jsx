@@ -26,7 +26,6 @@ const Header = () => {
 
     fetchHODInfo();
   }, [dispatch, hodInfo]);
-
   const hodName = hodInfo?.name || hodInfo?.fullname || 'HOD';
   const hodDepartment = hodInfo?.department?.name || hodInfo?.department || 'Department';
   const hodEmail = hodInfo?.email || '';
@@ -39,7 +38,7 @@ const Header = () => {
           <input
             type="text"
             placeholder="Search clubs, members..."
-            className="w-full pl-10 pr-4 py-2 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
       </div>
@@ -55,7 +54,7 @@ const Header = () => {
             <p className="text-sm font-medium text-gray-900">{hodName}</p>
             <p className="text-xs text-gray-600">HOD - {hodDepartment}</p>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
+          <div className="h-10 w-10 rounded-xl bg-teal-700 flex items-center justify-center">
             <User className="h-5 w-5 text-white" />
           </div>
         </div>

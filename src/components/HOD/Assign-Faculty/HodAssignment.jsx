@@ -82,9 +82,9 @@ export default function HODPortal() {
 
   if (isLoading && !hasError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-teal-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-teal-700 border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-700 font-medium text-lg">Loading...</p>
           <p className="text-gray-500 text-sm mt-2">Please wait</p>
         </div>
@@ -95,17 +95,17 @@ export default function HODPortal() {
   const { totalFaculty, totalSections, totalStudents, assignedFacultyCount } = stats;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/40 to-slate-100">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="bg-gradient-to-br from-blue-600 to-cyan-600 p-3 rounded-xl shadow-lg">
+              <div className="bg-gradient-to-br from-teal-700 to-teal-800 p-3 rounded-xl shadow-lg">
                 <Building2 className="h-7 w-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-teal-700 via-teal-800 to-teal-900 bg-clip-text text-transparent">
                   Faculty Assignment Portal
                 </h1>
                 <p className="text-sm text-gray-600 mt-1">
@@ -130,13 +130,13 @@ export default function HODPortal() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-lg border border-blue-200 p-5 hover:shadow-xl transition-all">
+          <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl shadow-lg border border-teal-200 p-5 hover:shadow-xl transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs sm:text-sm text-gray-700 mb-1 font-medium">Total Faculty</p>
-                <p className="text-2xl sm:text-3xl font-bold text-blue-600">{totalFaculty}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-teal-700">{totalFaculty}</p>
               </div>
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md">
+              <div className="p-3 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg shadow-md">
                 <Users className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
@@ -147,29 +147,29 @@ export default function HODPortal() {
                 <p className="text-xs sm:text-sm text-gray-700 mb-1 font-medium">Total Sections</p>
                 <p className="text-2xl sm:text-3xl font-bold text-emerald-600">{totalSections}</p>
               </div>
-              <div className="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg shadow-md">
+              <div className="p-3 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg shadow-md">
                 <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-lg border border-purple-200 p-5 hover:shadow-xl transition-all">
+          <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl shadow-lg border border-teal-200 p-5 hover:shadow-xl transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs sm:text-sm text-gray-700 mb-1 font-medium">Total Students</p>
-                <p className="text-2xl sm:text-3xl font-bold text-purple-600">{totalStudents}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-teal-700">{totalStudents}</p>
               </div>
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-md">
+              <div className="p-3 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg shadow-md">
                 <Users className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl shadow-lg border border-orange-200 p-5 hover:shadow-xl transition-all">
+          <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl shadow-lg border border-teal-200 p-5 hover:shadow-xl transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs sm:text-sm text-gray-700 mb-1 font-medium">Assigned Faculty</p>
-                <p className="text-2xl sm:text-3xl font-bold text-orange-600">{assignedFacultyCount}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-teal-700">{assignedFacultyCount}</p>
               </div>
-              <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-md">
+              <div className="p-3 bg-gradient-to-br from-teal-700 to-teal-800 rounded-lg shadow-md">
                 <CheckCircle2 className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
@@ -243,7 +243,7 @@ export default function HODPortal() {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 gap-4">
                   <div className="flex-1 min-w-[200px]">
                     {selectedFaculty ? (
-                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 shadow-sm">
+                      <div className="bg-gradient-to-br from-teal-50 to-teal-100 border border-teal-200 rounded-lg p-4 shadow-sm">
                         <p className="text-xs font-semibold text-blue-900 mb-2 uppercase tracking-wide">Selected Faculty</p>
                         <p className="text-base font-semibold text-gray-900 mb-1">{selectedFaculty.name || selectedFaculty.fullname}</p>
                         <p className="text-sm text-gray-600">{selectedFaculty.email}</p>
@@ -292,7 +292,7 @@ export default function HODPortal() {
               <button
                 onClick={handleAssignClick}
                 disabled={!selectedFaculty || !selectedSection}
-                className="w-full lg:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:via-cyan-700 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center space-x-2 whitespace-nowrap transform hover:scale-105 active:scale-95"
+                className="w-full lg:w-auto px-8 py-4 bg-gradient-to-r from-teal-700 via-teal-800 to-teal-900 text-white font-semibold rounded-lg hover:from-teal-800 hover:via-teal-900 hover:to-teal-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center space-x-2 whitespace-nowrap transform hover:scale-105 active:scale-95"
               >
                 <CheckCircle2 className="h-5 w-5" />
                 <span>Assign Faculty to Section</span>
