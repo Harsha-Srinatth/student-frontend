@@ -15,6 +15,11 @@ import {
   Building2,
   IdCard,
   Users,
+  Award,
+  Target,
+  Code,
+  Sparkles,
+  BookOpenCheck,
 } from "lucide-react";
 
 import { fetchSDashboardData } from "../../../features/student/studentDashSlice";
@@ -189,6 +194,50 @@ const StudentSettings = ({ student: studentProp }) => {
               ))}
             </div>
           </div>
+        </motion.div>
+
+        {/* Student Scores (from Redux - teachingPoints, projectsPoints, etc.) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Award className="w-6 h-6 text-teal-600" />
+            <h2 className="text-xl font-semibold text-gray-800">Your Scores</h2>
+          </div>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { key: "teachingPoints", label: "Teaching Points", value: reduxStudent?.teachingPoints ?? 0, icon: BookOpenCheck },
+              { key: "projectsPoints", label: "Projects Points", value: reduxStudent?.projectsPoints ?? 0, icon: Code },
+              { key: "problemSolvingRank", label: "Problem Solving Rank", value: reduxStudent?.problemSolvingRank ?? 0, icon: Target },
+              { key: "extraCurricularPoints", label: "Extra Curricular Points", value: reduxStudent?.extraCurricularPoints ?? 0, icon: Sparkles },
+              { key: "coCurricularPoints", label: "Co-Curricular Points", value: reduxStudent?.coCurricularPoints ?? 0, icon: BookOpen },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <li
+                  key={item.key}
+                  className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 border border-gray-100"
+                >
+                  <span className="w-6 h-6 flex-shrink-0 text-teal-600">
+                    <Icon className="w-6 h-6" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-600">{item.label}</p>
+                    <p className="text-base font-bold text-gray-800">
+                      {reduxLoading ? (
+                        <span className={`inline-block w-12 h-5 ${shimmerCls} rounded`} />
+                      ) : (
+                        item.value
+                      )}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </motion.div>
 
         {/* Notification Settings */}

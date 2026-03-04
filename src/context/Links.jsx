@@ -1,7 +1,8 @@
 import { 
   Home, Upload, Award, Briefcase, ClipboardList, BookOpenCheck, 
   Megaphone, Settings, CheckCircle2, History, Users, FileCheck, 
-  GraduationCap, BarChart3, UserPlus, Building2, MessageCircle, BookOpen
+  GraduationCap, BarChart3, UserPlus, Building2, MessageCircle, BookOpen,
+  CalendarDays
 } from "lucide-react";
 
 // 🎓 Student Sidebar Links
@@ -15,6 +16,7 @@ export const StudentSidebarLinks = [
   { icon: <BarChart3 size={20} />, label: 'Results', route: '/student/results' },
   { icon: <Users size={20} />, label: 'Club Enrolment', route: '/student/clubs/enrol' },
   { icon: <BookOpen size={20} />, label: 'Skill Exchange', route: '/student/skill-exchange' },
+  { icon: <CalendarDays size={20} />, label: 'Leave Requests', route: '/student/leaveRequests' },
   { icon: <Settings size={20} />, label: 'Settings', route: '/student/settings' },
 ];
 
@@ -29,6 +31,7 @@ export const FacultySidebarLinks = [
   { icon: <BookOpenCheck size={20} />, label: 'Marks Entry', route: '/faculty/add/marks' },
   { icon: <BookOpen size={20} />, label: 'Course Approvals', route: '/faculty/course-approvals' },
   { icon: <GraduationCap size={20} />, label: 'Course Completions', route: '/faculty/course-completions' },
+  { icon: <CalendarDays size={20} />, label: 'Leave Requests', route: '/faculty/leave-requests' },
   { icon: <Settings size={20} />, label: 'Settings', route: '/faculty/settings' },
 ];
 
@@ -39,6 +42,7 @@ export const StudentBottombarLinks = [
   { icon: <Upload size={20} />, label: 'Upload Files', route: '/student/upload' },
   { icon: <BookOpen size={20} />, label: 'Skill Exchange', route: '/student/skill-exchange' },
   { icon: <ClipboardList size={20} />, label: 'Pending Tasks', route: '/student/pending/approvels' },
+  { icon: <CalendarDays size={20} />, label: 'Leave Requests', route: '/student/leaveRequests' },
   { icon: <Award size={20} />, label: 'Achievements', route: '/student/achievements/all/docs' },
 ];
 
@@ -48,6 +52,7 @@ export const FacultyBottombarLinks = [
   { icon: <Home size={20} />, label: 'Home', route: '/faculty/home' },
   { icon: <CheckCircle2 size={20} />, label: 'Approvals', route: '/faculty/pending-approvals' },
   { icon: <History size={20} />, label: 'Verifications', route: '/faculty/verifications' },
+  { icon: <CalendarDays size={20} />, label: 'Leave Requests', route: '/faculty/leave-requests' },
 ];
 
 // 👨‍💼 Admin Sidebar Links

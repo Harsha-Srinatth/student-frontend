@@ -23,7 +23,7 @@ const StudentHome = () => {
   }, [dispatch]);
 
   return (
-    <PageContainer>
+    <PageContainer className="bg-green-50">
       <WelcomeBanner
         name={student?.fullname}
         loading={loading}
@@ -35,7 +35,7 @@ const StudentHome = () => {
       />
 
       {/* Leaderboard: top 10 by points — shown at top below header */}
-      <div className="mb-6">
+      <div className="mb-6 bg-green-100">
         <TopTenStudents />
       </div>
 

@@ -21,6 +21,7 @@ import {
   Trash2
 } from "lucide-react";
 import api from "../../../services/api";
+import Toast from "../../../components/shared/Toast";
 
 const FacultyAnnouncements = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const FacultyAnnouncements = () => {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [editAnnouncement, setEditAnnouncement] = useState(null);
+  const [toast, setToast] = useState(null);
   
   const listenersSetup = useRef(false);
   const hasFetchedRef = useRef(false);
@@ -197,7 +199,7 @@ const FacultyAnnouncements = () => {
       dispatch(fetchFacultyAnnouncements({ forceRefresh: true }));
     } catch (error) {
       console.error("Delete announcement error:", error);
-      alert(error.response?.data?.message || "Failed to delete announcement");
+      setToast({ type: "error", message: error.response?.data?.message || "Failed to delete announcement" });
     } finally {
       setDeletingId(null);
     }
@@ -272,6 +274,13 @@ const FacultyAnnouncements = () => {
 
   return (
     <div className="w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       {/* Enhanced Header */}
       <div className="relative p-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAzNGMwIDIuMjA5LTEuNzkxIDQtNCA0aC0xNmMtMi4yMDkgMC00LTEuNzkxLTQtNFYyNmMwLTIuMjA5IDEuNzkxLTQgNC00aDE2YzIuMjA5IDAgNCAxLjc5MSA0IDR2OHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvZz48L3N2Zz4=')] opacity-20"></div>

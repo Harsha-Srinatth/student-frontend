@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { FileText, Award, Users, Briefcase, Code, File } from "lucide-react";
 import api from "../../../../services/api";
 import Cookies from "js-cookie";
-import Toast from "./shared/Toast";
+import Toast from "../../../shared/Toast";
 import AnimatedProgress from "./shared/AnimatedProgress";
 import CertificateForm from "./forms/CertificateForm";
 import WorkshopForm from "./forms/WorkshopForm";
@@ -23,12 +23,12 @@ const REQUIRED_FIELDS = {
 const IMAGE_UPLOAD_TYPES = ["certificate", "workshop", "club", "internship", "project", "other"];
 
 const DOCUMENT_TYPES = [
-  { value: "certificate", label: "Certificate", icon: Award, gradient: "from-blue-500 to-cyan-600" },
-  { value: "workshop", label: "Workshop", icon: Users, gradient: "from-purple-500 to-pink-600" },
-  { value: "club", label: "Club Activity", icon: Users, gradient: "from-green-500 to-teal-600" },
-  { value: "internship", label: "Internship", icon: Briefcase, gradient: "from-orange-500 to-red-600" },
-  { value: "project", label: "Project", icon: Code, gradient: "from-indigo-500 to-purple-600" },
-  { value: "other", label: "Other", icon: File, gradient: "from-gray-500 to-slate-600" },
+  { value: "certificate", label: "Certificate", icon: Award, gradient: "bg-teal-900" },
+  { value: "workshop", label: "Workshop", icon: Users, gradient: "bg-teal-900" },
+  { value: "club", label: "Club Activity", icon: Users, gradient: "bg-teal-900" },
+  { value: "internship", label: "Internship", icon: Briefcase, gradient: "bg-teal-900" },
+  { value: "project", label: "Project", icon: Code, gradient: "bg-teal-900" },
+  { value: "other", label: "Other", icon: File, gradient: "bg-teal-900" },
 ];
 
 export default function UploadDocument() {
@@ -241,7 +241,7 @@ export default function UploadDocument() {
   const isSubmitDisabled = isUploading || !(REQUIRED_FIELDS[formData.type] || []).every((field) => (formData[field] ?? "").toString().trim() !== "");
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 sm:p-6 lg:p-8">
+    <div className="w-full min-h-screen bg-green-50 p-4 sm:p-6 lg:p-8">
       {toast && (
         <Toast
           message={toast.message}
@@ -250,17 +250,17 @@ export default function UploadDocument() {
         />
       )}
       
-      <div className="w-full max-w-none mx-auto">
+      <div className="w-full max-w-none mx-auto bg-green-50">
         {/* Header Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-8 mb-8">
+        <div className="bg-teal-900 rounded-3xl shadow-xl border border-white/20 p-8 mb-8">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-900 to-green-700 rounded-2xl mb-4">
               <FileText className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl font-bold bg-gradient-to-r text-white/90 bg-clip-text mb-2">
               Upload Document
             </h1>
-            <p className="text-gray-600">Share your achievements and experiences</p>
+            <p className="text-white/80">Share your achievements and experiences</p>
           </div>
         </div>
 
@@ -269,7 +269,7 @@ export default function UploadDocument() {
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
             {/* Document Type Selection */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-4">
+              <label className="block text-md font-semibold text-black mb-4">
                 Document Type *
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -283,8 +283,8 @@ export default function UploadDocument() {
                       onClick={() => handleTypeChange(docType.value)}
                       className={`p-4 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${
                         isSelected
-                          ? "border-transparent bg-gradient-to-br " + docType.gradient + " text-white shadow-lg"
-                          : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:shadow-md"
+                          ? "border-transparent bg-gradient-to-br " + docType.gradient + " text-white/90 shadow-lg"
+                          : "border-gray-200 bg-white/80 text-gray-700 hover:bg-green-50 hover:shadow-md"
                       }`}
                     >
                       <div className="flex flex-col items-center space-y-2">
@@ -299,20 +299,20 @@ export default function UploadDocument() {
 
             {/* Category type (for faculty points: co-curricular / extra-curricular / academic) */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-md font-semibold text-black mb-2">
                 Category (for points) *
               </label>
               <select
                 name="achievementType"
                 value={formData.achievementType}
                 onChange={handleChange}
-                className="w-full max-w-xs px-4 py-2.5 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                className="w-full max-w-xs px-4 py-2.5 rounded-xl border-2 border-gray-200 outline-none transition"
               >
-                <option value="co-curricular">Co-curricular</option>
-                <option value="extra-curricular">Extra-curricular</option>
-                <option value="academic">Academic</option>
+                <option value="co-curricular" className="text-black">Co-curricular</option>
+                <option value="extra-curricular" className="text-black">Extra-curricular</option>
+                <option value="academic" className="text-black">Academic</option>
               </select>
-              <p className="text-xs text-gray-500 mt-1">Faculty will award points based on this category.</p>
+              <p className="text-sm text-gray-500 mt-1">Faculty will award points based on this category.</p>
             </div>
 
             {/* Dynamic Form Fields */}
@@ -323,7 +323,7 @@ export default function UploadDocument() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center text-sm">
                   <span className="font-medium text-gray-700">Uploading...</span>
-                  <span className="text-blue-600 font-semibold">{uploadProgress}%</span>
+                  <span className="text-green-800 font-semibold">{uploadProgress}%</span>
                 </div>
                 <AnimatedProgress progress={uploadProgress} />
               </div>
@@ -333,10 +333,10 @@ export default function UploadDocument() {
             <button
               type="submit"
               disabled={isSubmitDisabled}
-              className={`w-full py-4 px-8 rounded-2xl font-semibold text-white text-lg transition-all duration-300 transform ${
+              className={`w-full py-4 px-8 rounded-2xl font-semibold text-white/90 text-lg transition-all duration-300 transform ${
                 isSubmitDisabled
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl hover:-translate-y-1 active:translate-y-0"
+                  ? "bg-gray-400/80 cursor-not-allowed"
+                  : "bg-gradient-to-r from-teal-900 to-teal-700 hover:from-teal-900 hover:to-teal-700 hover:shadow-xl hover:-translate-y-1 active:translate-y-0"
               }`}
             >
               {isUploading ? (

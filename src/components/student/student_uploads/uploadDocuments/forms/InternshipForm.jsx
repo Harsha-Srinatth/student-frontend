@@ -59,7 +59,7 @@ const InternshipForm = ({ formData, handleChange, handleFileSelect, imagePreview
       />
       
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-4">
+        <label className="block text-md font-semibold text-black mb-4">
           Upload Image *
         </label>
         <DragDropUpload

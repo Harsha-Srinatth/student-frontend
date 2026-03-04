@@ -16,9 +16,9 @@ import {
 import { generateAchievementPdf } from "../../../utils/pdfUtil";
 
 const TABS = [
-  { key: "certifications", label: "Certifications", icon: Award, color: "from-amber-500 to-orange-600" },
-  { key: "workshops", label: "Workshops", icon: BookOpen, color: "from-blue-500 to-indigo-600" },
-  { key: "clubs", label: "Clubs & Others", icon: Users, color: "from-purple-500 to-pink-600" },
+  { key: "certifications", label: "Certifications", icon: Award, color: "from-[#162b61] to-[#2F4A5D]" },
+  { key: "workshops", label: "Workshops", icon: BookOpen, color: "from-[#162b61] to-[#2F4A5D]" },
+  { key: "clubs", label: "Clubs & Others", icon: Users, color: "from-[#162b61] to-[#2F4A5D]" },
 ];
 
 const ApprovedByYou = () => {
@@ -70,36 +70,35 @@ const ApprovedByYou = () => {
 
   const getTabColor = (key) => {
     const tab = TABS.find(t => t.key === key);
-    return tab ? tab.color : "from-blue-500 to-indigo-600";
+    return tab ? tab.color : "from-[#162b61] to-[#2F4A5D]";
   };
 
   return (
     <div className="w-full max-w-6xl mx-auto">
-      {/* Main Container - Dark Theme */}
-      <div className="bg-slate-800 rounded-3xl overflow-hidden shadow-2xl shadow-black/20">
+      {/* Main Container */}
+      <div className="bg-[#E9E6E1] rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-[#D9D6D0]">
         
         {/* Header Section */}
-        <div className="relative p-8 pb-6 bg-gradient-to-br from-slate-700 to-slate-800">
+        <div className="relative p-8 pb-6 bg-[#E9E6E1]">
           <div className="flex items-start gap-6">
             <div className="relative">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg shadow-purple-500/25 flex items-center justify-center transform rotate-3 transition-all duration-500">
+              <div className="w-16 h-16 rounded-2xl bg-[#374763] shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center">
                 <FileText className="w-7 h-7 text-white" />
               </div>
-              <div className="absolute -inset-1 bg-gradient-to-br from-purple-400/20 to-pink-600/20 rounded-2xl blur-md -z-10" />
             </div>
             
             <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-[#2F3E5C] leading-tight">
                 Approved by You
               </h1>
-              <p className="text-slate-300 mt-2 text-lg">
+              <p className="text-[#5E6B7C] mt-2 text-lg">
                 Track and export student achievements you've reviewed
               </p>
               <div className="flex items-center gap-4 mt-4">
-                <div className="px-4 py-2 bg-green-500/20 text-green-300 rounded-full text-sm font-medium border border-green-500/30">
+                <div className="px-4 py-2 bg-[#D9D6D0] text-[#2F3E5C] rounded-full text-sm font-medium">
                   {tabContent.length} Records
                 </div>
-                <div className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-full text-sm font-medium border border-blue-500/30">
+                <div className="px-4 py-2 bg-[#D9D6D0] text-[#2F3E5C] rounded-full text-sm font-medium">
                   Faculty Review
                 </div>
               </div>
@@ -108,7 +107,7 @@ const ApprovedByYou = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-8 pb-8 bg-slate-800">
+        <div className="px-8 pb-8">
           <div className="flex flex-wrap gap-3">
             {TABS.map((tab) => {
               const isActive = activeTab === tab.key;
@@ -118,19 +117,15 @@ const ApprovedByYou = () => {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`
-                    group relative flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:ring-offset-2 focus:ring-offset-slate-800
+                  className={`flex items-center gap-3 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300
                     ${isActive 
-                      ? `bg-gradient-to-r ${tab.color} text-white shadow-xl` 
-                      : 'bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white shadow-lg'
+                      ? 'bg-[#374763] text-white shadow' 
+                      : 'bg-[#D9D6D0] text-[#2F3E5C] hover:bg-[#D9D6D0] hover:opacity-80'
                     }
                   `}
                 >
-                  <Icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'rotate-12' : 'group-hover:rotate-6'}`} />
+                  <Icon className="w-5 h-5" />
                   <span>{tab.label}</span>
-                  {isActive && (
-                    <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/10 rounded-2xl blur-sm -z-10" />
-                  )}
                 </button>
               );
             })}
@@ -138,39 +133,22 @@ const ApprovedByYou = () => {
         </div>
 
         {/* Content Area */}
-        <div className="px-8 pb-8 bg-slate-800">
+        <div className="px-8 pb-8">
           <div className="min-h-[400px]">
             {activitiesLoading ? (
-              <div className="space-y-6">
-                {[...Array(3)].map((_, idx) => (
-                  <div key={idx} className="animate-pulse">
-                    <div className="bg-slate-700/50 rounded-2xl p-6 shadow-lg">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-slate-600 rounded-xl" />
-                        <div className="flex-1 space-y-3">
-                          <div className="h-4 bg-slate-600 rounded-lg w-3/5" />
-                          <div className="h-3 bg-slate-600 rounded w-4/5" />
-                        </div>
-                        <div className="w-24 h-8 bg-slate-600 rounded-full" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <div className="text-center text-[#5E6B7C] py-8">Loading...</div>
             ) : error ? (
-              <div className="bg-red-900/20 border border-red-500/30 rounded-2xl p-8 text-center shadow-lg">
-                <XCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-                <p className="text-red-300 text-lg font-medium">{error}</p>
+              <div className="bg-[#FDECEC] border border-[#C0846A] rounded-xl p-6 text-center">
+                <XCircle className="w-10 h-10 text-[#C0846A] mx-auto mb-2" />
+                <p className="text-[#C0846A]">{error}</p>
               </div>
             ) : tabContent.length === 0 ? (
-              <div className="bg-slate-700/30 rounded-2xl p-12 text-center shadow-inner">
-                <div className="w-20 h-20 bg-slate-600/50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <FileText className="w-10 h-10 text-slate-400" />
-                </div>
-                <p className="text-slate-300 text-lg font-medium">
+              <div className="bg-[#D9D6D0] rounded-xl p-10 text-center">
+                <FileText className="w-10 h-10 text-[#5E6B7C] mx-auto mb-2" />
+                <p className="text-[#2F3E5C] font-medium">
                   No records found in this category
                 </p>
-                <p className="text-slate-400 text-sm mt-2">
+                <p className="text-[#5E6B7C] text-sm mt-2">
                   Check back later for new approvals
                 </p>
               </div>
@@ -186,39 +164,34 @@ const ApprovedByYou = () => {
                   return (
                     <div
                       key={idx}
-                      className="group relative bg-slate-700/40 hover:bg-slate-700/60 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02]"
+                      className="bg-[#E9E6E1] hover:bg-[#D9D6D0]/40 rounded-2xl shadow border border-[#D9D6D0] p-6 flex flex-col lg:flex-row lg:items-center gap-6 transition-all duration-300"
                     >
-                      {/* Gradient Border Effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/5 to-pink-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      
-                      <div className="relative p-6 flex flex-col lg:flex-row lg:items-center gap-6">
-                        {/* Icon & Main Content */}
-                        <div className="flex-1 flex items-start gap-5">
-                          <div className={`relative w-14 h-14 rounded-xl bg-gradient-to-br ${getTabColor(activeTab)} shadow-lg flex items-center justify-center transform transition-transform duration-300 group-hover:rotate-6`}>
+                      {/* Icon & Main Content */}
+                      <div className="flex-1 flex items-start gap-5">
+                          <div className="w-14 h-14 rounded-xl bg-[#374763] flex items-center justify-center">
                             {React.createElement(getTabIcon(activeTab), { className: "w-7 h-7 text-white" })}
-                            <div className="absolute -inset-1 bg-gradient-to-br from-white/20 to-transparent rounded-xl blur-sm -z-10" />
                           </div>
                           
-                          <div className="flex-1 space-y-3">
-                            <h3 className="text-xl font-bold text-white leading-tight group-hover:text-purple-300 transition-colors duration-300">
+                          <div className="flex-1 space-y-2">
+                            <h3 className="text-xl font-bold text-[#2F3E5C]">
                               {item.description}
                             </h3>
                             
-                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                            <div className="flex flex-wrap gap-x-6 gap-y-1 text-[#5E6B7C] text-sm">
                               {item.studentName && (
-                                <div className="flex items-center gap-2 text-slate-300">
-                                  <User2 className="w-4 h-4 text-blue-400" />
-                                  <span className="font-medium">{item.studentName}</span>
+                                <div className="flex items-center gap-1">
+                                  <User2 className="w-4 h-4" />
+                                  <span>{item.studentName}</span>
                                 </div>
                               )}
                               {item.institution && (
-                                <div className="flex items-center gap-2 text-slate-300">
-                                  <Building2 className="w-4 h-4 text-indigo-400" />
+                                <div className="flex items-center gap-1">
+                                  <Building2 className="w-4 h-4" />
                                   <span>{item.institution}</span>
                                 </div>
                               )}
-                              <div className="flex items-center gap-2 text-slate-300">
-                                <CalendarDays className="w-4 h-4 text-purple-400" />
+                              <div className="flex items-center gap-1">
+                                <CalendarDays className="w-4 h-4" />
                                 <span>{dateStr}</span>
                               </div>
                             </div>
@@ -228,43 +201,30 @@ const ApprovedByYou = () => {
                         {/* Actions */}
                         <div className="flex items-center gap-4">
                           {/* Download Button */}
-                          <div className="relative group/btn">
-                            <button
-                              onClick={() => {
-                                generateAchievementPdf({
-                                  title: item.description,
-                                  type: item.type,
-                                  studentName: item.studentName,
-                                  institution: item.institution,
-                                  approvedBy:
-                                    item.reviewedBy || item.approvedBy
-                                      ? `${item.reviewedBy || item.approvedBy} (Faculty)`
-                                      : "Faculty",
-                                  approvedOn:
-                                    item.approvedOn ||
-                                    item.reviewedOn ||
-                                    item.timestamp,
-                                  status: item.status,
-                                  imageUrl: item.imageUrl || item.certificateUrl,
-                                });
-                              }}
-                              className="relative w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-110 hover:rotate-6 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-800 flex items-center justify-center group"
-                            >
-                              <Download className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                            </button>
-                            {/* Tooltip */}
-                            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl border border-slate-700">
-                              Download PDF
-                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-slate-900" />
-                            </div>
-                          </div>
+                          <button
+                            onClick={() => {
+                              // Pass full item so pdfUtil can use backend field names (institutionName, facultyName, etc.)
+                              generateAchievementPdf({
+                                ...item,
+                                title: item.title ?? item.description,
+                                studentName: item.studentName ?? item.student_name,
+                                institution: item.institution ?? item.institutionName ?? item.institution_name,
+                                approvedBy: item.reviewedBy ?? item.approvedBy ?? item.facultyName ?? item.faculty_name,
+                                approvedOn: item.approvedOn ?? item.reviewedOn ?? item.timestamp,
+                                status: item.status,
+                                imageUrl: item.imageUrl ?? item.certificateUrl,
+                              });
+                            }}
+                            className="w-12 h-12 bg-[#374763] text-white rounded-xl shadow hover:scale-105 transition flex items-center justify-center"
+                          >
+                            <Download className="w-5 h-5" />
+                          </button>
 
                           {/* Status Badge */}
-                          <div className={`
-                            relative px-5 py-2.5 rounded-full font-bold text-sm shadow-lg transition-all duration-300 transform hover:scale-105
+                          <div className={`px-4 py-2 rounded-full text-sm font-semibold
                             ${isApproved 
-                              ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-500/40 hover:shadow-green-500/60' 
-                              : 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/40 hover:shadow-red-500/60'
+                              ? 'bg-[#D9D6D0] text-[#2F3E5C]' 
+                              : 'bg-[#D9D6D0] text-[#C0846A]'
                             }
                           `}>
                             <div className="flex items-center gap-2">
@@ -275,11 +235,8 @@ const ApprovedByYou = () => {
                               )}
                               <span>{isApproved ? 'Approved' : 'Rejected'}</span>
                             </div>
-                            {/* Shine effect */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full transform -skew-x-12 translate-x-full group-hover:translate-x-[-200%] transition-transform duration-700" />
                           </div>
                         </div>
-                      </div>
                     </div>
                   );
                 })}

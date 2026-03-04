@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector , useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { FileCheck, BookOpen, Users, Shield, Settings, Mail, Phone, User, Calendar, IdCard, Building2, Briefcase,Clock } from "lucide-react";
-import { fetchFacultyDashboardData, fetchFacultyMetrics } from "../../../features/faculty/facultyDashSlice";
-import FacultyMeritsCard from "./facultyMerits";
+import { FileCheck, BookOpen, Users, Shield, Settings, Mail, Phone, User, Calendar, IdCard, Building2, Briefcase,Clock, Loader2, UserIcon } from "lucide-react";
+import { fetchFacultyDashboardData } from "../../../features/faculty/facultyDashSlice";
 import NotificationSettings from "../../shared/NotificationSettings";
 
 // Faculty Details Card (passport size image, details right, all fields, improved UI)
@@ -15,7 +14,7 @@ const FacultyDetailsCard = ({ facultyData }) => (
     transition={{ duration: 0.6 }}
     className="bg-white rounded-2xl shadow-xl p-8 flex flex-col md:flex-row items-center text-center md:text-left relative overflow-hidden gap-10 border border-blue-100"
   >
-    <div className="w-28 h-36 rounded-lg overflow-hidden border-4 border-blue-500 shadow-md mb-4 md:mb-0 md:mr-10 flex-shrink-0 bg-gray-100">
+    <div className="w-28 h-36 rounded-lg overflow-hidden border-4 border-teal-500 shadow-md mb-4 md:mb-0 md:mr-10 flex-shrink-0 bg-gray-100">
       <img
         src={facultyData.profilePic}
         alt="Faculty"
@@ -24,16 +23,16 @@ const FacultyDetailsCard = ({ facultyData }) => (
       />
     </div>
     <div className="flex-1 space-y-2">
-      <h2 className="text-2xl font-bold text-blue-900 flex items-center gap-2"><User className="w-6 h-6 text-blue-500" />{facultyData.fullname}</h2>
+      <h2 className="text-2xl font-bold text-teal-900 flex items-center gap-2"><UserIcon className="w-6 h-6 text-teal-500" />{facultyData.fullname}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-left mt-2">
-        <div className="flex items-center gap-2"><IdCard className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Faculty ID:</span> <span className="text-gray-800">{facultyData.facultyid}</span></div>
-        <div className="flex items-center gap-2"><User className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Username:</span> <span className="text-gray-800">{facultyData.username}</span></div>
-        <div className="flex items-center gap-2"><Mail className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Email:</span> <span className="text-gray-800">{facultyData.email}</span></div>
-        <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Mobile:</span> <span className="text-gray-800">{facultyData.mobile}</span></div>
-        <div className="flex items-center gap-2"><Building2 className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Department:</span> <span className="text-gray-800">{facultyData.dept}</span></div>
-        <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Institution:</span> <span className="text-gray-800">{facultyData.institution || facultyData.collegeName || '—'}</span></div>
-        <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Designation:</span> <span className="text-gray-800">{facultyData.designation}</span></div>
-        <div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-blue-400" /> <span className="font-semibold text-gray-700">Date of Join:</span> <span className="text-gray-800">{facultyData.dateofjoin ? new Date(facultyData.dateofjoin).toLocaleDateString() : ''}</span></div>
+        <div className="flex items-center gap-2"><IdCard className="w-4 h-4 text-teal-400" /> <span className="font-semibold text-gray-700">Faculty ID:</span> <span className="text-gray-800">{facultyData.facultyid}</span></div>
+        <div className="flex items-center gap-2"><User className="w-4 h-4 text-teal-400" /> <span className="font-semibold text-gray-700">Username:</span> <span className="text-gray-800">{facultyData.username}</span></div>
+        <div className="flex items-center gap-2"><Mail className="w-4 h-4 text-teal-400" /> <span className="font-semibold text-gray-700">Email:</span> <span className="text-gray-800">{facultyData.email}</span></div>
+        <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-teal-400" /> <span className="font-semibold text-gray-700">Mobile:</span> <span className="text-gray-800">{facultyData.mobile}</span></div>
+        <div className="flex items-center gap-2"><Building2 className="w-4 h-4 text-teal-400" /> <span className="font-semibold text-gray-700">Department:</span> <span className="text-gray-800">{facultyData.dept}</span></div>
+        <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 text-teal-400" /> <span className="font-semibold text-gray-700">Institution:</span> <span className="text-gray-800">{facultyData.institution || facultyData.collegeName || '—'}</span></div>
+        <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-teal-400" /> <span className="font-semibold text-gray-700">Designation:</span> <span className="text-gray-800">{facultyData.designation}</span></div>
+        <div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-teal-400" /> <span className="font-semibold text-gray-700">Date of Join:</span> <span className="text-gray-800">{facultyData.dateofjoin ? new Date(facultyData.dateofjoin).toLocaleDateString() : ''}</span></div>
       </div>
     </div>
   </motion.div>
@@ -46,9 +45,8 @@ const FacultySettings = () => {
   // Get real data from Redux
   const faculty = useSelector((state) => state.facultyDashboard.faculty);
   const activities = useSelector((state) => state.facultyDashboard.activities);
-  const loading = useSelector((state) => state.facultyDashboard.loading || state.facultyDashboard.activitiesLoading || state.facultyDashboard.metricsLoading);
+  const loading = useSelector((state) => state.facultyDashboard.loading || state.facultyDashboard.activitiesLoading);
   const error = useSelector((state) => state.facultyDashboard.error);
-  const metrics = useSelector((state) => state.facultyDashboard.metrics);
   
   // Track if we've attempted to fetch data (prevents repeated fetches)
   const hasFetchedRef = useRef(false);
@@ -61,10 +59,6 @@ const FacultySettings = () => {
       dispatch(fetchFacultyDashboardData());
     }
   }, [dispatch, faculty]); // Keep faculty to check if it's null, but ref prevents re-fetching
-  //merits data
-  useEffect(() => {
-    dispatch(fetchFacultyMetrics());
-  }, [dispatch]);
 
   // Fallback dummy data
   const facultyData = faculty
@@ -142,11 +136,13 @@ const FacultySettings = () => {
       <div className="p-6 md:p-10 space-y-10">
         {loading && (
           <div className="flex justify-center items-center py-10">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600">
+              <Loader2 className="w-6 h-6 text-teal-600 animate-spin" />
+            </div>
           </div>
         )}
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-5 rounded-md mb-6">
+          <div className="bg-teal-50 border-l-4 border-teal-500 p-5 rounded-md mb-6">
             <div className="flex items-center">
               <svg className="h-6 w-6 text-red-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -157,8 +153,6 @@ const FacultySettings = () => {
         )}
         {/* Faculty Details Card */}
         <FacultyDetailsCard facultyData={facultyData} />
-       {/* Faculty Metrics Card */}
-        <FacultyMeritsCard metrics={metrics} />
 
         {/* Notification Settings */}
         <motion.div

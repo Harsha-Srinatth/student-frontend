@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StudentSidebarLinks, FacultySidebarLinks, HODSidebarLinks, HODBottombarLinks } from "../../context/Links";
+import { StudentSidebarLinks, FacultySidebarLinks, HODSidebarLinks, HODBottombarLinks, StudentBottombarLinks, FacultyBottombarLinks } from "../../context/Links";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { Plus, LogOut } from "lucide-react"; // Added logout icon
@@ -16,19 +16,7 @@ const Bottombar = () => {
 
   const bottombarQuickLinks =
     userRole === "hod" ? HODBottombarLinks :
-    userRole === "faculty"
-      ? [
-          { ...allLinks.find((l) => l.label === "Dashboard") },
-          { ...allLinks.find((l) => l.label === "Activity Approvals") },
-          { ...allLinks.find((l) => l.label === "Verification History") },
-        ].filter(link => link && link.route) // Filter out undefined/null links
-      : [
-          { ...allLinks.find((l) => l.label === "Dashboard") },
-          { ...allLinks.find((l) => l.label === "Skill Exchange") },
-          { ...allLinks.find((l) => l.label === "Upload Files") },
-          { ...allLinks.find((l) => l.label === "Pending Tasks") },
-          { ...allLinks.find((l) => l.label === "Achievements") },
-        ].filter(link => link && link.route); // Filter out undefined/null links
+    userRole === "faculty" ? FacultyBottombarLinks : StudentBottombarLinks;
 
   const [isOpen, setIsOpen] = useState(false);
 

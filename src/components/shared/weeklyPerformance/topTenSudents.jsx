@@ -62,18 +62,17 @@ const TopTenStudents = ({
       `}</style>
 
       <section
-        className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm"
-        style={{ background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)" }}
+        className="rounded-2xl overflow-hidden border border-b-2 border-gray-400 shadow-sm bg-white"
       >
         {/* Header */}
-        <div className="px-4 sm:px-5 py-4 flex items-center justify-between border-b border-slate-700 bg-slate-800">
+        <div className="px-4 sm:px-5 py-4 flex items-center justify-between border-b border-slate-200 bg-gradient-to-b from-teal-900 to-green-900">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-slate-700 shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-green-950 shrink-0">
               <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div className="min-w-0">
               <span className="text-base sm:text-lg font-bold text-white tracking-tight">Leaderboard</span>
-              <p className="text-slate-400 text-sm sm:text-base">Top performers</p>
+              <p className="text-white text-sm sm:text-base">Top performers</p>
             </div>
           </div>
           <button
@@ -93,8 +92,8 @@ const TopTenStudents = ({
               onClick={() => setActiveTab(tab.key)}
               className={`tab-underline flex-shrink-0 px-4 sm:px-5 py-3 text-sm sm:text-base font-semibold whitespace-nowrap transition-all ${
                 activeTab === tab.key
-                  ? "active text-slate-900 bg-slate-50"
-                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                  ? "active text-black bg-green-50"
+                  : "text-black hover:text-black hover:bg-green-50"
               }`}
             >
               {tab.label}
@@ -128,10 +127,10 @@ const TopTenStudents = ({
                       state: { openStudentId: student.studentid || student.studentId },
                     })
                   }
-                  className={`lb-row flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-3.5 cursor-pointer transition-all hover:bg-slate-50 group`}
+                  className={`lb-row flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-3.5 cursor-pointer transition-all hover:bg-green-50 group`}
                   style={{
                     animationDelay: `${idx * 0.04}s`,
-                    background: isMe ? "rgba(51,65,85,0.08)" : undefined,
+                    background: isMe ? "rgba(51,65,85,0.08)" : "bg-green-100",
                   }}
                 >
                   {/* Rank */}
@@ -150,7 +149,7 @@ const TopTenStudents = ({
                       background:
                         rankStyle
                           ? `radial-gradient(circle, ${rankStyle.glow}, transparent)`
-                          : "#f1f5f9",
+                          : "bg-green-100",
                       boxShadow: rankStyle ? `0 0 12px ${rankStyle.glow}` : undefined,
                     }}
                   >
@@ -161,7 +160,7 @@ const TopTenStudents = ({
                         className="w-full h-full object-cover rounded-xl"
                       />
                     ) : (
-                      <span className="text-sm font-bold text-slate-500">
+                      <span className="text-sm font-bold text-black">
                         {(student.fullname || "?")[0].toUpperCase()}
                       </span>
                     )}
@@ -172,7 +171,7 @@ const TopTenStudents = ({
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <span
                         className={`text-sm sm:text-base font-semibold truncate max-w-[120px] sm:max-w-[160px] ${
-                          isMe ? "text-slate-700" : "text-slate-800"
+                          isMe ? "text-slate-700" : "text-slate-900"
                         }`}
                       >
                         {student.fullname}
@@ -183,7 +182,7 @@ const TopTenStudents = ({
                         </span>
                       )}
                     </div>
-                    {/* Progress bar */}
+                    {/* Progress bar
                     <div className="h-1.5 sm:h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-700"
@@ -196,20 +195,20 @@ const TopTenStudents = ({
                             : "#cbd5e1",
                         }}
                       />
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Score */}
-                  <div className="shrink-0 text-right min-w-[44px]">
+                  <div className="shrink-0 text-right min-w-[44px] pr-20">
                     <span
                       className={`text-sm sm:text-base font-bold ${
                         rank === 1
                           ? "text-amber-500"
                           : rank === 2
-                          ? "text-slate-500"
+                          ? "text-yellow-500"
                           : rank === 3
                           ? "text-orange-500"
-                          : "text-slate-600"
+                          : "text-black"
                       }`}
                     >
                       {val.toLocaleString()}

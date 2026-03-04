@@ -122,14 +122,14 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Submit Leave Request</h2>
+              <h2 className="text-2xl font-bold text-black">Submit Leave Request</h2>
               <p className="text-sm text-gray-600 mt-1">Fill out the form below to request leave</p>
             </div>
             <button
               onClick={onCancel}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-teal-100 rounded-full transition-colors"
             >
-              <X size={24} className="text-gray-400" />
+              <X size={24} className="text-black" />
             </button>
           </div>
         </div>
@@ -137,16 +137,16 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Leave Type */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-black mb-3">
               Leave Type *
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {leaveTypes.map((type) => (
                 <label
                   key={type.value}
-                  className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all hover:bg-gray-50 ${
+                  className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all hover:bg-teal-50 ${
                     formData.leaveType === type.value
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-teal-900 bg-teal-50'
                       : 'border-gray-200'
                   }`}
                 >
@@ -159,13 +159,13 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
                     className="sr-only"
                   />
                   <span className="text-2xl mr-3">{type.icon}</span>
-                  <span className="text-sm font-medium text-gray-700">{type.label}</span>
+                  <span className="text-sm font-medium text-black">{type.label}</span>
                 </label>
               ))}
             </div>
             {errors.leaveType && (
-              <p className="text-red-500 text-sm mt-2 flex items-center">
-                <AlertCircle size={16} className="mr-1" />
+                <p className="text-teal-900 text-sm mt-2 flex items-center">
+                <AlertCircle size={16} className="text-teal-900 mr-1" />
                 {errors.leaveType}
               </p>
             )}
@@ -174,7 +174,7 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
           {/* Date Range */}
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-black mb-2">
                 <Calendar size={16} className="inline mr-2" />
                 Start Date *
               </label>
@@ -182,18 +182,18 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => handleInputChange('startDate', e.target.value)}
-                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all ${
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-teal-100 focus:border-teal-500 transition-all ${
                   errors.startDate ? 'border-red-500' : 'border-gray-200'
                 }`}
                 min={new Date().toISOString().split('T')[0]}
               />
               {errors.startDate && (
-                <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>
+                <p className="text-teal-900 text-sm mt-1">{errors.startDate}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-black mb-2">
                 <Calendar size={16} className="inline mr-2" />
                 End Date *
               </label>
@@ -201,21 +201,21 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => handleInputChange('endDate', e.target.value)}
-                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all ${
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-teal-100 focus:border-teal-500 transition-all ${
                   errors.endDate ? 'border-red-500' : 'border-gray-200'
                 }`}
                 min={formData.startDate || new Date().toISOString().split('T')[0]}
               />
               {errors.endDate && (
-                <p className="text-red-500 text-sm mt-1">{errors.endDate}</p>
+                <p className="text-teal-900 text-sm mt-1">{errors.endDate}</p>
               )}
             </div>
           </div>
 
           {/* Days Calculation */}
           {formData.startDate && formData.endDate && (
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
-              <div className="flex items-center text-blue-800">
+            <div className="bg-teal-50 border-2 border-teal-200 rounded-xl p-4">
+              <div className="flex items-center text-teal-900">
                 <Clock size={20} className="mr-2" />
                 <span className="font-semibold">
                   Total Leave Days: {calculateDays()} {calculateDays() === 1 ? 'day' : 'days'}
@@ -226,16 +226,16 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
 
           {/* Priority */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-black mb-3">
               Priority Level
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {priorityLevels.map((priority) => (
                 <label
                   key={priority.value}
-                  className={`relative flex items-center justify-center p-3 border-2 rounded-xl cursor-pointer transition-all hover:bg-gray-50 ${
+                      className={`relative flex items-center justify-center p-3 border-2 rounded-xl cursor-pointer transition-all hover:bg-teal-50 ${
                     formData.priority === priority.value
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-teal-900 bg-teal-50'
                       : 'border-gray-200'
                   }`}
                 >
@@ -257,11 +257,11 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
 
           {/* Emergency Contact (if emergency leave) */}
           {formData.leaveType === 'emergency' && (
-            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 space-y-4">
-              <h3 className="font-semibold text-red-800 mb-3">Emergency Contact Information</h3>
+            <div className="bg-teal-50 border-2 border-teal-200 rounded-xl p-4 space-y-4">
+              <h3 className="font-semibold text-teal-900 mb-3">Emergency Contact Information</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-red-700 mb-1">
+                  <label className="block text-sm font-medium text-teal-900 mb-1">
                     Contact Name *
                   </label>
                   <input
@@ -271,17 +271,17 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
                       ...formData.emergencyContact,
                       name: e.target.value
                     })}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-100 focus:border-red-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-100 focus:border-teal-500 ${
                       errors.emergencyContactName ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Full name"
                   />
                   {errors.emergencyContactName && (
-                    <p className="text-red-500 text-sm mt-1">{errors.emergencyContactName}</p>
+                    <p className="text-teal-900 text-sm mt-1">{errors.emergencyContactName}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-red-700 mb-1">
+                  <label className="block text-sm font-medium text-teal-900 mb-1">
                     Phone Number *
                   </label>
                   <input
@@ -291,18 +291,18 @@ const LeaveRequestForm = ({ onSubmit, onCancel, studentInfo }) => {
                       ...formData.emergencyContact,
                       phone: e.target.value
                     })}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-100 focus:border-red-500 ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-100 focus:border-teal-500 ${
                       errors.emergencyContactPhone ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="+1 (555) 000-0000"
                   />
                   {errors.emergencyContactPhone && (
-                    <p className="text-red-500 text-sm mt-1">{errors.emergencyContactPhone}</p>
+                    <p className="text-teal-900 text-sm mt-1">{errors.emergencyContactPhone}</p>
                   )}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-red-700 mb-1">
+                <label className="block text-sm font-medium text-teal-900 mb-1">
                   Relationship
                 </label>
                 <input

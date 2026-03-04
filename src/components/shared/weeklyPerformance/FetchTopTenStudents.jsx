@@ -38,12 +38,12 @@ const FetchTopTenStudents = ({ leaderboardPath, profilePath }) => {
           className="px-5 py-4 border-b border-slate-700"
           style={{ background: "linear-gradient(135deg, #0f172a, #1e293b)" }}
         >
-          <h3 className="text-white font-black text-base tracking-tight">Leaderboard</h3>
-          <p className="text-slate-400 text-xs">Top performers</p>
+          <h3 className="text-green-950 font-black text-base tracking-tight">Leaderboard</h3>
+          <p className="text-green-950 text-xs">Top performers</p>
         </div>
         <div className="p-8 flex justify-center items-center gap-3">
           <div className="w-7 h-7 border-2 border-sky-200 border-t-sky-500 rounded-full animate-spin" />
-          <span className="text-xs text-slate-400 font-medium">Loading…</span>
+          <span className="text-xs text-green-950 font-medium">Loading…</span>
         </div>
       </section>
     );

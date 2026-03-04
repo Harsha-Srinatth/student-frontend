@@ -15,7 +15,7 @@ const MainDashboard = () => {
 
   return (
     <SocketProvider>
-      <div className="flex h-screen w-full text-black bg-green-50">
+      <div className="flex h-screen w-full text-black bg-green-950">
         {/* Sidebar - fixed width like Instagram (64px on large screens) */}
         <aside className="hidden lg:block lg:w-64 h-full min-h-0 overflow-hidden bg-gray-100 flex-shrink-0">
           <Sidebar /> 
@@ -25,17 +25,17 @@ const MainDashboard = () => {
         <div className="flex flex-1 flex-col min-h-0">
           
           {/* Mobile Header - only visible on mobile/tablet */}
-          <div className="lg:hidden bg-white">
+          <div className="lg:hidden bg-green-50">
             <MobileHeader />
           </div>
           
           {/* Main Content Area */}
-          <section className="flex flex-1 overflow-y-auto p-2 bg-white">
+          <section className="flex flex-1 overflow-y-auto p-2 bg-green-50">
             <Outlet />
           </section>
           
           {/* Mobile Footer - only visible on mobile */}
-          <footer className="md:hidden w-full h-19 bg-white">
+          <footer className="md:hidden w-full h-19 bg-green-50">
             <Bottombar />
           </footer>
         </div>

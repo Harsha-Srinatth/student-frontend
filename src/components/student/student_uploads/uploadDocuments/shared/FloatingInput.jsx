@@ -20,7 +20,7 @@ const FloatingInput = ({
 
   const inputClasses = `
     w-full px-4 pt-6 pb-2 bg-white border-2 rounded-2xl transition-all duration-300 
-    ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}
+    ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-green-500'}
     focus:outline-none focus:ring-4 focus:ring-blue-500/10
     ${type === "date" ? "date-input" : ""}
     ${className}
@@ -29,7 +29,7 @@ const FloatingInput = ({
   const labelClasses = `
     absolute left-4 transition-all duration-300 pointer-events-none
     ${shouldFloat 
-      ? 'top-2 text-xs font-semibold text-blue-600' 
+      ? 'top-2 text-xs font-semibold text-green-800' 
       : 'top-1/2 -translate-y-1/2 text-gray-500'
     }
     ${error && shouldFloat ? 'text-red-600' : ''}

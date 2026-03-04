@@ -36,10 +36,10 @@ const DragDropUpload = ({ onFileSelect, preview, onRemove, error, fileName }) =>
       <div
         className={`relative border-2 border-dashed rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer group ${
           dragOver 
-            ? 'border-blue-500 bg-blue-50 scale-[1.02]' 
+            ? 'border-teal-900 bg-green-50 scale-[1.02]' 
             : error 
             ? 'border-red-300 hover:border-red-400' 
-            : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+            : 'border-gray-300 hover:border-teal-400 hover:bg-teal-50'
         }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -55,22 +55,22 @@ const DragDropUpload = ({ onFileSelect, preview, onRemove, error, fileName }) =>
         />
         
         <div className={`transition-all duration-300 ${dragOver ? 'scale-110' : 'group-hover:scale-105'}`}>
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-teal-900 to-teal-700 rounded-2xl flex items-center justify-center mb-4">
             <Upload className="w-8 h-8 text-white" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-black mb-2">
             {dragOver ? 'Drop your image here' : 'Upload Image'}
           </h3>
-          <p className="text-gray-500 text-sm mb-4">
+          <p className="text-black text-sm mb-4">
             Drag and drop or click to browse
           </p>
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-900 to-teal-700 text-white rounded-2xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
             Choose File
           </div>
         </div>
         
         {fileName && !preview && (
-          <div className="mt-4 text-sm text-gray-600">
+          <div className="mt-4 text-sm text-black">
             Selected: {fileName}
           </div>
         )}
@@ -80,7 +80,7 @@ const DragDropUpload = ({ onFileSelect, preview, onRemove, error, fileName }) =>
         <div className="relative group">
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-6 border-2 border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-gray-900">Preview</h4>
+              <h4 className="font-semibold text-black">Preview</h4>
               <button
                 onClick={(e) => {
                   e.stopPropagation();

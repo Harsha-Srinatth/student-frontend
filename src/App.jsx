@@ -42,8 +42,7 @@ import LeaveRequestDashboard from './components/student/LeaveRequestDash.jsx';
 import CreateClubAnnouncementStudent from './pages/student/student_dashboard/CreateClubAnnouncement.jsx';
 import AskDoubt from './pages/student/student_dashboard/AskDoubt.jsx';
 import DoubtDetail from './pages/student/student_dashboard/DoubtDetail.jsx';
-import SkillExchange from './pages/student/student_dashboard/SkillExchange.jsx';
-import AllStudentsWithScore from './components/shared/weeklyPerformance/AllStudentsWithScore.jsx';
+import SkillExchange from './pages/student/student_dashboard/SkillExchange.jsx';  
 import LeaderboardTablePage from './components/shared/weeklyPerformance/LeaderboardTablePage.jsx';
 
 // Faculty Dashboard Components
@@ -177,7 +176,7 @@ const App = () => {
         <Route path="student/ask/doubt" element={<RoleProtectedRoute allowedRoles={['student']}><AskDoubt /></RoleProtectedRoute>} />
         <Route path="student/ask/doubt/:doubtId" element={<RoleProtectedRoute allowedRoles={['student']}><DoubtDetail /></RoleProtectedRoute>} />
         <Route path="student/skill-exchange" element={<RoleProtectedRoute allowedRoles={['student']}><SkillExchange /></RoleProtectedRoute>} />
-        <Route path="student/students/view-all" element={<RoleProtectedRoute allowedRoles={['student']}><AllStudentsWithScore /></RoleProtectedRoute>} />
+        <Route path="student/students/view-all" element={<RoleProtectedRoute allowedRoles={['student']}><LeaderboardTablePage viewAllPath="/student/students/view-all" /></RoleProtectedRoute>} />
         <Route path="student/students/leaderboard" element={<RoleProtectedRoute allowedRoles={['student']}><LeaderboardTablePage viewAllPath="/student/students/view-all" /></RoleProtectedRoute>} />
         <Route path="student/settings" element={<RoleProtectedRoute allowedRoles={['student']}><StudentSettings /></RoleProtectedRoute>} />
         <Route path="student/profile/update" element={<RoleProtectedRoute allowedRoles={['student']}><UpdateStudentProfile /></RoleProtectedRoute>} />
@@ -187,7 +186,7 @@ const App = () => {
         <Route path="faculty/home" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyHome /></RoleProtectedRoute>} />
         <Route path="faculty/pending-approvals" element={<RoleProtectedRoute allowedRoles={['faculty']}><PendingApprovals /></RoleProtectedRoute>} />
         <Route path="faculty/search/student-profiles" element={<RoleProtectedRoute allowedRoles={['faculty']}><StudentList /></RoleProtectedRoute>} />
-        <Route path="faculty/students/view-all" element={<RoleProtectedRoute allowedRoles={['faculty']}><AllStudentsWithScore /></RoleProtectedRoute>} />
+        <Route path="faculty/students/view-all" element={<RoleProtectedRoute allowedRoles={['faculty']}><LeaderboardTablePage viewAllPath="/faculty/students/view-all" /></RoleProtectedRoute>} />
         <Route path="faculty/students/leaderboard" element={<RoleProtectedRoute allowedRoles={['faculty']}><LeaderboardTablePage viewAllPath="/faculty/students/view-all" /></RoleProtectedRoute>} />
         <Route path="faculty/add/attendance" element={<RoleProtectedRoute allowedRoles={['faculty']}><FacultyAttendance /></RoleProtectedRoute>} />
         <Route path="faculty/Approvels/docs/students" element={<RoleProtectedRoute allowedRoles={['faculty']}><ApprovedByYou /></RoleProtectedRoute>} />
@@ -204,7 +203,7 @@ const App = () => {
         
         {/* HOD Routes */}
         <Route path="hod/dashboard" element={<RoleProtectedRoute allowedRoles={['hod']}><HODDashboard /></RoleProtectedRoute>} />
-        <Route path="hod/students/view-all" element={<RoleProtectedRoute allowedRoles={['hod']}><AllStudentsWithScore /></RoleProtectedRoute>} />
+        <Route path="hod/students/view-all" element={<RoleProtectedRoute allowedRoles={['hod']}><LeaderboardTablePage viewAllPath="/hod/students/view-all" /></RoleProtectedRoute>} />
         <Route path="hod/students/leaderboard" element={<RoleProtectedRoute allowedRoles={['hod']}><LeaderboardTablePage viewAllPath="/hod/students/view-all" /></RoleProtectedRoute>} />
         <Route path="hod/announcements" element={<RoleProtectedRoute allowedRoles={['hod']}><AnnouncementsManagement /></RoleProtectedRoute>} />
         <Route path="hod/analytics" element={<RoleProtectedRoute allowedRoles={['hod']}><Analytics /></RoleProtectedRoute>} />

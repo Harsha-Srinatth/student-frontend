@@ -51,15 +51,15 @@ const Credits = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl text-white shadow-lg">
+          <div className="p-2 bg-gradient-to-br from-teal-900 to-teal-700 rounded-xl text-white shadow-lg">
             <GraduationCap className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-800">Academic Performance</h3>
-            <p className="text-sm text-gray-500">4 Semesters Progress</p>
+            <h3 className="text-xl font-bold text-black">Academic Performance</h3>
+            <p className="text-sm text-black">4 Semesters Progress</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-slate-100 to-gray-100 text-slate-700 border border-slate-200">
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-teal-50 to-teal-100 text-teal-700 border border-teal-200">
           <Award className="w-4 h-4" />
           {totalCredits} Credits
         </div>

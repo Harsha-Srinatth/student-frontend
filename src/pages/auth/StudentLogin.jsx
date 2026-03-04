@@ -27,10 +27,11 @@ export default function StudentLogin() {
       const user = response.data.user;
       console.log("responce for student login",response.data.user);
   
-      // Save token, role, and userId (for FCM token registration on this device)
-      Cookies.set("token", token, { expires: 7, secure: true });
-      Cookies.set("userRole", "student", { expires: 7, secure: true });
-      Cookies.set("userId", user.studentid, { expires: 7, secure: true });
+      // Save token, role, and userId (secure only over HTTPS so cookies work on HTTP too)
+      const cookieOpts = { expires: 7, secure: typeof window !== "undefined" && window.location.protocol === "https:" };
+      Cookies.set("token", token, cookieOpts);
+      Cookies.set("userRole", "student", cookieOpts);
+      Cookies.set("userId", user.studentid, cookieOpts);
 
       // Register this device's FCM token if permission already granted (no prompt)
       registerFCMTokenIfGranted();

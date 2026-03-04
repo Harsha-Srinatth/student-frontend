@@ -23,12 +23,13 @@ export default function HODLogin() {
       const token = response.data.token;
       const user = response.data.user;
 
-      Cookies.set("token", token, { expires: 7, secure: true });
-      Cookies.set("userRole", "hod", { expires: 7, secure: true });
-      Cookies.set("hodId", user.hodId, { expires: 7, secure: true });
-      Cookies.set("collegeId", user.collegeId, { expires: 7, secure: true });
+      const cookieOpts = { expires: 7, secure: typeof window !== "undefined" && window.location.protocol === "https:" };
+      Cookies.set("token", token, cookieOpts);
+      Cookies.set("userRole", "hod", cookieOpts);
+      Cookies.set("hodId", user.hodId, cookieOpts);
+      Cookies.set("collegeId", user.collegeId, cookieOpts);
       if (user.department) {
-        Cookies.set("department", user.department, { expires: 7, secure: true });
+        Cookies.set("department", user.department, cookieOpts);
       }
 
       navigate("/hod/dashboard");

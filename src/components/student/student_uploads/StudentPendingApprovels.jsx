@@ -51,30 +51,30 @@ const StudentPendingApprovels = () => {
     const configs = {
       pending: {
         icon: Clock,
-        gradient: 'from-amber-500 to-amber-600',
-        bg: 'bg-amber-50',
-        text: 'text-amber-700',
-        border: 'border-amber-200',
-        badge: 'bg-amber-100 text-amber-700',
-        iconColor: 'text-amber-600'
+        gradient: 'bg-teal-900',
+        bg: 'bg-teal-50',
+        text: 'text-teal-700',
+        border: 'border-teal-200',
+        badge: 'bg-teal-100 text-teal-700',
+        iconColor: 'text-teal-600'
       },
       rejected: {
         icon: XCircle,
-        gradient: 'from-red-500 to-red-600',
-        bg: 'bg-red-50',
-        text: 'text-red-700',
-        border: 'border-red-200',
-        badge: 'bg-red-100 text-red-700',
-        iconColor: 'text-red-600'
+        gradient: 'bg-teal-900',
+        bg: 'bg-teal-50',
+        text: 'text-teal-700',
+        border: 'border-teal-200',
+        badge: 'bg-teal-100 text-teal-700',
+        iconColor: 'text-teal-600'
       },
       approved: {
         icon: CheckCircle,
-        gradient: 'from-emerald-500 to-emerald-600',
-        bg: 'bg-emerald-50',
-        text: 'text-emerald-700',
-        border: 'border-emerald-200',
-        badge: 'bg-emerald-100 text-emerald-700',
-        iconColor: 'text-emerald-600'
+        gradient: 'bg-teal-900',
+        bg: 'bg-teal-50',
+        text: 'text-teal-700',
+        border: 'border-teal-200',
+        badge: 'bg-teal-100 text-teal-700',
+        iconColor: 'text-teal-600'
       }
     };
     return configs[tabId] || configs.pending;
@@ -141,15 +141,15 @@ const StudentPendingApprovels = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8 w-full">
+    <div className="bg-gradient-to-br from-teal-50 to-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8 w-full">
       {/* Header */}
       <div className="mb-5 sm:mb-8">
-        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">My Approvals</h2>
-        <p className="text-gray-600 text-xs sm:text-sm">Track the status of your approval requests</p>
+        <h2 className="text-xl sm:text-3xl font-bold text-teal-900 mb-1 sm:mb-2">My Approvals</h2>
+        <p className="text-teal-900 text-md sm:text-sm">Track the status of your approval requests</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-5 sm:mb-8 pb-3 sm:pb-4 border-b border-gray-200 overflow-x-auto">
+      <div className="flex pl-2 gap-2 mb-5 sm:mb-8 pb-3 sm:pb-4 border-b border-gray-200 overflow-x-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -162,11 +162,11 @@ const StudentPendingApprovels = () => {
               className={`flex items-center gap-2 px-5 py-2.5 font-semibold rounded-xl transition-all duration-200 whitespace-nowrap ${
                 isActive
                   ? `bg-gradient-to-r ${tabConfig.gradient} text-white shadow-md scale-105`
-                  : "text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                  : "text-black bg-white border border-gray-200 hover:bg-teal-50 hover:border-gray-300"
               }`}
             >
               <Icon className={`w-4 h-4 ${isActive ? 'text-white' : tabConfig.iconColor}`} />
-              <span className="text-sm">{tab.label}</span>
+              <span className="text-md">{tab.label}</span>
               <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
                 isActive 
                   ? 'bg-white/20 text-white' 
@@ -188,8 +188,8 @@ const StudentPendingApprovels = () => {
             <div className="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-2xl flex items-center justify-center">
               <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
-            <h3 className="text-lg font-semibold text-red-600 mb-2">Error Loading Approvals</h3>
-            <p className="text-red-500 text-sm">{error}</p>
+            <h3 className="text-lg font-semibold text-black mb-2">Error Loading Approvals</h3>
+            <p className="text-black text-md">{error}</p>
           </div>
         ) : currentRecords.length === 0 ? (
           <EmptyState />

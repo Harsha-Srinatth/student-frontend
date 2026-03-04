@@ -27,10 +27,11 @@ export default function FacultyLogin() {
       const token = response.data.token;
       const user = response.data.user;
 
-      // Save token, role, and userId (for FCM token registration on this device)
-      Cookies.set("token", token, { expires: 7, secure: true });
-      Cookies.set("userRole", "faculty", { expires: 7, secure: true });
-      Cookies.set("userId", user.facultyid, { expires: 7, secure: true });
+      // Save token, role, and userId (secure only over HTTPS so cookies work on HTTP too)
+      const cookieOpts = { expires: 7, secure: typeof window !== "undefined" && window.location.protocol === "https:" };
+      Cookies.set("token", token, cookieOpts);
+      Cookies.set("userRole", "faculty", cookieOpts);
+      Cookies.set("userId", user.facultyid, cookieOpts);
 
       // Register this device's FCM token if permission already granted (no prompt)
       registerFCMTokenIfGranted();

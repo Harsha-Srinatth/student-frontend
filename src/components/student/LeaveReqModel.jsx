@@ -5,49 +5,28 @@ import {
 } from 'lucide-react';
 
 const LeaveRequestModal = ({ request, onClose }) => {
-  const getStatusConfig = (status) => {
-    switch (status) {
-      case 'pending':
-        return { color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: <Clock size={20} />, label: 'Pending Review' };
-      case 'approved':
-        return { color: 'bg-green-100 text-green-800 border-green-200', icon: <CheckCircle size={20} />, label: 'Approved' };
-      case 'rejected':
-        return { color: 'bg-red-100 text-red-800 border-red-200', icon: <XCircle size={20} />, label: 'Rejected' };
-      default:
-        return { color: 'bg-gray-100 text-gray-800 border-gray-200', icon: <AlertCircle size={20} />, label: status };
-    }
-  };
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'urgent': return 'bg-red-500';
-      case 'high': return 'bg-orange-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
-    }
-  };
 
   const getLeaveTypeEmoji = (type) => ({
-    medical: '🏥',
-    personal: '👤',
-    emergency: '🚨',
-    family: '👨‍👩‍👧‍👦',
-    academic: '🎓',
-    other: '📝'
+    Medical: '🏥',
+    Personal: '👤',
+    Emergency: '🚨',
+    Family: '👨‍👩‍👧‍👦',
+    Academic: '🎓',
+    Other: '📝'
   }[type] || '📝');
 
   const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' }) : 'N/A';
   const formatTime = (date) => date ? new Date(date).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }) : 'N/A';
 
-  const statusConfig = getStatusConfig(request.status);
-  const totalDays = request.totalDays || (request.startDate && request.endDate ? Math.ceil((new Date(request.endDate) - new Date(request.startDate)) / (1000*60*60*24)) + 1 : 0);
+  const totalDays = request.totalDays ?? (request.startDate && request.endDate
+    ? Math.ceil((new Date(request.endDate) - new Date(request.startDate)) / (1000 * 60 * 60 * 24)) + 1
+    : 0);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Priority Strip */}
-        <div className={`h-2 w-full ${getPriorityColor(request.priority)}`}></div>
 
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
@@ -70,13 +49,14 @@ const LeaveRequestModal = ({ request, onClose }) => {
         <div className="p-6 space-y-6">
           {/* Status Badge */}
           <div className="flex items-center justify-center">
-            <div className={`flex items-center space-x-3 px-6 py-3 rounded-2xl border-2 ${statusConfig.color}`}>
-              {statusConfig.icon}<span className="text-lg font-bold">{statusConfig.label}</span>
+            <div className={`flex items-center space-x-3 px-6 py-3 rounded-2xl border-2 bg-gradient-to-r from-teal-900 to-teal-700 text-white`}>
+              <Clock size={20} />
+              <span className="text-lg font-bold">Pending Review</span>
             </div>
           </div>
 
           {/* Leave Duration */}
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6">
+          <div className="bg-gradient-to-r from-teal-50 to-teal-100 rounded-2xl p-6">
             <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
               <Calendar className="mr-2" size={20}/> Leave Duration
             </h3>
