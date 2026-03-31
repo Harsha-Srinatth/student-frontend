@@ -61,7 +61,7 @@ import Analytics from './pages/HOD/Analytics';
 import HODPortal from './components/HOD/Assign-Faculty/HodAssignment.jsx';
 import CreateNewClubs from './pages/HOD/CreateNewClubs.jsx';
 import HodSettings from './pages/HOD/HodSettings.jsx';
-import CreateClubPredictor from './pages/hod/CreateClubPredictor.jsx';
+import CreateClubPredictor from './pages/HOD/CreateClubPredictor.jsx';
 // 🔒 Protected Route
 const ProtectedRoute = ({ children }) => {
   const token = Cookies.get('token');
