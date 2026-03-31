@@ -14,7 +14,7 @@ import hodDashboardReducer from "../features/HOD/hodDashSlice";
 import hodAnnouncementsReducer from "../features/HOD/hodAnnouncementsSlice";
 import hodAssignmentReducer from "../features/HOD/hodAssignmentSlice";
 import doubtsReducer from "../features/student/doubtsSlice";
-import clubPredictionReducer from "../features/hod/clubPredictionSlice";
+import clubPredictionReducer from "../features/HOD/clubPredictionSlice";
 import { socketMiddleware } from "../middleware/socketMiddleware";
 
 export const store = configureStore({
