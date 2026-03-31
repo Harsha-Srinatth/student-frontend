@@ -84,6 +84,24 @@ export const fetchAllApprovals = createAsyncThunk(
  * Fetch announcements for the student
  * Redux store acts as cache - components should check state first before calling
  */
+export const fetchPlacementPrediction = createAsyncThunk(
+  "dashboard/fetchPlacementPrediction",
+  async (_, { rejectWithValue, getState }) => {
+    const state = getState();
+    const { placement } = state.studentDashboard;
+    // Return cached result if already fetched (re-fetch only on forceRefresh)
+    if (placement?.tier != null) return { fromCache: true, ...placement };
+    try {
+      const response = await api.get("/student/placement-prediction");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to load placement prediction"
+      );
+    }
+  }
+);
+
 export const fetchStudentAnnouncements = createAsyncThunk(
   "dashboard/fetchStudentAnnouncements",
   async (_, { rejectWithValue, getState }) => {
@@ -143,12 +161,15 @@ const dashboardSlice = createSlice({
     loading: false,
     error: null,
     topTenStudents: [],
+    // Placement prediction (ML model result)
+    placement: null,
+    placementLoading: false,
+    placementError: null,
     teachingPoints: 0,
     projectsPoints: 0,
     problemSolvingRank: 0,
     extraCurricularPoints: 0,
     coCurricularPoints: 0,
-    weightedPoints: 0,
     // Timestamps for stale checking (Redux is the cache, timestamps help determine freshness)
     lastFetched: null,
     achievementsLastFetched: null,
@@ -253,10 +274,12 @@ const dashboardSlice = createSlice({
       state.problemSolvingRank = 0;
       state.extraCurricularPoints = 0;
       state.coCurricularPoints = 0;
-      state.weightedPoints = 0;
       state.lastFetched = null;
       state.achievementsLastFetched = null;
       state.approvalsLastFetched = null;
+      state.placement = null;
+      state.placementLoading = false;
+      state.placementError = null;
     },
   },
   extraReducers: (builder) => {
@@ -273,9 +296,16 @@ const dashboardSlice = createSlice({
         // Only update if not from cache (i.e., fresh API response)
         if (!action.payload.fromCache) {
           state.loading = false;
+          const counts = action.payload.counts || {};
           state.student = action.payload.student;
           if (state.student) {
             state.student.profileImage = action.payload.student?.profileImage || null;
+            // Merge score fields from counts into student so Settings and other UIs can read from reduxStudent
+            state.student.teachingPoints = counts.teachingPoints ?? state.student.teachingPoints ?? 0;
+            state.student.projectsPoints = counts.projectsPoints ?? state.student.projectsPoints ?? 0;
+            state.student.problemSolvingRank = counts.problemSolvingRank ?? state.student.problemSolvingRank ?? 0;
+            state.student.extraCurricularPoints = counts.extraCurricularPoints ?? state.student.extraCurricularPoints ?? 0;
+            state.student.coCurricularPoints = counts.coCurricularPoints ?? state.student.coCurricularPoints ?? 0;
           }
           
           if (action.payload.counts) {
@@ -297,12 +327,14 @@ const dashboardSlice = createSlice({
         // Update timestamp (Redux is the cache)
         state.lastFetched = Date.now();
         state.topTenStudents = action.payload.topTenStudents || [];
-        state.teachingPoints = action.payload.teachingPoints || 0;
-        state.projectsPoints = action.payload.projectsPoints || 0;
-        state.problemSolvingRank = action.payload.problemSolvingRank || 0;
-        state.extraCurricularPoints = action.payload.extraCurricularPoints || 0;
-        state.coCurricularPoints = action.payload.coCurricularPoints || 0;
-        state.weightedPoints = action.payload.weightedPoints || 0;
+        // Scores come from student object (or counts as fallback)
+        const studentPayload = action.payload.student || {};
+        const countsPayload = action.payload.counts || {};
+        state.teachingPoints = studentPayload.teachingPoints ?? countsPayload.teachingPoints ?? 0;
+        state.projectsPoints = studentPayload.projectsPoints ?? countsPayload.projectsPoints ?? 0;
+        state.problemSolvingRank = studentPayload.problemSolvingRank ?? countsPayload.problemSolvingRank ?? 0;
+        state.extraCurricularPoints = studentPayload.extraCurricularPoints ?? countsPayload.extraCurricularPoints ?? 0;
+        state.coCurricularPoints = studentPayload.coCurricularPoints ?? countsPayload.coCurricularPoints ?? 0;
         } else {
           // From cache - don't touch loading state to avoid unnecessary toggles
           if (import.meta.env.DEV) {
@@ -370,11 +402,30 @@ const dashboardSlice = createSlice({
       .addCase(fetchStudentAnnouncements.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Placement prediction
+      .addCase(fetchPlacementPrediction.pending, (state) => {
+        state.placementLoading = true;
+        state.placementError = null;
+      })
+      .addCase(fetchPlacementPrediction.fulfilled, (state, action) => {
+        state.placementLoading = false;
+        if (!action.payload.fromCache) {
+          state.placement = {
+            ...action.payload.prediction,
+            inputFeatures: action.payload.inputFeatures,
+          };
+        }
+      })
+      .addCase(fetchPlacementPrediction.rejected, (state, action) => {
+        state.placementLoading = false;
+        state.placementError = action.payload || "Failed to load placement prediction";
       });
   },
 });
 
-export const { 
+export const {
   clearDashboardCache,
   updateCountsRealtime,
   updateApprovalsRealtime,

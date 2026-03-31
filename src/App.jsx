@@ -8,19 +8,11 @@ import { setupForegroundMessageHandler } from '../firebase.js';
 
 // Public Pages
 import Landing from './pages/auth/Landing.jsx';
-import RoleOfTheUser from './pages/auth/Roleoftheuser.jsx';
-import Roleforlogin from './pages/auth/Roleforlogin.jsx';
 import OtpPage from "./forms/OtpPage";
 
-// Registration Pages
-import StudentRegistration from './pages/auth/StudentRegistration.jsx';
-import FacultyRegistration from './pages/auth/FacultyRegistration.jsx';
-import HODRegistration from './pages/auth/HODRegistration.jsx';
-// Login Pages
-import StudentLogin from './pages/auth/StudentLogin.jsx';
-import FacultyLogin from './pages/auth/FacultyLogin.jsx';
-import HODLogin from './pages/auth/HODLogin.jsx';
-
+// Unified Auth Pages
+import LoginPage from './pages/auth/LoginPage.jsx';
+import RegisterPage from './pages/auth/RegisterPage.jsx';
 
 // Dashboard Layout
 import MainDashboard from "./pages/MainDashboard.jsx";
@@ -69,6 +61,7 @@ import Analytics from './pages/HOD/Analytics';
 import HODPortal from './components/HOD/Assign-Faculty/HodAssignment.jsx';
 import CreateNewClubs from './pages/HOD/CreateNewClubs.jsx';
 import HodSettings from './pages/HOD/HodSettings.jsx';
+import CreateClubPredictor from './pages/hod/CreateClubPredictor.jsx';
 // 🔒 Protected Route
 const ProtectedRoute = ({ children }) => {
   const token = Cookies.get('token');
@@ -134,19 +127,21 @@ const App = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/landing/page" element={<Landing />} />
-      <Route path="/roleoftheuser" element={<RoleOfTheUser />} />
-      <Route path="/roleforlogin" element={<Roleforlogin />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/otp/verification" element={<OtpPage />} />
       
-      {/* Registration Routes */}
-      <Route path="/register/student" element={<StudentRegistration />} />
-      <Route path="/register/faculty" element={<FacultyRegistration />} />
-      <Route path="/hod/register" element={<HODRegistration />} />
-      
-      {/* Login Routes */}
-      <Route path="/login/student" element={<StudentLogin />} />
-      <Route path="/login/faculty" element={<FacultyLogin />} />
-      <Route path="/hod/login" element={<HODLogin />} />
+      {/* Legacy Redirects to unified pages */}
+      <Route path="/roleforlogin" element={<Navigate to="/login" replace />} />
+      <Route path="/roleoftheuser" element={<Navigate to="/register" replace />} />
+      <Route path="/login/student" element={<Navigate to="/login" replace />} />
+      <Route path="/login/faculty" element={<Navigate to="/login" replace />} />
+      <Route path="/hod/login" element={<Navigate to="/login" replace />} />
+      <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+      <Route path="/register/student" element={<Navigate to="/register" replace />} />
+      <Route path="/register/faculty" element={<Navigate to="/register" replace />} />
+      <Route path="/hod/register" element={<Navigate to="/register" replace />} />
+      <Route path="/admin/register" element={<Navigate to="/register" replace />} />
 
       {/* Profile Upload */}
       <Route path="/student/profile-img/upload" element={<AddProfile />} />
@@ -209,6 +204,7 @@ const App = () => {
         <Route path="hod/analytics" element={<RoleProtectedRoute allowedRoles={['hod']}><Analytics /></RoleProtectedRoute>} />
         <Route path="hod/assign-faculty" element={<RoleProtectedRoute allowedRoles={['hod']}><HODPortal /></RoleProtectedRoute>} />
         <Route path="hod/clubs" element={<RoleProtectedRoute allowedRoles={['hod']}><CreateNewClubs /></RoleProtectedRoute>} />
+        <Route path="hod/club-predictor" element={<RoleProtectedRoute allowedRoles={['hod']}><CreateClubPredictor /></RoleProtectedRoute>} />
         <Route path="hod/settings" element={<RoleProtectedRoute allowedRoles={['hod']}><HodSettings /></RoleProtectedRoute>} />
       </Route>
       

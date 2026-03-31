@@ -11,6 +11,8 @@ import {
   Trash2,
   Tag,
   MoreVertical,
+  Sparkles,
+  X,
 } from "lucide-react";
 import {
   fetchDoubtDetail,
@@ -19,6 +21,7 @@ import {
   deleteDoubt,
   deleteReply,
   toggleSolved,
+  fetchDoubtSummary,
 } from "../../../features/student/doubtsSlice";
 import socketService from "../../../services/socketService";
 import { getTagClass, DOUBT_COLORS, DOUBT_ANIMATION } from "../../../components/student/doubts/doubtTheme";
@@ -68,6 +71,9 @@ const DoubtDetail = () => {
     hasMoreReplies,
     repliesPage,
     viewerStudentId,
+    summaryByDoubt,
+    summaryLoading,
+    summaryError,
   } = useSelector((state) => state.doubts);
 
   const student = useSelector((state) => state.studentDashboard.student);
@@ -76,8 +82,11 @@ const DoubtDetail = () => {
 
   const [replyContent, setReplyContent] = useState("");
   const [replyMenuOpen, setReplyMenuOpen] = useState(null);
+  const [showSummary, setShowSummary] = useState(false);
   const repliesEndRef = useRef(null);
   const hadDoubt = useRef(false);
+
+  const aiSummary = summaryByDoubt[doubtId] || null;
 
   const replies = repliesByDoubt[doubtId] || [];
   const isMine = selectedDoubt?.createdBy === currentStudentId;
@@ -143,6 +152,13 @@ const DoubtDetail = () => {
   const handleToggleSolved = useCallback(() => {
     dispatch(toggleSolved({ doubtId }));
   }, [dispatch, doubtId]);
+
+  const handleSummarize = useCallback(() => {
+    setShowSummary(true);
+    if (!aiSummary) {
+      dispatch(fetchDoubtSummary({ doubtId }));
+    }
+  }, [dispatch, doubtId, aiSummary]);
 
   const goBack = useCallback(() => navigate("/student/ask/doubt"), [navigate]);
 
@@ -266,14 +282,79 @@ const DoubtDetail = () => {
         <p className={`text-sm ${DOUBT_COLORS.textSecondary} leading-relaxed whitespace-pre-wrap`}>
           {selectedDoubt.description}
         </p>
-        <div className={`flex items-center gap-1.5 ${DOUBT_COLORS.textMuted} text-xs mt-3`}>
-          <MessageCircle size={14} strokeWidth={1.8} />
-          <span>{selectedDoubt.replyCount || 0} {selectedDoubt.replyCount === 1 ? "reply" : "replies"}</span>
+        <div className="flex items-center justify-between mt-3">
+          <div className={`flex items-center gap-1.5 ${DOUBT_COLORS.textMuted} text-xs`}>
+            <MessageCircle size={14} strokeWidth={1.8} />
+            <span>{selectedDoubt.replyCount || 0} {selectedDoubt.replyCount === 1 ? "reply" : "replies"}</span>
+          </div>
+          {(selectedDoubt.replyCount || 0) >= 2 && (
+            <button
+              onClick={handleSummarize}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-sm hover:from-violet-600 hover:to-purple-700 active:scale-95 transition-all duration-150"
+            >
+              <Sparkles size={12} />
+              AI Summary
+            </button>
+          )}
         </div>
       </div>
 
       {/* Replies — chat style: others left, mine right */}
       <div className={`flex-1 overflow-y-auto px-3 sm:px-5 py-4 space-y-2 ${DOUBT_COLORS.inputBg}`}>
+
+        {/* AI Summary Card */}
+        {showSummary && (
+          <div className="mb-4 rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-purple-50 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-violet-100">
+              <div className="flex items-center gap-2">
+                <Sparkles size={14} className="text-teal-600" />
+                <span className="text-xs font-bold text-teal-700 tracking-wide uppercase">AI Reply Summary</span>
+              </div>
+              <button
+                onClick={() => setShowSummary(false)}
+                className="p-0.5 rounded-full text-teal-400 hover:text-teal-700 hover:bg-teal-100 transition-colors"
+                aria-label="Close summary"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <div className="px-4 py-3">
+              {summaryLoading && !aiSummary ? (
+                <div className="flex items-center gap-2 text-teal-600 text-sm py-1">
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Generating summary...</span>
+                </div>
+              ) : summaryError ? (
+                <div className="space-y-2">
+                  <p className="text-red-500 text-xs leading-relaxed">{summaryError}</p>
+                  <button
+                    onClick={() => dispatch(fetchDoubtSummary({ doubtId }))}
+                    className="text-teal-600 text-xs font-semibold hover:underline"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : aiSummary ? (
+                <>
+                  <p className="text-sm text-slate-700 leading-relaxed mb-3">{aiSummary.summary}</p>
+                  {aiSummary.keywords?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {aiSummary.keywords.map((kw, i) => (
+                        <span
+                          key={i}
+                          className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 border border-violet-200"
+                        >
+                          #{kw}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : null}
+            </div>
+          </div>
+        )}
+
         {hasMoreReplies[doubtId] && (
           <div className="text-center mb-3">
             <button

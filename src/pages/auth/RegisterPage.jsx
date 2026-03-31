@@ -1,0 +1,327 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+import api from '../../services/api';
+import { useToast } from '../../contexts/ToastContext';
+import { requestPermission } from '../../../firebase.js';
+
+import AuthLayout from './AuthLayout';
+import Input from './components/Input';
+import Select from './components/Select';
+import CollegeSearchSelect from './components/CollegeSearchSelect';
+
+const roles = [
+  { id: 'student', label: 'Student' },
+  { id: 'faculty', label: 'Faculty' },
+  { id: 'hod', label: 'HOD' },
+];
+
+const capitalize = (s) => s ? s.replace(/\b\w/g, char => char.toUpperCase()) : '';
+
+export default function RegisterPage() {
+  const navigate = useNavigate();
+  const { addToast } = useToast();
+  
+  const [activeRole, setActiveRole] = useState('student');
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [fcmToken, setFcmToken] = useState(null);
+
+  const [formData, setFormData] = useState({
+    identifier: '', fullname: '', username: '', email: '', mobile: '', password: '', confirmPassword: '',
+    collegeId: '', department: '', section: '', facultyId: '', dateofjoin: '', subjects: ''
+  });
+
+  const [selectedCollege, setSelectedCollege] = useState(null);
+
+  useEffect(() => {
+    const getFCM = async () => {
+      try {
+        const token = await requestPermission();
+        if (token) setFcmToken(token);
+      } catch (err) { }
+    };
+    getFCM();
+  }, []);
+
+  const handleChange = (e) => {
+    let { name, value } = e.target;
+    if (name === 'mobile') value = value.replace(/\D/g, '').slice(0, 10);
+    if (['fullname', 'department'].includes(name)) value = capitalize(value);
+    
+    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'department' && activeRole === 'student') {
+       setFormData(prev => ({ ...prev, section: '' }));
+    }
+  };
+
+  const handleCollegeSelect = (college) => {
+    setSelectedCollege(college);
+    if (!college) {
+      setFormData(prev => ({ ...prev, collegeId: '', department: '', section: '', facultyId: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, collegeId: college.collegeId, department: '', section: '', facultyId: '' }));
+    }
+  };
+
+  const getIdentifierLabel = () => {
+    return activeRole === 'student' ? 'Student ID' : 
+           activeRole === 'faculty' ? 'Faculty ID' : 'HOD ID';
+  };
+
+  const validateStep1 = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.identifier || !formData.fullname || !formData.username || !formData.email || !formData.mobile || !formData.password) {
+      addToast('Please fill all required personal details.', 'error');
+      return false;
+    }
+    if (formData.mobile.length !== 10) {
+      addToast('Mobile number must be 10 digits.', 'error');
+      return false;
+    }
+    if (!emailRegex.test(formData.email)) {
+      addToast('Invalid email address.', 'error');
+      return false;
+    }
+    if (formData.password.length < 8) {
+      addToast('Password must be at least 8 characters.', 'error');
+      return false;
+    }
+    if (activeRole === 'hod' && formData.password !== formData.confirmPassword) {
+      addToast('Passwords do not match.', 'error');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (step === 1) {
+      if (validateStep1()) setStep(2);
+      return;
+    }
+
+    if (!formData.collegeId) { addToast('College is required.', 'error'); return; }
+    
+    if (activeRole === 'student') {
+       if (!formData.department || !formData.section || !formData.dateofjoin) {
+          addToast('Please fill all academic details.', 'error'); return;
+       }
+    } else if (activeRole === 'faculty') {
+       if (!formData.department || !formData.dateofjoin || !formData.subjects) {
+          addToast('Please fill all professional details.', 'error'); return;
+       }
+    } else if (activeRole === 'hod') {
+       if (!formData.department) {
+          addToast('Department is required.', 'error'); return;
+       }
+    }
+
+    setLoading(true);
+    try {
+      let endpoint = '';
+      let payload = {
+         fullname: formData.fullname.trim(),
+         username: formData.username.trim(),
+         email: formData.email.trim(),
+         password: formData.password
+      };
+
+      if (fcmToken) payload.fcmToken = fcmToken;
+
+      if (activeRole === 'student') {
+         endpoint = '/register/student';
+         payload.studentid = formData.identifier.trim();
+         payload.mobileno = formData.mobile;
+         payload.institutionId = formData.collegeId;
+         payload.dept = formData.department;
+         payload.section = formData.section.trim();
+         payload.facultyid = formData.facultyId;
+         payload.dateofjoin = formData.dateofjoin;
+      } 
+      else if (activeRole === 'faculty') {
+         endpoint = '/register/faculty';
+         payload.facultyid = formData.identifier.trim();
+         payload.mobile = formData.mobile;
+         payload.collegeId = formData.collegeId;
+         payload.dept = formData.department;
+         payload.dateofjoin = formData.dateofjoin;
+         payload.subjects = formData.subjects.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      else if (activeRole === 'hod') {
+         endpoint = '/register/hod';
+         payload.hodId = formData.identifier.trim();
+         payload.mobile = formData.mobile;
+         payload.collegeId = formData.collegeId;
+         payload.department = formData.department;
+      }
+
+      await api.post(endpoint, payload);
+      addToast('Registration successful! Welcome aboard.', 'success');
+      setTimeout(() => navigate('/login'), 1500);
+
+    } catch (err) {
+      addToast(err.response?.data?.message || 'Registration failed.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDepartments = () => {
+     if (selectedCollege?.Departments?.length > 0) return selectedCollege.Departments;
+     return ['Computer Science', 'Information Technology', 'Electronics', 'Mechanical'];
+  };
+
+  const getSections = () => {
+    if (selectedCollege?.Sections?.length > 0) return selectedCollege.Sections;
+    return ['A', 'B', 'C', 'D'];
+  };
+
+  return (
+    <AuthLayout
+      title="Create Account"
+      subtitle="Join the communication engine in two simple steps"
+      maxWidth="max-w-xl"
+    >
+      {step === 1 && (
+        <div className="flex p-1 mb-6 bg-slate-100/80 rounded-lg w-full max-w-sm mx-auto">
+          {roles.map((role) => {
+            const isActive = activeRole === role.id;
+            return (
+              <button
+                key={role.id}
+                onClick={() => {
+                  setActiveRole(role.id);
+                  setFormData(prev => ({ ...prev, identifier: '' }));
+                }}
+                className={`relative flex-1 py-1.5 rounded-md transition-all text-[13.5px] font-semibold ${
+                  isActive ? 'text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+                type="button"
+              >
+                {isActive && (
+                  <motion.div layoutId="activeRoleTabReg" className="absolute inset-0 bg-white rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.04)]" transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }} />
+                )}
+                <span className="relative z-10">{role.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Progress Indicator */}
+      <div className="flex items-center gap-2 mb-8 max-w-sm mx-auto">
+        <div className={`h-1 flex-1 rounded-full ${step >= 1 ? 'bg-emerald-500' : 'bg-slate-200'}`} />
+        <div className={`h-1 flex-1 rounded-full ${step >= 2 ? 'bg-emerald-500' : 'bg-slate-200'}`} />
+      </div>
+
+      <form onSubmit={handleSubmit}>
+         <AnimatePresence mode="wait">
+           {step === 1 ? (
+             <motion.div key="step1" initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -5 }} transition={{ duration: 0.2 }}>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                   <Input label="Full Name" name="fullname" value={formData.fullname} onChange={handleChange} placeholder="John Doe" autoComplete="name" required />
+                   <Input label="Username" name="username" value={formData.username} onChange={handleChange} placeholder="johndoe123" autoComplete="username" required />
+                   <Input label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="john@example.com" autoComplete="email" required />
+                   <Input label="Mobile Number" type="tel" name="mobile" value={formData.mobile} onChange={handleChange} placeholder="10 digits" required />
+                   <Input label={getIdentifierLabel()} name="identifier" value={formData.identifier} onChange={handleChange} placeholder="Required" required className="sm:col-span-2" />
+                   <Input label="Password" type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Min 8 chars" autoComplete="new-password" required />
+                   
+                   {activeRole === 'hod' ? (
+                      <Input label="Confirm Password" type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirm password" required />
+                   ) : (
+                      <div className="hidden sm:block"></div>
+                   )}
+                </div>
+
+             </motion.div>
+           ) : (
+             <motion.div key="step2" initial={{ opacity: 0, x: 5 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 5 }} transition={{ duration: 0.2 }} className="space-y-4">
+               
+               <CollegeSearchSelect 
+                  value={selectedCollege} 
+                  onChange={handleCollegeSelect} 
+                  error={!formData.collegeId && step === 2}
+               />
+
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Select 
+                     label="Department" 
+                     name="department" 
+                     value={formData.department} 
+                     onChange={handleChange} 
+                     disabled={!selectedCollege}
+                     options={[
+                        { label: 'Select Department', value: '', disabled: true },
+                        ...getDepartments().map(d => ({ label: d, value: d }))
+                     ]}
+                     required
+                  />
+                  {activeRole === 'student' && (
+                     <Select
+                        label="Section"
+                        name="section"
+                        value={formData.section}
+                        onChange={handleChange}
+                        disabled={!formData.department}
+                        options={[
+                           { label: 'Select Section', value: '', disabled: true },
+                           ...getSections().map(s => ({ label: s, value: s }))
+                        ]}
+                        required
+                     />
+                  )}
+               </div>
+
+               {(activeRole === 'student' || activeRole === 'faculty') && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     <Input label="Date of Joining" type="date" name="dateofjoin" value={formData.dateofjoin} onChange={handleChange} required />
+                     {activeRole === 'student' && (
+                       <Input label="Faculty Mentor ID" name="facultyId" value={formData.facultyId} onChange={handleChange} placeholder="Optional Mentor ID" />
+                     )}
+                  </div>
+               )}
+
+               {activeRole === 'faculty' && (
+                  <Input label="Subjects Taught" name="subjects" value={formData.subjects} onChange={handleChange} placeholder="e.g. Math, Physics (comma separated)" required />
+               )}
+
+             </motion.div>
+           )}
+         </AnimatePresence>
+
+        <div className="flex items-center justify-between pt-8 mt-6 border-t border-slate-100">
+          {step === 2 ? (
+            <button type="button" onClick={() => setStep(1)} className="text-[14.5px] font-semibold text-slate-500 hover:text-slate-800 transition-colors">
+              Back
+            </button>
+          ) : <div></div>}
+          
+          <button
+            type="submit"
+            disabled={loading}
+            className={`px-8 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-[14.5px] transition-all ${
+              loading 
+                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'
+            }`}
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : step === 1 ? 'Continue' : 'Complete Sign Up'}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-8 text-center pt-6 border-t border-slate-100">
+        <p className="text-slate-500 text-[13.5px]">
+          Already have an account?{' '}
+          <Link to="/login" className="text-emerald-600 font-semibold hover:underline">
+            Sign in here
+          </Link>
+        </p>
+      </div>
+    </AuthLayout>
+  );
+}

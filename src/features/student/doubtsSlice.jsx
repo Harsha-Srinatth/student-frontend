@@ -87,6 +87,70 @@ export const toggleSolved = createAsyncThunk(
   }
 );
 
+// ─── Gemini 2.5 Flash — direct call, no discovery, no fallback ──────────────
+const GEMINI_KEY  = import.meta.env.VITE_GEMINI_API_KEY || "";
+const GEMINI_URL  =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
+export const fetchDoubtSummary = createAsyncThunk(
+  "doubts/fetchDoubtSummary",
+  async ({ doubtId }, { rejectWithValue, getState }) => {
+    try {
+      if (!GEMINI_KEY.startsWith("AIza")) {
+        return rejectWithValue("VITE_GEMINI_API_KEY not set in student-frontend/.env");
+      }
+
+      const replies = getState().doubts.repliesByDoubt[doubtId] || [];
+      if (replies.length < 2) {
+        return { doubtId, summary: "Not enough replies yet to generate a summary.", keywords: [] };
+      }
+
+      const repliesText = replies
+        .slice(0, 50)
+        .map((r, i) => `${i + 1}. ${r.content.slice(0, 300)}`)
+        .join("\n");
+
+      const prompt =
+        `You are a concise academic assistant. Read these student replies to a doubt and:\n` +
+        `1. Write a sentence summary capturing the key ideas.\n` +
+        `2. List 3-5 short keywords (topics/concepts mentioned).\n\n` +
+        `Replies:\n${repliesText}\n\n` +
+        `Respond ONLY in this exact format (no extra text):\n` +
+        `Summary: <your sentence summary here>\n` +
+        `Keywords: <keyword1, keyword2, keyword3>`;
+
+      const res = await fetch(`${GEMINI_URL}?key=${GEMINI_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 250 },
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const msg = err?.error?.message || `Gemini error ${res.status}`;
+        return rejectWithValue(msg);
+      }
+
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+
+      const summaryMatch  = text.match(/Summary:\s*(.+?)(?:\n|$)/i);
+      const keywordsMatch = text.match(/Keywords:\s*(.+?)(?:\n|$)/i);
+      const summary  = summaryMatch?.[1]?.trim() || text;
+      const keywords = keywordsMatch
+        ? keywordsMatch[1].split(",").map((k) => k.trim()).filter(Boolean)
+        : [];
+
+      return { doubtId, summary, keywords };
+    } catch (error) {
+      return rejectWithValue(error.message || "Failed to generate summary");
+    }
+  }
+);
+
 // ─── Helpers ────────────────────────────────────────────
 
 const updateDoubtInList = (list, doubt) => {
@@ -135,6 +199,11 @@ const doubtsSlice = createSlice({
     feedError: null,
     detailError: null,
     createError: null,
+
+    // AI Summary — keyed by doubtId
+    summaryByDoubt: {},
+    summaryLoading: false,
+    summaryError: null,
   },
   reducers: {
     // Socket-driven: new doubt from someone in same college
@@ -199,6 +268,7 @@ const doubtsSlice = createSlice({
     clearSelectedDoubt: (state) => {
       state.selectedDoubt = null;
       state.viewerStudentId = null;
+      state.summaryError = null;
     },
 
     clearDoubtsData: () => doubtsSlice.getInitialState(),
@@ -321,6 +391,21 @@ const doubtsSlice = createSlice({
         if (state.selectedDoubt?._id === doubt._id) {
           state.selectedDoubt = { ...state.selectedDoubt, ...doubt };
         }
+      })
+
+      // fetchDoubtSummary
+      .addCase(fetchDoubtSummary.pending, (state) => {
+        state.summaryLoading = true;
+        state.summaryError = null;
+      })
+      .addCase(fetchDoubtSummary.fulfilled, (state, action) => {
+        const { doubtId, summary, keywords } = action.payload;
+        state.summaryByDoubt[doubtId] = { summary, keywords };
+        state.summaryLoading = false;
+      })
+      .addCase(fetchDoubtSummary.rejected, (state, action) => {
+        state.summaryLoading = false;
+        state.summaryError = action.payload || "Failed to generate summary";
       });
   },
 });

@@ -14,6 +14,7 @@ import hodDashboardReducer from "../features/HOD/hodDashSlice";
 import hodAnnouncementsReducer from "../features/HOD/hodAnnouncementsSlice";
 import hodAssignmentReducer from "../features/HOD/hodAssignmentSlice";
 import doubtsReducer from "../features/student/doubtsSlice";
+import clubPredictionReducer from "../features/hod/clubPredictionSlice";
 import { socketMiddleware } from "../middleware/socketMiddleware";
 
 export const store = configureStore({
@@ -33,6 +34,7 @@ export const store = configureStore({
     hodAnnouncements: hodAnnouncementsReducer,
     hodAssignment: hodAssignmentReducer,
     doubts: doubtsReducer,
+    clubPrediction: clubPredictionReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

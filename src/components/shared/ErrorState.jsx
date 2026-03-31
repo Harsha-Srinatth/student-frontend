@@ -1,36 +1,27 @@
-import React from "react";
-import { XCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw, WifiOff } from 'lucide-react';
 
-/**
- * Shared Error State Component
- * Reusable error display with retry functionality
- * 
- * @param {Object} props
- * @param {string} props.message - Error message to display
- * @param {Function} props.onRetry - Retry callback function
- * @param {string} props.title - Custom error title (optional)
- * @param {string} props.className - Additional CSS classes
- */
-const ErrorState = ({ 
-  message, 
-  onRetry, 
-  title = "Error",
-  className = "" 
-}) => {
+const VARIANTS = {
+  default: { icon: AlertCircle, color: 'text-red-400', bg: 'bg-red-50', border: 'border-red-100' },
+  network: { icon: WifiOff,     color: 'text-orange-400', bg: 'bg-orange-50', border: 'border-orange-100' },
+};
+
+const ErrorState = ({ message = 'Something went wrong. Please try again.', onRetry, variant = 'default', title = 'Error' }) => {
+  const { icon: Icon, color, bg, border } = VARIANTS[variant] ?? VARIANTS.default;
+
   return (
-    <div className={`bg-red-50 border border-red-200 rounded-2xl p-8 text-center ${className}`}>
-      <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <XCircle className="w-8 h-8 text-red-500" />
+    <div className={`flex flex-col items-center justify-center py-14 px-6 text-center rounded-2xl border ${bg} ${border}`}>
+      <div className={`w-16 h-16 rounded-full ${bg} border-2 ${border} flex items-center justify-center mb-4`}>
+        <Icon className={`w-8 h-8 ${color}`} />
       </div>
-      <h3 className="text-lg font-semibold text-red-900 mb-2">{title}</h3>
-      <p className="text-red-600 mb-4">{message}</p>
+      <h3 className="text-lg font-semibold text-gray-800 mb-1">{title}</h3>
+      <p className="text-sm text-gray-500 max-w-xs mb-5">{message}</p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 hover:border-emerald-300 hover:text-emerald-700 text-gray-700 rounded-xl text-sm font-medium transition-all shadow-sm"
         >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Retry
+          <RefreshCw className="w-4 h-4" />
+          Try Again
         </button>
       )}
     </div>
@@ -38,4 +29,3 @@ const ErrorState = ({
 };
 
 export default ErrorState;
-
