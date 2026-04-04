@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchStudentsByFaculty, fetchStudentDetails, showStudentModal, hideStudentModal } from '../../../features/faculty/facultySlice';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
@@ -17,14 +18,13 @@ const StudentList = () => {
     detailsLoading 
   } = useSelector((state) => state.students);
 
-  const [searchTerm, setSearchTerm] = useState(""); // added search state
+  const [searchTerm, setSearchTerm] = useState("");
+  /** Avoid treating "no students yet" as "need refetch" (empty [] would retrigger fetch forever). */
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   useEffect(() => {
-    // Only fetch if students not already in Redux or data is stale
-    if (!students || students.length === 0) {
-      dispatch(fetchStudentsByFaculty());
-    }
-  }, [dispatch, students]);
+    dispatch(fetchStudentsByFaculty()).finally(() => setInitialFetchDone(true));
+  }, [dispatch]);
 
   const handleStudentClick = (studentid) => {
     dispatch(fetchStudentDetails(studentid));
@@ -55,10 +55,10 @@ const StudentList = () => {
     return '#F43F5E'; // Rose
   };
 
-  if (studentsLoading) {
+  if (!initialFetchDone || studentsLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center min-h-[16rem]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" aria-label="Loading students" />
       </div>
     );
   }
@@ -90,7 +90,7 @@ const StudentList = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 sm:p-6 lg:p-8 w-full">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-8">
@@ -104,7 +104,7 @@ const StudentList = () => {
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                     <span className="text-gray-600">
-                      Total Students: <span className="font-bold text-blue-600 text-xl">{students.length}</span>
+                      Total Students: <span className="font-bold text-blue-600 text-xl">{(students || []).length}</span>
                     </span>
                   </div>
                 </div>
@@ -145,29 +145,41 @@ const StudentList = () => {
           </div>
         </div>
         {/* Students Grid */}
-        {students.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
-            <div className="max-w-md mx-auto">
-              <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {(students || []).length === 0 ? (
+          <div className="bg-white w-full rounded-2xl shadow-lg border border-gray-100 p-8 sm:p-12 text-center">
+            <div className="max-w-lg mx-auto space-y-4">
+              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">No Students Found</h3>
-              <p className="text-gray-500 mb-6">No students are currently assigned to this faculty.</p>
-              <button 
+              <h3 className="text-xl font-semibold text-gray-900">No mentee students yet</h3>
+              <p className="text-gray-600 text-[15px] leading-relaxed text-left sm:text-center">
+                This page lists students who have <strong className="text-gray-800">your Faculty ID</strong> set as their mentor.
+                They can select you during <strong className="text-gray-800">student registration</strong> (faculty mentor search), or your{' '}
+                <strong className="text-gray-800">HOD</strong> can assign students to you from the class assignment tools.
+              </p>
+              <p className="text-gray-500 text-sm leading-relaxed text-left sm:text-center">
+                Not sure which ID students should use? Open{' '}
+                <Link to="/faculty/settings" className="text-blue-600 font-semibold underline hover:text-blue-700">
+                  Faculty Settings
+                </Link>
+                {' '}to see your Faculty ID. If this still looks wrong, contact your HOD or department admin.
+              </p>
+              <button
+                type="button"
                 onClick={() => dispatch(fetchStudentsByFaculty())}
-                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                Refresh
+                Refresh list
               </button>
             </div>
           </div>
         ) : filteredStudents.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
+          <div className="bg-white w-full rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
             <div className="max-w-md mx-auto">
               <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
                 <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
