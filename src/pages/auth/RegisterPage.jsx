@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
@@ -10,6 +10,7 @@ import AuthLayout from './AuthLayout';
 import Input from './components/Input';
 import Select from './components/Select';
 import CollegeSearchSelect from './components/CollegeSearchSelect';
+import FacultySearchSelect from './components/FacultySearchSelect';
 
 const roles = [
   { id: 'student', label: 'Student' },
@@ -30,10 +31,13 @@ export default function RegisterPage() {
 
   const [formData, setFormData] = useState({
     identifier: '', fullname: '', username: '', email: '', mobile: '', password: '', confirmPassword: '',
-    collegeId: '', department: '', section: '', facultyId: '', dateofjoin: '', subjects: ''
+    collegeId: '', department: '', section: '', dateofjoin: '', subjects: ''
   });
 
+  const [selectedMentor, setSelectedMentor] = useState(null);
   const [selectedCollege, setSelectedCollege] = useState(null);
+  const [collegeMetaLoading, setCollegeMetaLoading] = useState(false);
+  const collegeFetchSeq = useRef(0);
 
   useEffect(() => {
     const getFCM = async () => {
@@ -48,7 +52,7 @@ export default function RegisterPage() {
   const handleChange = (e) => {
     let { name, value } = e.target;
     if (name === 'mobile') value = value.replace(/\D/g, '').slice(0, 10);
-    if (['fullname', 'department'].includes(name)) value = capitalize(value);
+    if (name === 'fullname') value = capitalize(value);
     
     setFormData(prev => ({ ...prev, [name]: value }));
 
@@ -57,12 +61,59 @@ export default function RegisterPage() {
     }
   };
 
-  const handleCollegeSelect = (college) => {
-    setSelectedCollege(college);
+  const handleCollegeSelect = async (college) => {
     if (!college) {
-      setFormData(prev => ({ ...prev, collegeId: '', department: '', section: '', facultyId: '' }));
-    } else {
-      setFormData(prev => ({ ...prev, collegeId: college.collegeId, department: '', section: '', facultyId: '' }));
+      collegeFetchSeq.current += 1;
+      setCollegeMetaLoading(false);
+      setSelectedCollege(null);
+      setSelectedMentor(null);
+      setFormData((prev) => ({ ...prev, collegeId: '', department: '', section: '' }));
+      return;
+    }
+
+    const seq = ++collegeFetchSeq.current;
+    setCollegeMetaLoading(true);
+    setSelectedMentor(null);
+    setFormData((prev) => ({
+      ...prev,
+      collegeId: college.collegeId,
+      department: '',
+      section: '',
+    }));
+    setSelectedCollege({ ...college, Departments: [], Sections: [] });
+
+    try {
+      const { data } = await api.get(`/college/${encodeURIComponent(college.collegeId)}`);
+      if (seq !== collegeFetchSeq.current) return;
+
+      const full = data?.data;
+      if (!full) {
+        addToast('Could not load college details.', 'error');
+        setSelectedCollege(null);
+        setSelectedMentor(null);
+        setFormData((prev) => ({ ...prev, collegeId: '', department: '', section: '' }));
+        return;
+      }
+
+      const departments = Array.isArray(full.Departments) ? full.Departments.filter(Boolean) : [];
+      const sections = Array.isArray(full.Sections) ? full.Sections.filter(Boolean) : [];
+
+      setSelectedCollege({
+        collegeId: full.collegeId,
+        collegeName: full.collegeName ?? college.collegeName,
+        collegeCity: full.collegeCity,
+        collegeState: full.collegeState,
+        Departments: departments,
+        Sections: sections,
+      });
+    } catch (err) {
+      if (seq !== collegeFetchSeq.current) return;
+      addToast(err.response?.data?.message || 'Could not load departments for this college.', 'error');
+      setSelectedCollege(null);
+      setSelectedMentor(null);
+      setFormData((prev) => ({ ...prev, collegeId: '', department: '', section: '' }));
+    } finally {
+      if (seq === collegeFetchSeq.current) setCollegeMetaLoading(false);
     }
   };
 
@@ -138,7 +189,7 @@ export default function RegisterPage() {
          payload.institutionId = formData.collegeId;
          payload.dept = formData.department;
          payload.section = formData.section.trim();
-         payload.facultyid = formData.facultyId;
+         payload.facultyid = selectedMentor?.facultyid ?? '';
          payload.dateofjoin = formData.dateofjoin;
       } 
       else if (activeRole === 'faculty') {
@@ -170,14 +221,16 @@ export default function RegisterPage() {
   };
 
   const getDepartments = () => {
-     if (selectedCollege?.Departments?.length > 0) return selectedCollege.Departments;
-     return ['Computer Science', 'Information Technology', 'Electronics', 'Mechanical'];
+    const d = selectedCollege?.Departments;
+    return Array.isArray(d) ? d.filter(Boolean) : [];
   };
 
   const getSections = () => {
-    if (selectedCollege?.Sections?.length > 0) return selectedCollege.Sections;
-    return ['A', 'B', 'C', 'D'];
+    const s = selectedCollege?.Sections;
+    return Array.isArray(s) ? s.filter(Boolean) : [];
   };
+
+  const deptOptionsReady = selectedCollege && !collegeMetaLoading && getDepartments().length > 0;
 
   return (
     <AuthLayout
@@ -194,7 +247,12 @@ export default function RegisterPage() {
                 key={role.id}
                 onClick={() => {
                   setActiveRole(role.id);
-                  setFormData(prev => ({ ...prev, identifier: '' }));
+                  if (role.id !== 'student') setSelectedMentor(null);
+                  setFormData((prev) => ({
+                    ...prev,
+                    identifier: '',
+                    ...(role.id !== 'student' ? { section: '' } : {}),
+                  }));
                 }}
                 className={`relative flex-1 py-1.5 rounded-md transition-all text-[13.5px] font-semibold ${
                   isActive ? 'text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
@@ -247,15 +305,35 @@ export default function RegisterPage() {
                   error={!formData.collegeId && step === 2}
                />
 
+               {collegeMetaLoading && (
+                 <p className="text-[13px] text-slate-500 flex items-center gap-2">
+                   <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+                   Loading departments and sections for this college…
+                 </p>
+               )}
+
+               {selectedCollege && !collegeMetaLoading && getDepartments().length === 0 && (
+                 <p className="text-[13px] text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                   This college has no departments configured yet. Please contact your administrator.
+                 </p>
+               )}
+
+               {activeRole === 'student' && selectedCollege && !collegeMetaLoading && getDepartments().length > 0 && getSections().length === 0 && (
+                 <p className="text-[13px] text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                   This college has no sections configured yet. Please contact your administrator.
+                 </p>
+               )}
+
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Select 
                      label="Department" 
                      name="department" 
                      value={formData.department} 
                      onChange={handleChange} 
-                     disabled={!selectedCollege}
+                     disabled={!deptOptionsReady}
+                     className={activeRole === 'student' ? '' : 'sm:col-span-2'}
                      options={[
-                        { label: 'Select Department', value: '', disabled: true },
+                        { label: collegeMetaLoading ? 'Loading…' : !selectedCollege ? 'Select a college first' : getDepartments().length === 0 ? 'No departments' : 'Select Department', value: '', disabled: true },
                         ...getDepartments().map(d => ({ label: d, value: d }))
                      ]}
                      required
@@ -266,9 +344,9 @@ export default function RegisterPage() {
                         name="section"
                         value={formData.section}
                         onChange={handleChange}
-                        disabled={!formData.department}
+                        disabled={!formData.department || collegeMetaLoading || getSections().length === 0}
                         options={[
-                           { label: 'Select Section', value: '', disabled: true },
+                           { label: !getSections().length ? 'No sections' : 'Select Section', value: '', disabled: true },
                            ...getSections().map(s => ({ label: s, value: s }))
                         ]}
                         required
@@ -280,7 +358,12 @@ export default function RegisterPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                      <Input label="Date of Joining" type="date" name="dateofjoin" value={formData.dateofjoin} onChange={handleChange} required />
                      {activeRole === 'student' && (
-                       <Input label="Faculty Mentor ID" name="facultyId" value={formData.facultyId} onChange={handleChange} placeholder="Optional Mentor ID" />
+                       <FacultySearchSelect
+                         collegeId={formData.collegeId}
+                         disabled={!formData.collegeId || collegeMetaLoading}
+                         value={selectedMentor}
+                         onChange={setSelectedMentor}
+                       />
                      )}
                   </div>
                )}
