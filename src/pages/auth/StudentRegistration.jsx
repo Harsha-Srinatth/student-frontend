@@ -88,7 +88,7 @@ const StudentRegistration = () => {
           setInstitutionName(null);
         }
         return;
-      }
+  }
 
       setSearchingCollege(true);
       try {

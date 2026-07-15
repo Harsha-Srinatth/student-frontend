@@ -30,7 +30,7 @@ const shimmerCls = "animate-pulse bg-gray-200";
 const StudentSettings = ({ student: studentProp }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { student: reduxStudent, loading: reduxLoading } = useSelector(
+  const { student: reduxStudent, loading: reduxLoading, counts: reduxCounts } = useSelector(
     (state) => state.studentDashboard
   );
   const [error, setError] = useState("");
@@ -68,6 +68,11 @@ const StudentSettings = ({ student: studentProp }) => {
         facultyName: reduxStudent.faculty?.fullname || "—",
         facultyid: reduxStudent.facultyid || reduxStudent.faculty?.facultyid || "—",
         institution: reduxStudent.collegeName ?? reduxStudent.institution ?? "—",
+        teachingPoints: reduxStudent.teachingPoints ?? 0,
+        projectsPoints: reduxStudent.projectsPoints ?? 0,
+        problemSolvingRank: reduxStudent.problemSolvingRank ?? 0,
+        extraCurricularPoints: reduxStudent.extraCurricularPoints ?? 0,
+        coCurricularPoints: reduxStudent.coCurricularPoints ?? 0,
         profilePic: reduxStudent.profileImage?.url || "https://api.dicebear.com/7.x/avataaars/svg?seed=student",
       };
     }
@@ -209,11 +214,11 @@ const StudentSettings = ({ student: studentProp }) => {
           </div>
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { key: "teachingPoints", label: "Teaching Points", value: reduxStudent?.teachingPoints ?? 0, icon: BookOpenCheck },
-              { key: "projectsPoints", label: "Projects Points", value: reduxStudent?.projectsPoints ?? 0, icon: Code },
-              { key: "problemSolvingRank", label: "Problem Solving Rank", value: reduxStudent?.problemSolvingRank ?? 0, icon: Target },
-              { key: "extraCurricularPoints", label: "Extra Curricular Points", value: reduxStudent?.extraCurricularPoints ?? 0, icon: Sparkles },
-              { key: "coCurricularPoints", label: "Co-Curricular Points", value: reduxStudent?.coCurricularPoints ?? 0, icon: BookOpen },
+              { key: "teachingPoints", label: "Teaching Points", value: reduxStudent?.teachingPoints ?? reduxCounts?.teachingPoints ?? 0, icon: BookOpenCheck },
+              { key: "projectsPoints", label: "Projects Points", value: reduxStudent?.projectsPoints ?? reduxCounts?.projectsPoints ?? 0, icon: Code },
+              { key: "problemSolvingRank", label: "Problem Solving Rank", value: reduxStudent?.problemSolvingRank ?? reduxCounts?.problemSolvingRank ?? 0, icon: Target },
+              { key: "extraCurricularPoints", label: "Extra Curricular Points", value: reduxStudent?.extraCurricularPoints ?? reduxCounts?.extraCurricularPoints ?? 0, icon: Sparkles },
+              { key: "coCurricularPoints", label: "Co-Curricular Points", value: reduxStudent?.coCurricularPoints ?? reduxCounts?.coCurricularPoints ?? 0, icon: BookOpen },
             ].map((item) => {
               const Icon = item.icon;
               return (

@@ -69,6 +69,7 @@ import Analytics from './pages/HOD/Analytics';
 import HODPortal from './components/HOD/Assign-Faculty/HodAssignment.jsx';
 import CreateNewClubs from './pages/HOD/CreateNewClubs.jsx';
 import HodSettings from './pages/HOD/HodSettings.jsx';
+import CreateClubPredictor from './pages/hod/CreateClubPredictor.jsx';
 // 🔒 Protected Route
 const ProtectedRoute = ({ children }) => {
   const token = Cookies.get('token');
@@ -209,6 +210,7 @@ const App = () => {
         <Route path="hod/analytics" element={<RoleProtectedRoute allowedRoles={['hod']}><Analytics /></RoleProtectedRoute>} />
         <Route path="hod/assign-faculty" element={<RoleProtectedRoute allowedRoles={['hod']}><HODPortal /></RoleProtectedRoute>} />
         <Route path="hod/clubs" element={<RoleProtectedRoute allowedRoles={['hod']}><CreateNewClubs /></RoleProtectedRoute>} />
+        <Route path="hod/club-predictor" element={<RoleProtectedRoute allowedRoles={['hod']}><CreateClubPredictor /></RoleProtectedRoute>} />
         <Route path="hod/settings" element={<RoleProtectedRoute allowedRoles={['hod']}><HodSettings /></RoleProtectedRoute>} />
       </Route>
       

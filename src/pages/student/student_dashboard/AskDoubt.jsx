@@ -255,6 +255,7 @@ const AskDoubt = () => {
               <div className="space-y-3">
                 {displayList.map((doubt) => (
                   <DoubtCard
+                      key={doubt._id}
                       doubt={doubt}
                       onClick={handleDoubtClick}
                       onDelete={activeTab === TAB_MY ? handleDeleteDoubt : undefined}

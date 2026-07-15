@@ -8,6 +8,7 @@ import TopTenStudents from "../../../components/shared/weeklyPerformance/topTenS
 import RecentActivities from "./RecentActivities";
 import Announcements from "./Announcements";
 import RejectedApprovals from "./RejectedApprovels";
+import PlacementPrediction from "./PlacementPrediction";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { fetchSDashboardData } from "../../../features/student/studentDashSlice";
@@ -49,6 +50,12 @@ const StudentHome = () => {
         </div>
       </div>
       <Credits />
+
+      {/* Placement Prediction Card */}
+      <div className="mb-2">
+        <PlacementPrediction />
+      </div>
+
       {/* Bottom Row - Activities and Announcements */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RecentActivities />
