@@ -13,9 +13,15 @@ import {
   fetchClubPrediction,
   resetPrediction,
   clearError,
+<<<<<<< HEAD
 } from "../../features/hod/clubPredictionSlice";
 
 // ─── Static option lists ─────────────────────────────────────────────────────
+=======
+} from "../../features/HOD/clubPredictionSlice";
+
+// ─── Static option lists 
+>>>>>>> 49cad37e1004797a27088d51db76b908f527f8cd
 
 const CLUB_TYPES = [
   { value: "co-curricular",    label: "Co-Curricular",    icon: Zap,          color: "blue"  },

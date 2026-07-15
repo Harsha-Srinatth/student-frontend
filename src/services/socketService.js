@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
 import Cookies from 'js-cookie';
+import { SERVER_URL } from '../config/serverUrl';
 
 let navigateFunction = null;
 export const setSocketNavigate = (navigate) => { navigateFunction = navigate; };
@@ -28,9 +29,8 @@ class SocketService {
     const token = Cookies.get('token');
     if (!token) return null;
 
-    let url = import.meta.env.VITE_API_URL?.trim();
-    if (!url || /^\d+$/.test(url)) url = 'http://localhost:3000';
-    if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'http://localhost:3000';
+    const url = SERVER_URL || (import.meta.env.DEV ? 'http://localhost:3000' : '');
+    if (!url) return null;
 
     this.socket = io(url, {
       auth: { token },
